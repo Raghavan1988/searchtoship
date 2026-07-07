@@ -46,6 +46,50 @@ main {
 	margin: auto;
 	padding: 2.5rem 1rem 3rem;
 }
+header {
+	position: sticky;
+	top: 0;
+	z-index: 10;
+	margin: 0;
+	padding: 0 1rem;
+	background: rgba(255, 253, 248, 0.9);
+	border-bottom: 1px solid var(--line);
+	backdrop-filter: blur(16px);
+}
+nav {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+	max-width: 1040px;
+	margin: 0 auto;
+	min-height: 58px;
+}
+nav h2 {
+	margin: 0;
+	font-size: 0.95rem;
+}
+nav h2 a,
+nav h2 a.active {
+	color: var(--ink);
+	text-decoration: none;
+}
+nav a {
+	color: var(--ink);
+	text-decoration: none;
+}
+nav a.active {
+	color: var(--accent-dark);
+}
+.internal-links {
+	display: flex;
+	gap: 0.9rem;
+	font-size: 0.9rem;
+}
+.github-link {
+	display: flex;
+	color: var(--muted);
+}
 h1,
 h2,
 h3,
@@ -204,6 +248,19 @@ hr {
 	background: var(--panel-soft);
 	color: #ffffff;
 }
+footer {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 0.5rem 1.25rem;
+	padding: 1.75em 1em;
+	color: var(--muted);
+	text-align: center;
+}
+footer span:last-child {
+	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+	font-size: 0.78rem;
+}
 .page {
 	width: 860px;
 }
@@ -254,6 +311,9 @@ hr {
 	}
 	.project-card a {
 		justify-self: start;
+	}
+	.github-link {
+		display: none;
 	}
 	.content {
 		padding: 1.25rem;

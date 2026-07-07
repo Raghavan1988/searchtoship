@@ -190,6 +190,27 @@ hr {
 	line-height: 1.42;
 	margin: 0.75rem 0 0;
 }
+.profile-links {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.55rem;
+	margin-top: 1rem;
+}
+.profile-links a {
+	background: rgba(255, 253, 248, 0.82);
+	border: 1px solid var(--line);
+	border-radius: 999px;
+	color: var(--ink);
+	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+	font-size: 0.82rem;
+	padding: 0.42rem 0.72rem;
+	text-decoration: none;
+}
+.profile-links a:hover {
+	background: var(--ink);
+	border-color: var(--ink);
+	color: var(--paper-soft);
+}
 .project-list {
 	display: grid;
 	gap: 0.65rem;
@@ -277,6 +298,46 @@ hr {
 .theme-interpretability a:hover {
 	background: #3a2b22;
 }
+.theme-evals {
+	background:
+		linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(246, 248, 250, 0.92)),
+		#ffffff;
+	border-color: #d7dce2;
+}
+.theme-evals::before {
+	background: linear-gradient(90deg, #111318, #667085, #d7dce2);
+}
+.theme-evals .project-area {
+	color: #4b5563;
+}
+.theme-evals a {
+	background: #111318;
+	border-color: #111318;
+	color: #ffffff;
+}
+.theme-evals a:hover {
+	background: #2b3038;
+}
+.theme-search {
+	background:
+		linear-gradient(180deg, rgba(243, 249, 255, 0.96), rgba(236, 253, 245, 0.9)),
+		#f3f9ff;
+	border-color: #bfd7ee;
+}
+.theme-search::before {
+	background: linear-gradient(90deg, #4285f4, #34a853, #fbbc04, #ea4335);
+}
+.theme-search .project-area {
+	color: #2563eb;
+}
+.theme-search a {
+	background: #12326b;
+	border-color: #1d4ed8;
+	color: #f8fbff;
+}
+.theme-search a:hover {
+	background: #164a96;
+}
 footer {
 	display: flex;
 	flex-wrap: wrap;
@@ -289,40 +350,6 @@ footer {
 footer span:last-child {
 	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 	font-size: 0.78rem;
-}
-.page {
-	width: 860px;
-}
-.content {
-	background: rgba(255, 253, 248, 0.82);
-	border: 1px solid var(--line);
-	border-radius: 8px;
-	box-shadow: var(--box-shadow);
-	padding: 2.2rem;
-}
-.content h1 {
-	max-width: 13ch;
-	font-size: clamp(2.5rem, 5.8vw, 4.8rem);
-}
-.content p {
-	color: var(--muted);
-}
-.about-list {
-	border-top: 1px solid var(--line);
-	border-bottom: 1px solid var(--line);
-	margin: 2rem 0;
-	padding: 1.5rem 0;
-}
-.about-list h2 {
-	font-size: 1.15em;
-}
-.about-list ul {
-	margin: 0;
-	padding-left: 1.25rem;
-	color: var(--muted);
-}
-.about-list li {
-	margin-bottom: 0.75rem;
 }
 @media (max-width: 860px) {
 	body {
@@ -350,9 +377,6 @@ footer span:last-child {
 	}
 	.github-link {
 		display: none;
-	}
-	.content {
-		padding: 1.25rem;
 	}
 }
 

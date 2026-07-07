@@ -173,6 +173,22 @@ hr {
 	border-radius: 8px;
 	padding: 2rem;
 }
+.about-list {
+	border-top: 1px solid rgba(var(--gray-light), 80%);
+	border-bottom: 1px solid rgba(var(--gray-light), 80%);
+	margin: 2rem 0;
+	padding: 1.5rem 0;
+}
+.about-list h2 {
+	font-size: 1.15em;
+}
+.about-list ul {
+	margin: 0;
+	padding-left: 1.25rem;
+}
+.about-list li {
+	margin-bottom: 0.75rem;
+}
 @media (max-width: 720px) {
 	body {
 		font-size: 18px;

@@ -2,12 +2,23 @@
 const today = new Date();
 ---
 
-<footer>&copy; {today.getFullYear()} Raghavan Muthuregunathan. Built to ship.</footer>
+<footer>
+	<span>&copy; {today.getFullYear()} Raghavan Muthuregunathan</span>
+	<span>retrieval -> evals -> production</span>
+</footer>
 
 <style>
 	footer {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: 0.5rem 1.25rem;
 		padding: 2.5em 1em;
 		color: rgb(var(--gray));
 		text-align: center;
+	}
+	footer span:last-child {
+		font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+		font-size: 0.78rem;
 	}
 </style>

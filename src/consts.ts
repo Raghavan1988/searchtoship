@@ -1,3 +1,3 @@
 export const SITE_TITLE = 'Raghavan Muthuregunathan';
 export const SITE_DESCRIPTION =
-	'Personal website for Raghavan Muthuregunathan, focused on building useful software and shipping ideas.';
+	'Raghavan Muthuregunathan builds search, retrieval, evaluation, and AI product systems that hold up in production.';

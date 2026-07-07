@@ -14,39 +14,81 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 		<Header />
 		<main class="home">
 			<section class="hero">
-				<p class="eyebrow">Personal site</p>
-				<h1>Raghavan Muthuregunathan</h1>
-				<p class="lede">
-					I build practical software, learn in public, and turn ideas into things people can use.
-				</p>
-				<div class="actions">
-					<a class="button primary" href="/about">About me</a>
-					<a class="button secondary" href="https://github.com/Raghavan1988">GitHub</a>
+				<div class="hero-copy">
+					<p class="eyebrow">Search / retrieval / shipped intelligence</p>
+					<h1>Raghavan Muthuregunathan</h1>
+					<p class="lede">
+						I work where model behavior meets product reality: retrieval, ranking, evaluation,
+						assistants, and the systems discipline to make them dependable at scale.
+					</p>
+					<div class="actions">
+						<a class="button primary" href="/about">Read profile</a>
+						<a class="button secondary" href="https://github.com/Raghavan1988">GitHub</a>
+					</div>
+				</div>
+				<div class="system-panel" aria-label="System signal">
+					<div class="panel-bar">
+						<span></span>
+						<span></span>
+						<span></span>
+						<p>prod-eval trace</p>
+					</div>
+					<div class="trace-line">
+						<span>query_intent</span>
+						<strong>0.94</strong>
+					</div>
+					<div class="trace-line">
+						<span>retrieval_grounding</span>
+						<strong>pass</strong>
+					</div>
+					<div class="trace-line">
+						<span>ranker_delta</span>
+						<strong>+3.8%</strong>
+					</div>
+					<div class="trace-line">
+						<span>assistant_latency</span>
+						<strong>p95 412ms</strong>
+					</div>
+					<div class="spark-grid" aria-hidden="true">
+						<i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+					</div>
 				</div>
 			</section>
 
 			<section class="focus-grid" aria-label="Areas of focus">
 				<article>
-					<h2>Build</h2>
+					<p class="kicker">01</p>
+					<h2>Search Systems</h2>
 					<p>
-						I care about turning fuzzy ideas into working products with clear scope, useful defaults,
-						and thoughtful execution.
+						Query understanding, typeahead, spell correction, ranking, personalization, and the
+						uncomfortable details that make relevance feel obvious.
 					</p>
 				</article>
 				<article>
-					<h2>Learn</h2>
+					<p class="kicker">02</p>
+					<h2>Model Evaluation</h2>
 					<p>
-						I like using real projects as the classroom: exploring tools, documenting decisions, and
-						improving through steady iteration.
+						Grounding, regression suites, failure analysis, and the habit of measuring behavior before
+						turning a demo into a dependency.
 					</p>
 				</article>
 				<article>
-					<h2>Ship</h2>
+					<p class="kicker">03</p>
+					<h2>Field Engineering</h2>
 					<p>
-						My bias is toward momentum: small releases, fast feedback, and making work visible enough
-						to get better.
+						Bridging research ideas, customer workflows, latency budgets, rollout plans, and the last
+						mile where systems earn trust.
 					</p>
 				</article>
+			</section>
+
+			<section class="notes-band" aria-label="Operating notes">
+				<p>Working style</p>
+				<ul>
+					<li>Read the paper, build the baseline, inspect the misses.</li>
+					<li>Treat evals as product infrastructure, not ceremony.</li>
+					<li>Prefer small, observable releases over impressive unreleased prototypes.</li>
+				</ul>
 			</section>
 		</main>
 		<Footer />

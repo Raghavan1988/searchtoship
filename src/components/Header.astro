@@ -26,8 +26,9 @@ import HeaderLink from './HeaderLink.astro';
 	header {
 		margin: 0;
 		padding: 0 1em;
-		background: rgba(255, 255, 255, 0.92);
-		border-bottom: 1px solid rgba(var(--gray-light), 80%);
+		background: rgba(8, 17, 31, 0.86);
+		border-bottom: 1px solid rgba(var(--line), 90%);
+		backdrop-filter: blur(16px);
 	}
 	h2 {
 		margin: 0;
@@ -60,6 +61,7 @@ import HeaderLink from './HeaderLink.astro';
 	}
 	.github-link {
 		display: flex;
+		color: rgb(var(--gray));
 	}
 	@media (max-width: 720px) {
 		h2 {

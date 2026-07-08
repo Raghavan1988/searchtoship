@@ -278,6 +278,33 @@ hr {
 	background: var(--panel-soft);
 	color: #ffffff;
 }
+.project-card details {
+	grid-column: 2 / -1;
+	grid-row: 3;
+	border-top: 1px solid rgba(17, 19, 24, 0.1);
+	margin-top: 0.2rem;
+	padding-top: 0.75rem;
+}
+.project-card summary {
+	cursor: pointer;
+	color: var(--ink);
+	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+	font-size: 0.82rem;
+	font-weight: 700;
+	list-style-position: outside;
+}
+.project-card summary:hover {
+	color: var(--accent-dark);
+}
+.project-card ul {
+	display: grid;
+	gap: 0.45rem;
+	margin: 0.75rem 0 0;
+	padding-left: 1.2rem;
+	color: var(--muted);
+	font-size: 0.95rem;
+	line-height: 1.45;
+}
 .theme-interpretability {
 	background:
 		linear-gradient(180deg, rgba(255, 249, 241, 0.96), rgba(250, 240, 226, 0.9)),
@@ -368,7 +395,8 @@ footer span:last-child {
 	.project-area,
 	.project-card h2,
 	.project-card p:not(.project-area),
-	.project-card a {
+	.project-card a,
+	.project-card details {
 		grid-column: 1;
 		grid-row: auto;
 	}

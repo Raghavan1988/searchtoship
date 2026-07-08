@@ -13,6 +13,13 @@ const projects = [
 			'Small-transformer study, pre-registered across maze and HTTP domains, testing when residual-stream features are recoverable, useful, or merely cheap for the architecture to carry. The central update: probe recoverability is not the same thing as usefulness or causality.',
 		link: 'https://github.com/Raghavan1988/LatentWorldsGPT',
 		linkLabel: 'GitHub',
+		takeaways: [
+			'Pre-registered maze and HTTP predictions before running the probes, making failures easier to inspect.',
+			'Tested whether small next-token transformers develop linearly recoverable latent task representations.',
+			'Falsified the strict N-criterion: recoverability is not the same as predictive usefulness.',
+			'Identified architectural carry-through: information at positionally distinct input slots can remain decodable later.',
+			'Uses multi-seed probes, destroyed-structure controls, per-layer ablations, and position-controlled probing.',
+		],
 	},
 	{
 		area: 'Evals',
@@ -22,6 +29,13 @@ const projects = [
 			'Co-authored a KDD-accepted evaluation framework that turns calibrated human product judgment into scalable policy-aligned surrogate judges for industrial search.',
 		link: 'https://arxiv.org/abs/2602.07840',
 		linkLabel: 'arXiv 2602.07840',
+		takeaways: [
+			'Addresses the governance gap between nuanced human oversight and high-throughput production search evaluation.',
+			'Operationalizes product judgment through Policy, curated Precedent, and an LLM Surrogate Judge calibration loop.',
+			'Uses teacher-student distillation to move high-fidelity judgments into compact student surrogates at lower cost.',
+			'Deployed within LinkedIn Search ecosystems for offline evaluation, policy oversight, and regression detection.',
+			'Published in the KDD 2026 proceedings.',
+		],
 	},
 	{
 		area: 'Semantic Search',
@@ -31,6 +45,13 @@ const projects = [
 			'Co-authored a deployed structured query understanding system that consolidates search interpretation into schema-constrained generation with scalable annotation and evaluation.',
 		link: 'https://arxiv.org/abs/2605.27441',
 		linkLabel: 'arXiv 2605.27441',
+		takeaways: [
+			'Consolidates disparate query-understanding components into a single Small Language Model.',
+			'Uses schema-constrained generation so query interpretations are structured for downstream search systems.',
+			'Introduces Query Illuminator for high-quality auto-annotation, distillation, and scalable evaluation.',
+			'Validated through offline and online tests in LinkedIn Job Search.',
+			'Shows horizontal extensibility through a People Search case study under low-latency serving constraints.',
+		],
 	},
 ];
 ---
@@ -65,6 +86,12 @@ const projects = [
 							<h2>{project.title}</h2>
 							<p>{project.done}</p>
 							<a href={project.link}>{project.linkLabel}</a>
+							<details>
+								<summary>Key takeaways</summary>
+								<ul>
+									{project.takeaways.map((takeaway) => <li>{takeaway}</li>)}
+								</ul>
+							</details>
 						</article>
 					))
 				}

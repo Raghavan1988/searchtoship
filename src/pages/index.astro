@@ -70,6 +70,47 @@ const mazeLayerProbeRows = [
 ];
 
 const attentionTokens = ['BOS', 'S', 'c2', 'c3', 'c4', 'C'];
+
+const httpCarryRows = [
+	{
+		id: 'same',
+		label: 'same-request path',
+		source: 'p_k',
+		target: 'sz_k',
+		gap: '+0.809 accuracy units',
+		pp: '+80.9 percentage points',
+		width: '100%',
+	},
+	{
+		id: 'previous',
+		label: 'previous-request path',
+		source: 'p_{k-1}',
+		target: 'sz_k',
+		gap: '+0.674 accuracy units',
+		pp: '+67.4 percentage points',
+		width: '83.3%',
+	},
+	{
+		id: 'recent',
+		label: 'recent large-response path',
+		source: 'p_j',
+		target: 'sz_k',
+		gap: '+0.621 accuracy units',
+		pp: '+62.1 percentage points',
+		width: '76.8%',
+	},
+	{
+		id: 'recent-lag',
+		label: 'recent large-response path, lag >= 3',
+		source: 'p_j',
+		target: 'sz_k',
+		gap: '+0.514 accuracy units',
+		pp: '+51.4 percentage points',
+		width: '63.5%',
+	},
+];
+
+const httpTokens = ['p_j', 'sz_j>=5', '...', 'p_{k-1}', 'sz_{k-1}', 'p_k', 's_k', 'sz_k'];
 ---
 
 <!doctype html>
@@ -109,7 +150,9 @@ const attentionTokens = ['BOS', 'S', 'c2', 'c3', 'c4', 'C'];
 								</ul>
 								{
 									project.theme === 'interpretability' && (
-										<div class="maze-trace" data-maze-trace>
+										<details class="visual-details">
+											<summary>Open MAZE carry-through trace</summary>
+											<div class="maze-trace" data-maze-trace>
 											<div class="trace-copy">
 												<h3>MAZE carry-through trace</h3>
 												<p>
@@ -252,7 +295,109 @@ const attentionTokens = ['BOS', 'S', 'c2', 'c3', 'c4', 'C'];
 													</div>
 												</div>
 											</details>
-										</div>
+											</div>
+										</details>
+										<details class="visual-details">
+											<summary>Open HTTP non-first-slot carry-through trace</summary>
+											<div class="http-trace" data-http-trace>
+												<div class="trace-copy">
+													<h3>HTTP carry-through beyond first slots</h3>
+													<p>
+														The HTTP follow-ups probe path-category features at the current
+														size token. The strongest non-first-slot case is the previous
+														request path <code>p_{'{'}k-1{'}'}</code> recovered at <code>sz_k</code>.
+													</p>
+												</div>
+												<p class="trace-subtitle" data-http-subtitle>
+													Autoplay: highlighting previous-request path p_{'{'}k-1{'}'} at current size token sz_k.
+												</p>
+												<div class="http-visual-grid">
+													<div class="http-token-panel">
+														<p class="panel-label">HTTP request token stream</p>
+														<div class="http-token-strip">
+															{httpTokens.map((token) => (
+																<span class="http-token" data-http-token={token}>{token}</span>
+															))}
+														</div>
+														<div class="http-arrow-field" aria-hidden="true">
+															<span class="http-arc"></span>
+														</div>
+														<p class="mechanism-caption">
+															The source token is not the first slot. It is inside a repeated
+															request record, then read later at the current request's size token.
+														</p>
+													</div>
+													<div class="stream-panel">
+														<p class="panel-label">HTTP follow-up probe gaps</p>
+														<p class="layer-source-note">
+															Source:
+															<a href="https://github.com/Raghavan1988/LatentWorldsGPT/blob/main/docs/paper/report.md">
+																report.md</a
+															>, section 7.2.5.
+														</p>
+														<div class="layer-probe-bars">
+															{httpCarryRows.map((row) => (
+																<button
+																	class="http-row"
+																	type="button"
+																	data-http-row={row.id}
+																	data-source={row.source}
+																	data-target={row.target}
+																>
+																	<span class="http-label">{row.label}</span>
+																	<span class="layer-bar" style={`--bar-width: ${row.width}`}>
+																		<i aria-hidden="true" />
+																	</span>
+																	<span class="layer-gap">{row.gap}</span>
+																	<span class="layer-mini">{row.pp}</span>
+																</button>
+															))}
+														</div>
+													</div>
+												</div>
+												<details class="attention-details">
+													<summary>Show HTTP attention matrix sketch</summary>
+													<div class="attention-visual">
+														<div>
+															<p class="panel-label">Toy HTTP attention matrix</p>
+															<div class="attention-matrix http-attention-matrix" aria-label="Toy HTTP attention matrix showing current size token reading earlier path tokens">
+																<span class="corner"></span>
+																{httpTokens.map((token) => <span class="axis-token">{token}</span>)}
+																{httpTokens.map((rowToken, rowIndex) => (
+																	<>
+																		<span class="axis-token">{rowToken}</span>
+																		{httpTokens.map((_, colIndex) => {
+																			const isTargetRow = rowIndex === 7;
+																			const isSourceColumn = colIndex === 1 || colIndex === 5;
+																			const isDiagonal = rowIndex === colIndex;
+																			const className = isTargetRow && isSourceColumn
+																				? 'heat-cell reads-start'
+																				: isDiagonal
+																					? 'heat-cell diagonal'
+																					: 'heat-cell';
+																			return <span class={className}></span>;
+																		})}
+																	</>
+																))}
+															</div>
+														</div>
+														<div class="attention-explain">
+															<h4>Why this is not first-slot copying</h4>
+															<p>
+																The highlighted source can be <code>p_{'{'}k-1{'}'}</code>,
+																the previous request path, or <code>p_j</code>, the most recent
+																earlier large-response path. These are not fixed first tokens.
+															</p>
+															<p>
+																The visual shows <code>sz_k</code> reading path tokens from
+																earlier positions because attention can cheaply route those
+																values into the residual stream.
+															</p>
+														</div>
+													</div>
+												</details>
+											</div>
+										</details>
 									)
 								}
 							</details>
@@ -342,6 +487,42 @@ const attentionTokens = ['BOS', 'S', 'c2', 'c3', 'c4', 'C'];
 				slider.addEventListener('pointerdown', pauseAutoplay);
 				renderMazeTrace();
 				autoplayTimer = window.setInterval(autoplay, 1900);
+			}
+
+			const httpTrace = document.querySelector('[data-http-trace]');
+			if (httpTrace) {
+				const rows = [...httpTrace.querySelectorAll('[data-http-row]')];
+				const tokens = [...httpTrace.querySelectorAll('[data-http-token]')];
+				const subtitle = httpTrace.querySelector('[data-http-subtitle]');
+
+				const labels = {
+					same: 'Same-request path: p_k is recovered at sz_k with an MLP probe accuracy gap of +0.809 accuracy units, or +80.9 percentage points.',
+					previous: 'Previous-request path: p_{k-1} is recovered at sz_k with an MLP probe accuracy gap of +0.674 accuracy units, or +67.4 percentage points.',
+					recent: 'Recent large-response path: p_j is content-selected, not fixed-position, and is recovered at sz_k with an MLP probe accuracy gap of +0.621 accuracy units, or +62.1 percentage points.',
+					'recent-lag': 'Recent large-response path with lag >= 3 remains recoverable with an MLP probe accuracy gap of +0.514 accuracy units, or +51.4 percentage points.',
+				};
+
+				const tokenForSource = {
+					p_k: 'p_k',
+					'p_{k-1}': 'p_{k-1}',
+					p_j: 'p_j',
+				};
+
+				const selectHttpRow = (row) => {
+					rows.forEach((candidate) => candidate.classList.toggle('is-active', candidate === row));
+					const sourceToken = tokenForSource[row.dataset.source] || row.dataset.source;
+					const targetToken = row.dataset.target;
+
+					tokens.forEach((token) => {
+						token.classList.toggle('is-source', token.dataset.httpToken === sourceToken);
+						token.classList.toggle('is-target', token.dataset.httpToken === targetToken);
+					});
+					subtitle.textContent = labels[row.dataset.httpRow];
+				};
+
+				rows.forEach((row) => row.addEventListener('click', () => selectHttpRow(row)));
+				const defaultRow = rows.find((row) => row.dataset.httpRow === 'previous') || rows[0];
+				selectHttpRow(defaultRow);
 			}
 		</script>
 	</body>

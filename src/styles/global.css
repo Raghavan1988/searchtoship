@@ -313,6 +313,23 @@ hr {
 	padding: 1rem;
 	overflow: hidden;
 }
+.visual-details {
+	border: 1px solid rgba(141, 106, 79, 0.18);
+	border-radius: 8px;
+	margin-top: 0.8rem;
+	padding: 0.8rem;
+}
+.visual-details > summary {
+	color: #8f4c2f;
+}
+.http-trace {
+	background: rgba(255, 248, 238, 0.72);
+	border: 1px solid #dcc3a6;
+	border-radius: 8px;
+	margin-top: 1rem;
+	overflow: hidden;
+	padding: 1rem;
+}
 .trace-copy {
 	display: grid;
 	grid-template-columns: minmax(14rem, 0.55fr) minmax(0, 1fr);
@@ -346,6 +363,82 @@ hr {
 	grid-template-columns: minmax(0, 280px) minmax(0, 1fr);
 	gap: 1rem;
 	align-items: stretch;
+}
+.http-visual-grid {
+	display: grid;
+	grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+	gap: 1rem;
+	align-items: stretch;
+}
+.http-token-panel {
+	background: rgba(255, 253, 248, 0.74);
+	border: 1px solid #d8c2a8;
+	border-radius: 8px;
+	min-width: 0;
+	padding: 0.85rem;
+}
+.http-token-strip {
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	gap: 0.45rem;
+}
+.http-token {
+	background: #fff8f1;
+	border: 1px solid rgba(141, 106, 79, 0.24);
+	border-radius: 8px;
+	color: #6f6257;
+	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+	font-size: 0.8rem;
+	font-weight: 700;
+	padding: 0.6rem 0.45rem;
+	text-align: center;
+}
+.http-token.is-source {
+	background: #c15f3c;
+	border-color: #8a3f24;
+	color: white;
+	box-shadow: 0 0 0 3px rgba(193, 95, 60, 0.16);
+}
+.http-token.is-target {
+	background: #2f6fed;
+	border-color: #12326b;
+	color: white;
+	box-shadow: 0 0 0 3px rgba(47, 111, 237, 0.16);
+}
+.http-arrow-field {
+	height: 3.5rem;
+	position: relative;
+}
+.http-arc {
+	position: absolute;
+	inset: 0.6rem 18% 0.1rem 18%;
+	border: 3px solid #c15f3c;
+	border-bottom: 0;
+	border-radius: 999px 999px 0 0;
+	opacity: 0.68;
+}
+.http-row {
+	display: grid;
+	grid-template-columns: minmax(11rem, 1.15fr) minmax(0, 1fr) 9.8rem 10.5rem;
+	gap: 0.7rem;
+	align-items: center;
+	background: transparent;
+	border: 0;
+	border-radius: 6px;
+	color: inherit;
+	cursor: pointer;
+	font: inherit;
+	padding: 0.24rem;
+	text-align: left;
+}
+.http-row.is-active {
+	background: rgba(193, 95, 60, 0.08);
+}
+.http-label {
+	color: #2a211b;
+	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+	font-size: 0.76rem;
+	font-weight: 700;
 }
 .maze-board {
 	display: grid;
@@ -626,6 +719,9 @@ hr {
 	border-radius: 8px;
 	padding: 0.55rem;
 }
+.http-attention-matrix {
+	grid-template-columns: 4.6rem repeat(8, 1fr);
+}
 .axis-token {
 	color: #6f6257;
 	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
@@ -707,7 +803,8 @@ footer span:last-child {
 	}
 	.trace-copy,
 	.trace-grid,
-	.trace-controls {
+	.trace-controls,
+	.http-visual-grid {
 		grid-template-columns: 1fr;
 	}
 	.layer-probe-row,
@@ -721,6 +818,10 @@ footer span:last-child {
 	}
 	.maze-board {
 		width: min(100%, 340px);
+	}
+	.http-token-strip,
+	.http-row {
+		grid-template-columns: 1fr;
 	}
 	.github-link {
 		display: none;

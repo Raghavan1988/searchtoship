@@ -59,6 +59,15 @@ const mazeCells = Array.from({ length: 64 }, (_, index) => ({
 	row: Math.floor(index / 8) + 1,
 	col: (index % 8) + 1,
 }));
+
+const mazeLayerProbeRows = [
+	{ layer: 'L0', trained: '4.9%', untrained: '4.4%', gap: '+0.6 pp', width: '3.6%' },
+	{ layer: 'L1', trained: '8.5%', untrained: '4.4%', gap: '+4.2 pp', width: '27.3%' },
+	{ layer: 'L2', trained: '16.3%', untrained: '4.5%', gap: '+11.8 pp', width: '77.6%' },
+	{ layer: 'L3', trained: '17.4%', untrained: '4.3%', gap: '+13.1 pp', width: '86.2%' },
+	{ layer: 'L4', trained: '18.5%', untrained: '4.2%', gap: '+14.3 pp', width: '94.1%' },
+	{ layer: 'L5', trained: '20.2%', untrained: '5.0%', gap: '+15.2 pp', width: '100%' },
+];
 ---
 
 <!doctype html>
@@ -125,37 +134,41 @@ const mazeCells = Array.from({ length: 64 }, (_, index) => ({
 												</div>
 
 												<div class="stream-panel">
-													<p class="panel-label">Residual stream lanes</p>
-													<div class="stream-lanes" aria-label="Transformer layers">
-														{[0, 1, 2, 3, 4, 5].map((layer) => (
-															<div class="stream-lane" data-layer={layer}>
-																<span>Layer {layer}</span>
-																<i aria-hidden="true" />
+													<p class="panel-label">Layer-by-layer start-cell probe accuracy</p>
+													<p class="layer-source-note">
+														Layer values come from
+														<a href="https://github.com/Raghavan1988/LatentWorldsGPT/blob/main/docs/results/results_maze_navigation.md">
+															results_maze_navigation.md</a
+														>. Best-layer summary comes from
+														<a href="https://github.com/Raghavan1988/LatentWorldsGPT/blob/main/docs/paper/report.md">
+															report.md</a
+														>.
+													</p>
+													<div
+														class="layer-probe-bars"
+														aria-label="Start-cell probe accuracy by transformer layer"
+													>
+														{mazeLayerProbeRows.map((row) => (
+															<div class="layer-probe-row" data-layer-row={row.layer}>
+																<span class="layer-name">{row.layer}</span>
+																<span class="layer-bar" style={`--bar-width: ${row.width}`}>
+																	<i aria-hidden="true" />
+																</span>
+																<span class="layer-value">
+																	{row.trained} trained / {row.untrained} baseline / {row.gap} gap
+																</span>
 															</div>
 														))}
 													</div>
-												</div>
-
-												<div class="probe-panel">
-													<p class="panel-label">Reported MAZE probe readout</p>
-													<dl>
-														<div>
-															<dt>Transformer layer index</dt>
-															<dd>5 of 6 layers</dd>
-														</div>
-														<div>
-															<dt>Start-cell probe accuracy, trained model</dt>
-															<dd>20.2%</dd>
-														</div>
-														<div>
-															<dt>Start-cell probe accuracy, untrained baseline</dt>
-															<dd>5.0%</dd>
-														</div>
-														<div>
-															<dt>Probe accuracy gap, trained minus untrained</dt>
-															<dd>+15.2 percentage points</dd>
-														</div>
-													</dl>
+													<div class="copy-mechanism" aria-label="Attention copy mechanism">
+														<span>first path token</span>
+														<i aria-hidden="true"></i>
+														<span>attention can read it</span>
+														<i aria-hidden="true"></i>
+														<span>residual stream carries it</span>
+														<i aria-hidden="true"></i>
+														<span>probe decodes start cell</span>
+													</div>
 												</div>
 											</div>
 
@@ -175,6 +188,28 @@ const mazeCells = Array.from({ length: 64 }, (_, index) => ({
 													Current token position: 7 of 10 path tokens. Current cell: row 4,
 													column 5.
 												</p>
+											</div>
+
+											<div class="probe-panel">
+												<p class="panel-label">Reported MAZE probe readout</p>
+												<dl>
+													<div>
+														<dt>Best transformer layer for start-cell MLP probe</dt>
+														<dd>Layer 5 of 6 layers</dd>
+													</div>
+													<div>
+														<dt>Start-cell probe accuracy, trained model, layer 5</dt>
+														<dd>20.2%</dd>
+													</div>
+													<div>
+														<dt>Start-cell probe accuracy, untrained baseline, layer 5</dt>
+														<dd>5.0%</dd>
+													</div>
+													<div>
+														<dt>Probe accuracy gap, trained minus untrained, layer 5</dt>
+														<dd>+15.2 percentage points</dd>
+													</div>
+												</dl>
 											</div>
 										</div>
 									)
@@ -203,6 +238,7 @@ const mazeCells = Array.from({ length: 64 }, (_, index) => ({
 			const trace = document.querySelector('[data-maze-trace]');
 			if (trace) {
 				const cells = [...trace.querySelectorAll('.maze-cell')];
+				const layerRows = [...trace.querySelectorAll('[data-layer-row]')];
 				const slider = trace.querySelector('[data-token-slider]');
 				const readout = trace.querySelector('[data-token-readout]');
 				const subtitle = trace.querySelector('[data-trace-subtitle]');
@@ -234,6 +270,10 @@ const mazeCells = Array.from({ length: 64 }, (_, index) => ({
 						if (row === start[0] && col === start[1]) cell.classList.add('is-start');
 						if (row === goal[0] && col === goal[1]) cell.classList.add('is-goal');
 						if (row === current[0] && col === current[1]) cell.classList.add('is-current');
+					});
+
+					layerRows.forEach((row, index) => {
+						row.classList.toggle('is-active', index === Math.min(position - 1, layerRows.length - 1));
 					});
 
 					readout.textContent = `Current token position: ${position} of ${mazePath.length} path tokens. Current cell: row ${current[0]}, column ${current[1]}. Start cell: row ${start[0]}, column ${start[1]}. Goal cell: row ${goal[0]}, column ${goal[1]}.`;

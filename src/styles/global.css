@@ -305,6 +305,184 @@ hr {
 	font-size: 0.95rem;
 	line-height: 1.45;
 }
+.maze-trace {
+	background: rgba(255, 248, 238, 0.72);
+	border: 1px solid #dcc3a6;
+	border-radius: 8px;
+	margin-top: 1rem;
+	padding: 1rem;
+}
+.trace-copy {
+	display: grid;
+	grid-template-columns: 16rem 1fr;
+	gap: 1rem;
+	align-items: start;
+	margin-bottom: 1rem;
+}
+.trace-copy h3 {
+	font-size: 1.05rem;
+	margin: 0;
+}
+.trace-copy p,
+.trace-note,
+.trace-controls p {
+	color: #6f6257;
+	font-size: 0.9rem;
+	line-height: 1.45;
+	margin: 0;
+}
+.trace-grid {
+	display: grid;
+	grid-template-columns: 16rem minmax(14rem, 1fr) minmax(16rem, 1fr);
+	gap: 1rem;
+}
+.maze-board {
+	display: grid;
+	grid-template-columns: repeat(8, 1fr);
+	gap: 0.25rem;
+	background:
+		linear-gradient(90deg, rgba(42, 33, 27, 0.05) 1px, transparent 1px),
+		linear-gradient(rgba(42, 33, 27, 0.05) 1px, transparent 1px),
+		#fffaf3;
+	background-size: 1rem 1rem;
+	border: 1px solid #d8c2a8;
+	border-radius: 8px;
+	padding: 0.5rem;
+}
+.maze-cell {
+	aspect-ratio: 1;
+	background: rgba(255, 253, 248, 0.82);
+	border: 1px solid rgba(141, 106, 79, 0.2);
+	border-radius: 4px;
+	position: relative;
+}
+.maze-cell.is-path {
+	background: rgba(30, 93, 174, 0.12);
+	border-color: rgba(30, 93, 174, 0.28);
+}
+.maze-cell.is-start {
+	background: #c15f3c;
+	border-color: #8a3f24;
+	box-shadow: 0 0 0 3px rgba(193, 95, 60, 0.2);
+}
+.maze-cell.is-start::after {
+	content: 'S';
+}
+.maze-cell.is-current {
+	background: #2f6fed;
+	border-color: #12326b;
+	box-shadow: 0 0 0 3px rgba(47, 111, 237, 0.18);
+}
+.maze-cell.is-current::after {
+	content: 'C';
+}
+.maze-cell.is-goal {
+	background: #10b981;
+	border-color: #047857;
+	box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.18);
+}
+.maze-cell.is-goal::after {
+	content: 'G';
+}
+.maze-cell::after {
+	position: absolute;
+	inset: 0;
+	display: grid;
+	place-items: center;
+	color: white;
+	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+	font-size: 0.68rem;
+	font-weight: 700;
+}
+.stream-panel,
+.probe-panel {
+	background: rgba(255, 253, 248, 0.74);
+	border: 1px solid #d8c2a8;
+	border-radius: 8px;
+	padding: 0.85rem;
+}
+.panel-label {
+	color: #a45632;
+	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+	font-size: 0.74rem;
+	font-weight: 700;
+	margin: 0 0 0.75rem;
+	text-transform: uppercase;
+}
+.stream-lanes {
+	display: grid;
+	gap: 0.45rem;
+	margin-bottom: 0.75rem;
+}
+.stream-lane {
+	display: grid;
+	grid-template-columns: 4.5rem 1fr;
+	gap: 0.65rem;
+	align-items: center;
+	color: #6f6257;
+	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+	font-size: 0.75rem;
+}
+.stream-lane i {
+	display: block;
+	height: 0.6rem;
+	border-radius: 999px;
+	background:
+		linear-gradient(90deg, rgba(193, 95, 60, 0.95) 0 26%, rgba(47, 111, 237, 0.7) 40% 58%, rgba(16, 185, 129, 0.85) 82% 100%),
+		#f0e3d4;
+	box-shadow: inset 0 0 0 1px rgba(42, 33, 27, 0.08);
+	opacity: 0.42;
+}
+.stream-lane[data-layer='5'] i {
+	height: 0.82rem;
+	opacity: 1;
+	box-shadow: 0 0 0 3px rgba(193, 95, 60, 0.13);
+}
+.probe-panel dl {
+	display: grid;
+	gap: 0.55rem;
+	margin: 0;
+}
+.probe-panel div {
+	border-bottom: 1px solid rgba(141, 106, 79, 0.18);
+	padding-bottom: 0.5rem;
+}
+.probe-panel div:last-child {
+	border-bottom: 0;
+	padding-bottom: 0;
+}
+.probe-panel dt {
+	color: #6f6257;
+	font-size: 0.78rem;
+	line-height: 1.25;
+}
+.probe-panel dd {
+	color: #2a211b;
+	font-size: 1rem;
+	font-weight: 700;
+	margin: 0.1rem 0 0;
+}
+.trace-controls {
+	display: grid;
+	grid-template-columns: minmax(16rem, 0.9fr) 1fr;
+	gap: 1rem;
+	align-items: center;
+	border-top: 1px solid rgba(141, 106, 79, 0.18);
+	margin-top: 1rem;
+	padding-top: 1rem;
+}
+.trace-controls label {
+	display: grid;
+	gap: 0.45rem;
+	color: #2a211b;
+	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+	font-size: 0.78rem;
+	font-weight: 700;
+}
+.trace-controls input {
+	accent-color: #c15f3c;
+	width: 100%;
+}
 .theme-interpretability {
 	background:
 		linear-gradient(180deg, rgba(255, 249, 241, 0.96), rgba(250, 240, 226, 0.9)),
@@ -402,6 +580,11 @@ footer span:last-child {
 	}
 	.project-card a {
 		justify-self: start;
+	}
+	.trace-copy,
+	.trace-grid,
+	.trace-controls {
+		grid-template-columns: 1fr;
 	}
 	.github-link {
 		display: none;

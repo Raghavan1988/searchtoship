@@ -54,6 +54,11 @@ const projects = [
 		],
 	},
 ];
+
+const mazeCells = Array.from({ length: 64 }, (_, index) => ({
+	row: Math.floor(index / 8) + 1,
+	col: (index % 8) + 1,
+}));
 ---
 
 <!doctype html>
@@ -91,6 +96,89 @@ const projects = [
 								<ul>
 									{project.takeaways.map((takeaway) => <li>{takeaway}</li>)}
 								</ul>
+								{
+									project.theme === 'interpretability' && (
+										<div class="maze-trace" data-maze-trace>
+											<div class="trace-copy">
+												<h3>MAZE carry-through trace</h3>
+												<p>
+													An illustrative 8 x 8 cell path showing the central finding: the
+													current token moves away from the start cell, but the start-cell
+													feature remains decodable from the residual stream.
+												</p>
+											</div>
+
+											<div class="trace-grid">
+												<div class="maze-board" aria-label="Illustrative 8 by 8 maze path">
+													{mazeCells.map((cell) => (
+														<span
+															class="maze-cell"
+															data-row={cell.row}
+															data-col={cell.col}
+															aria-label={`row ${cell.row}, column ${cell.col}`}
+														/>
+													))}
+												</div>
+
+												<div class="stream-panel">
+													<p class="panel-label">Residual stream lanes</p>
+													<div class="stream-lanes" aria-label="Transformer layers">
+														{[0, 1, 2, 3, 4, 5].map((layer) => (
+															<div class="stream-lane" data-layer={layer}>
+																<span>Layer {layer}</span>
+																<i aria-hidden="true" />
+															</div>
+														))}
+													</div>
+													<p class="trace-note">
+														Copper signal: start cell carried forward. Blue signal: current
+														cell needed for the next path token. Green signal: goal cell.
+													</p>
+												</div>
+
+												<div class="probe-panel">
+													<p class="panel-label">Reported MAZE probe readout</p>
+													<dl>
+														<div>
+															<dt>Transformer layer index</dt>
+															<dd>5 of 6 layers</dd>
+														</div>
+														<div>
+															<dt>Start-cell probe accuracy, trained model</dt>
+															<dd>20.2%</dd>
+														</div>
+														<div>
+															<dt>Start-cell probe accuracy, untrained baseline</dt>
+															<dd>5.0%</dd>
+														</div>
+														<div>
+															<dt>Probe accuracy gap, trained minus untrained</dt>
+															<dd>+15.2 percentage points</dd>
+														</div>
+													</dl>
+												</div>
+											</div>
+
+											<div class="trace-controls">
+												<label>
+													<span>Current token position in illustrative path</span>
+													<input
+														type="range"
+														min="1"
+														max="10"
+														value="7"
+														step="1"
+														data-token-slider
+													/>
+												</label>
+												<p data-token-readout>
+													Current token position: 7 of 10 path tokens. Current cell: row 4,
+													column 5.
+												</p>
+											</div>
+										</div>
+									)
+								}
 							</details>
 						</article>
 					))
@@ -98,5 +186,50 @@ const projects = [
 			</section>
 		</main>
 		<Footer />
+		<script is:inline>
+			const mazePath = [
+				[1, 2],
+				[1, 3],
+				[2, 3],
+				[3, 3],
+				[3, 4],
+				[4, 4],
+				[4, 5],
+				[5, 5],
+				[5, 6],
+				[6, 6],
+			];
+
+			const trace = document.querySelector('[data-maze-trace]');
+			if (trace) {
+				const cells = [...trace.querySelectorAll('.maze-cell')];
+				const slider = trace.querySelector('[data-token-slider]');
+				const readout = trace.querySelector('[data-token-readout]');
+				const start = mazePath[0];
+				const goal = mazePath[mazePath.length - 1];
+
+				const renderMazeTrace = () => {
+					const position = Number(slider.value);
+					const current = mazePath[position - 1];
+
+					cells.forEach((cell) => {
+						const row = Number(cell.dataset.row);
+						const col = Number(cell.dataset.col);
+						const pathIndex = mazePath.findIndex(([pathRow, pathCol]) => pathRow === row && pathCol === col);
+						cell.className = 'maze-cell';
+
+						if (pathIndex >= 0 && pathIndex < position) cell.classList.add('is-path');
+						if (row === start[0] && col === start[1]) cell.classList.add('is-start');
+						if (row === goal[0] && col === goal[1]) cell.classList.add('is-goal');
+						if (row === current[0] && col === current[1]) cell.classList.add('is-current');
+					});
+
+					readout.textContent = `Current token position: ${position} of ${mazePath.length} path tokens. Current cell: row ${current[0]}, column ${current[1]}. Start cell: row ${start[0]}, column ${start[1]}. Goal cell: row ${goal[0]}, column ${goal[1]}.`;
+				};
+
+				slider.addEventListener('input', renderMazeTrace);
+				renderMazeTrace();
+			}
+		</script>
 	</body>
 </html>

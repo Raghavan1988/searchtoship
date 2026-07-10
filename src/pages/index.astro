@@ -71,46 +71,80 @@ const mazeLayerProbeRows = [
 
 const attentionTokens = ['BOS', 'S', 'c2', 'c3', 'c4', 'C'];
 
-const httpCarryRows = [
+const httpSteps = [
 	{
 		id: 'same',
-		label: 'same-request path',
+		label: 'Same-request path',
 		source: 'p_k',
 		target: 'sz_k',
+		sourceName: 'current request path category',
+		targetName: 'current response-size token',
 		gap: '+0.809 accuracy units',
 		pp: '+80.9 percentage points',
 		width: '100%',
+		explain:
+			'p_k is two fields before sz_k inside the same request record, so the model can read local request context.',
 	},
 	{
 		id: 'previous',
-		label: 'previous-request path',
+		label: 'Previous-request path',
 		source: 'p_{k-1}',
 		target: 'sz_k',
+		sourceName: 'previous request path category',
+		targetName: 'current response-size token',
 		gap: '+0.674 accuracy units',
 		pp: '+67.4 percentage points',
 		width: '83.3%',
+		explain:
+			'p_{k-1} crosses a request boundary. It is not a first slot, and it is not adjacent to sz_k.',
 	},
 	{
 		id: 'recent',
-		label: 'recent large-response path',
+		label: 'Recent large-response path',
 		source: 'p_j',
 		target: 'sz_k',
+		sourceName: 'path category for the most recent earlier large response',
+		targetName: 'current response-size token',
 		gap: '+0.621 accuracy units',
 		pp: '+62.1 percentage points',
 		width: '76.8%',
+		explain:
+			'p_j is content-selected: j is the most recent earlier request whose response-size bin is at least 5.',
 	},
 	{
 		id: 'recent-lag',
-		label: 'recent large-response path, lag >= 3',
+		label: 'Recent large-response path, lag >= 3',
 		source: 'p_j',
 		target: 'sz_k',
+		sourceName: 'earlier large-response path category at lag >= 3',
+		targetName: 'current response-size token',
 		gap: '+0.514 accuracy units',
 		pp: '+51.4 percentage points',
 		width: '63.5%',
+		explain:
+			'Even when the selected earlier large response is at least 3 request records back, the feature remains recoverable.',
 	},
 ];
 
-const httpTokens = ['p_j', 'sz_j>=5', '...', 'p_{k-1}', 'sz_{k-1}', 'p_k', 's_k', 'sz_k'];
+const httpTokens = [
+	{ token: 'p_j', label: 'Earlier large-response path' },
+	{ token: 'sz_j>=5', label: 'Earlier large-response size bin' },
+	{ token: '...', label: 'Intervening request records' },
+	{ token: 'p_{k-1}', label: 'Previous request path' },
+	{ token: 'sz_{k-1}', label: 'Previous response-size bin' },
+	{ token: 'p_k', label: 'Current request path' },
+	{ token: 's_k', label: 'Current status bucket' },
+	{ token: 'sz_k', label: 'Current response-size bin' },
+];
+
+const httpNotation = [
+	{ symbol: 'k', meaning: 'current request index' },
+	{ symbol: 'k-1', meaning: 'previous request index' },
+	{ symbol: 'j', meaning: 'most recent earlier request with response-size bin >= 5' },
+	{ symbol: 'p', meaning: 'path category, such as image, HTML, CGI, directory, or other' },
+	{ symbol: 's', meaning: 'HTTP status bucket' },
+	{ symbol: 'sz', meaning: 'response-size bin' },
+];
 ---
 
 <!doctype html>
@@ -303,99 +337,131 @@ const httpTokens = ['p_j', 'sz_j>=5', '...', 'p_{k-1}', 'sz_{k-1}', 'p_k', 's_k'
 												<div class="trace-copy">
 													<h3>HTTP carry-through beyond first slots</h3>
 													<p>
-														The HTTP follow-ups probe path-category features at the current
-														size token. The strongest non-first-slot case is the previous
-														request path <code>p_{'{'}k-1{'}'}</code> recovered at <code>sz_k</code>.
+														The HTTP sequence is a repeated request record. This walkthrough
+														shows how path-category information can remain recoverable at the
+														current response-size token even when the source is not a first slot.
 													</p>
 												</div>
+												<div class="notation-grid" aria-label="HTTP notation definitions">
+													{httpNotation.map((item) => (
+														<div>
+															<strong>{item.symbol}</strong>
+															<span>{item.meaning}</span>
+														</div>
+													))}
+												</div>
 												<p class="trace-subtitle" data-http-subtitle>
-													Autoplay: highlighting previous-request path p_{'{'}k-1{'}'} at current size token sz_k.
+													Autoplay: highlighting the previous request path category and the current response-size token.
 												</p>
 												<div class="http-visual-grid">
 													<div class="http-token-panel">
 														<p class="panel-label">HTTP request token stream</p>
 														<div class="http-token-strip">
-															{httpTokens.map((token) => (
-																<span class="http-token" data-http-token={token}>{token}</span>
+															{httpTokens.map((entry) => (
+																<span class="http-token" data-http-token={entry.token}>
+																	<strong>{entry.token}</strong>
+																	<small>{entry.label}</small>
+																</span>
 															))}
 														</div>
 														<div class="http-arrow-field" aria-hidden="true">
 															<span class="http-arc"></span>
 														</div>
 														<p class="mechanism-caption">
-															The source token is not the first slot. It is inside a repeated
-															request record, then read later at the current request's size token.
+															Copper is the source path token. Blue is the current response-size
+															token where the probe reads the residual stream.
 														</p>
 													</div>
-													<div class="stream-panel">
-														<p class="panel-label">HTTP follow-up probe gaps</p>
+													<div class="http-step-panel">
+														<p class="panel-label">Selected follow-up</p>
 														<p class="layer-source-note">
 															Source:
 															<a href="https://github.com/Raghavan1988/LatentWorldsGPT/blob/main/docs/paper/report.md">
 																report.md</a
 															>, section 7.2.5.
 														</p>
-														<div class="layer-probe-bars">
-															{httpCarryRows.map((row) => (
-																<button
-																	class="http-row"
-																	type="button"
-																	data-http-row={row.id}
-																	data-source={row.source}
-																	data-target={row.target}
-																>
-																	<span class="http-label">{row.label}</span>
-																	<span class="layer-bar" style={`--bar-width: ${row.width}`}>
-																		<i aria-hidden="true" />
-																	</span>
-																	<span class="layer-gap">{row.gap}</span>
-																	<span class="layer-mini">{row.pp}</span>
-																</button>
-															))}
+														<div class="http-step-card">
+															<h4 data-http-title>Previous-request path</h4>
+															<p data-http-explain>
+																p_{'{'}k-1{'}'} crosses a request boundary. It is not a first slot,
+																and it is not adjacent to sz_k.
+															</p>
+															<div class="http-metrics">
+																<div>
+																	<span>Source token</span>
+																	<strong data-http-source>p_{'{'}k-1{'}'}</strong>
+																	<small data-http-source-name>previous request path category</small>
+																</div>
+																<div>
+																	<span>Readout token</span>
+																	<strong data-http-target>sz_k</strong>
+																	<small data-http-target-name>current response-size token</small>
+																</div>
+																<div>
+																	<span>MLP probe accuracy gap</span>
+																	<strong data-http-gap>+0.674 accuracy units</strong>
+																	<small data-http-pp>+67.4 percentage points</small>
+																</div>
+															</div>
+															<span class="layer-bar http-selected-bar" style="--bar-width: 83.3%">
+																<i aria-hidden="true" data-http-bar></i>
+															</span>
 														</div>
 													</div>
 												</div>
-												<details class="attention-details">
-													<summary>Show HTTP attention matrix sketch</summary>
-													<div class="attention-visual">
-														<div>
-															<p class="panel-label">Toy HTTP attention matrix</p>
-															<div class="attention-matrix http-attention-matrix" aria-label="Toy HTTP attention matrix showing current size token reading earlier path tokens">
-																<span class="corner"></span>
-																{httpTokens.map((token) => <span class="axis-token">{token}</span>)}
-																{httpTokens.map((rowToken, rowIndex) => (
-																	<>
-																		<span class="axis-token">{rowToken}</span>
-																		{httpTokens.map((_, colIndex) => {
-																			const isTargetRow = rowIndex === 7;
-																			const isSourceColumn = colIndex === 1 || colIndex === 5;
-																			const isDiagonal = rowIndex === colIndex;
-																			const className = isTargetRow && isSourceColumn
-																				? 'heat-cell reads-start'
-																				: isDiagonal
-																					? 'heat-cell diagonal'
-																					: 'heat-cell';
-																			return <span class={className}></span>;
-																		})}
-																	</>
-																))}
-															</div>
-														</div>
-														<div class="attention-explain">
-															<h4>Why this is not first-slot copying</h4>
-															<p>
-																The highlighted source can be <code>p_{'{'}k-1{'}'}</code>,
-																the previous request path, or <code>p_j</code>, the most recent
-																earlier large-response path. These are not fixed first tokens.
-															</p>
-															<p>
-																The visual shows <code>sz_k</code> reading path tokens from
-																earlier positions because attention can cheaply route those
-																values into the residual stream.
-															</p>
+												<div class="trace-controls">
+													<label>
+														<span>HTTP carry-through example</span>
+														<input
+															type="range"
+															min="0"
+															max={httpSteps.length - 1}
+															value="1"
+															step="1"
+															data-http-slider
+														/>
+													</label>
+													<p data-http-readout>
+														Example 2 of 4: previous-request path category is recovered at the current response-size token.
+													</p>
+												</div>
+												<div class="http-attention-section">
+													<p class="panel-label">Toy HTTP attention matrix</p>
+													<div class="http-attention-wrap">
+														<div class="attention-matrix http-attention-matrix" aria-label="Toy HTTP attention matrix showing current size token reading earlier path tokens">
+															<span class="corner"></span>
+															{httpTokens.map((entry) => <span class="axis-token">{entry.token}</span>)}
+															{httpTokens.map((rowEntry, rowIndex) => (
+																<>
+																	<span class="axis-token">{rowEntry.token}</span>
+																	{httpTokens.map((entry, colIndex) => {
+																		const isTargetRow = rowIndex === 7;
+																		const isSourceColumn = ['p_j', 'p_{k-1}', 'p_k'].includes(entry.token);
+																		const isDiagonal = rowIndex === colIndex;
+																		const className = isTargetRow && isSourceColumn
+																			? 'heat-cell reads-start'
+																			: isDiagonal
+																				? 'heat-cell diagonal'
+																				: 'heat-cell';
+																		return <span class={className}></span>;
+																	})}
+																</>
+															))}
 														</div>
 													</div>
-												</details>
+													<div class="attention-explain">
+														<h4>How to read this</h4>
+														<p>
+															Rows are readout positions, columns are tokens that can be read.
+															The bottom row is <code>sz_k</code>, the current response-size token.
+														</p>
+														<p>
+															Copper cells show <code>sz_k</code> reading earlier path-category
+															tokens. That is the visual point: attention can cheaply route
+															non-first-slot path information into the residual stream.
+														</p>
+													</div>
+												</div>
 											</div>
 										</details>
 									)
@@ -491,38 +557,115 @@ const httpTokens = ['p_j', 'sz_j>=5', '...', 'p_{k-1}', 'sz_{k-1}', 'p_k', 's_k'
 
 			const httpTrace = document.querySelector('[data-http-trace]');
 			if (httpTrace) {
-				const rows = [...httpTrace.querySelectorAll('[data-http-row]')];
 				const tokens = [...httpTrace.querySelectorAll('[data-http-token]')];
 				const subtitle = httpTrace.querySelector('[data-http-subtitle]');
+				const slider = httpTrace.querySelector('[data-http-slider]');
+				const readout = httpTrace.querySelector('[data-http-readout]');
+				const title = httpTrace.querySelector('[data-http-title]');
+				const explain = httpTrace.querySelector('[data-http-explain]');
+				const source = httpTrace.querySelector('[data-http-source]');
+				const sourceName = httpTrace.querySelector('[data-http-source-name]');
+				const target = httpTrace.querySelector('[data-http-target]');
+				const targetName = httpTrace.querySelector('[data-http-target-name]');
+				const gap = httpTrace.querySelector('[data-http-gap]');
+				const pp = httpTrace.querySelector('[data-http-pp]');
+				const bar = httpTrace.querySelector('.http-selected-bar');
+				let httpAutoplayTimer;
+				let httpAutoplayPaused = false;
 
-				const labels = {
-					same: 'Same-request path: p_k is recovered at sz_k with an MLP probe accuracy gap of +0.809 accuracy units, or +80.9 percentage points.',
-					previous: 'Previous-request path: p_{k-1} is recovered at sz_k with an MLP probe accuracy gap of +0.674 accuracy units, or +67.4 percentage points.',
-					recent: 'Recent large-response path: p_j is content-selected, not fixed-position, and is recovered at sz_k with an MLP probe accuracy gap of +0.621 accuracy units, or +62.1 percentage points.',
-					'recent-lag': 'Recent large-response path with lag >= 3 remains recoverable with an MLP probe accuracy gap of +0.514 accuracy units, or +51.4 percentage points.',
-				};
+				const steps = [
+					{
+						label: 'Same-request path',
+						source: 'p_k',
+						target: 'sz_k',
+						sourceName: 'current request path category',
+						targetName: 'current response-size token',
+						gap: '+0.809 accuracy units',
+						pp: '+80.9 percentage points',
+						width: '100%',
+						explain: 'p_k is the path category for the current request. The probe reads it later at sz_k, the current response-size bin.',
+						subtitle: 'Autoplay: same-request carry-through. The source is p_k, and the readout position is sz_k.',
+					},
+					{
+						label: 'Previous-request path',
+						source: 'p_{k-1}',
+						target: 'sz_k',
+						sourceName: 'previous request path category',
+						targetName: 'current response-size token',
+						gap: '+0.674 accuracy units',
+						pp: '+67.4 percentage points',
+						width: '83.3%',
+						explain: 'p_{k-1} is the previous request path category. It crosses a request boundary before being read at the current sz_k token.',
+						subtitle: 'Autoplay: non-first-slot carry-through. The source is p_{k-1}, not the first token, and the readout is sz_k.',
+					},
+					{
+						label: 'Recent large-response path',
+						source: 'p_j',
+						target: 'sz_k',
+						sourceName: 'path category for the most recent earlier large response',
+						targetName: 'current response-size token',
+						gap: '+0.621 accuracy units',
+						pp: '+62.1 percentage points',
+						width: '76.8%',
+						explain: 'p_j means the path category at request j, where j is selected by content: the most recent earlier response-size bin of at least 5.',
+						subtitle: 'Autoplay: content-selected carry-through. j points to the most recent earlier large-response request.',
+					},
+					{
+						label: 'Recent large-response path, lag >= 3',
+						source: 'p_j',
+						target: 'sz_k',
+						sourceName: 'earlier large-response path category at lag >= 3',
+						targetName: 'current response-size token',
+						gap: '+0.514 accuracy units',
+						pp: '+51.4 percentage points',
+						width: '63.5%',
+						explain: 'The selected p_j can be at least 3 request records back. The result still shows a recoverable path-category feature at sz_k.',
+						subtitle: 'Autoplay: longer-range carry-through. The source is several request records back, but still decodable at sz_k.',
+					},
+				];
 
-				const tokenForSource = {
-					p_k: 'p_k',
-					'p_{k-1}': 'p_{k-1}',
-					p_j: 'p_j',
-				};
-
-				const selectHttpRow = (row) => {
-					rows.forEach((candidate) => candidate.classList.toggle('is-active', candidate === row));
-					const sourceToken = tokenForSource[row.dataset.source] || row.dataset.source;
-					const targetToken = row.dataset.target;
+				const renderHttpTrace = () => {
+					const index = Number(slider.value);
+					const step = steps[index];
 
 					tokens.forEach((token) => {
-						token.classList.toggle('is-source', token.dataset.httpToken === sourceToken);
-						token.classList.toggle('is-target', token.dataset.httpToken === targetToken);
+						token.classList.toggle('is-source', token.dataset.httpToken === step.source);
+						token.classList.toggle('is-target', token.dataset.httpToken === step.target);
 					});
-					subtitle.textContent = labels[row.dataset.httpRow];
+
+					title.textContent = step.label;
+					explain.textContent = step.explain;
+					source.textContent = step.source;
+					sourceName.textContent = step.sourceName;
+					target.textContent = step.target;
+					targetName.textContent = step.targetName;
+					gap.textContent = step.gap;
+					pp.textContent = step.pp;
+					bar.style.setProperty('--bar-width', step.width);
+					subtitle.textContent = step.subtitle;
+					readout.textContent = `Example ${index + 1} of ${steps.length}: ${step.sourceName} is recovered at the ${step.targetName}. Reported MLP probe gap: ${step.gap}, or ${step.pp}.`;
 				};
 
-				rows.forEach((row) => row.addEventListener('click', () => selectHttpRow(row)));
-				const defaultRow = rows.find((row) => row.dataset.httpRow === 'previous') || rows[0];
-				selectHttpRow(defaultRow);
+				const autoplayHttp = () => {
+					if (httpAutoplayPaused) return;
+					slider.value = String((Number(slider.value) + 1) % steps.length);
+					renderHttpTrace();
+				};
+
+				const pauseHttpAutoplay = () => {
+					httpAutoplayPaused = true;
+					window.clearInterval(httpAutoplayTimer);
+					subtitle.textContent = 'Paused: adjust the slider to inspect the source token, readout token, and reported probe gap.';
+				};
+
+				slider.addEventListener('input', () => {
+					pauseHttpAutoplay();
+					renderHttpTrace();
+				});
+				slider.addEventListener('focus', pauseHttpAutoplay);
+				slider.addEventListener('pointerdown', pauseHttpAutoplay);
+				renderHttpTrace();
+				httpAutoplayTimer = window.setInterval(autoplayHttp, 2400);
 			}
 		</script>
 	</body>

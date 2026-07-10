@@ -107,6 +107,10 @@ const mazeCells = Array.from({ length: 64 }, (_, index) => ({
 													feature remains decodable from the residual stream.
 												</p>
 											</div>
+											<p class="trace-subtitle" data-trace-subtitle>
+												Autoplay: the path starts at row 1, column 2 while the copper start-cell
+												signal is carried forward.
+											</p>
 
 											<div class="trace-grid">
 												<div class="maze-board" aria-label="Illustrative 8 by 8 maze path">
@@ -130,10 +134,6 @@ const mazeCells = Array.from({ length: 64 }, (_, index) => ({
 															</div>
 														))}
 													</div>
-													<p class="trace-note">
-														Copper signal: start cell carried forward. Blue signal: current
-														cell needed for the next path token. Green signal: goal cell.
-													</p>
 												</div>
 
 												<div class="probe-panel">
@@ -205,8 +205,20 @@ const mazeCells = Array.from({ length: 64 }, (_, index) => ({
 				const cells = [...trace.querySelectorAll('.maze-cell')];
 				const slider = trace.querySelector('[data-token-slider]');
 				const readout = trace.querySelector('[data-token-readout]');
+				const subtitle = trace.querySelector('[data-trace-subtitle]');
 				const start = mazePath[0];
 				const goal = mazePath[mazePath.length - 1];
+				let autoplayTimer;
+				let autoplayPaused = false;
+
+				const subtitles = [
+					'Autoplay: the path starts at row 1, column 2. This is the start cell, marked in copper.',
+					'The current token advances, but the start-cell marker stays visible as carried context.',
+					'Blue marks the current cell needed for the next path token. Green marks the goal cell.',
+					'By the later path tokens, the model is far from the start cell, but the start-cell feature remains decodable.',
+					'Reported MAZE result: start-cell probe accuracy is 20.2% for the trained model versus 5.0% for the untrained baseline.',
+					'The probe accuracy gap is +15.2 percentage points, so recoverable does not automatically mean useful.',
+				];
 
 				const renderMazeTrace = () => {
 					const position = Number(slider.value);
@@ -225,10 +237,30 @@ const mazeCells = Array.from({ length: 64 }, (_, index) => ({
 					});
 
 					readout.textContent = `Current token position: ${position} of ${mazePath.length} path tokens. Current cell: row ${current[0]}, column ${current[1]}. Start cell: row ${start[0]}, column ${start[1]}. Goal cell: row ${goal[0]}, column ${goal[1]}.`;
+					subtitle.textContent = subtitles[Math.min(position - 1, subtitles.length - 1)];
 				};
 
-				slider.addEventListener('input', renderMazeTrace);
+				const autoplay = () => {
+					if (autoplayPaused) return;
+					const nextPosition = Number(slider.value) >= mazePath.length ? 1 : Number(slider.value) + 1;
+					slider.value = String(nextPosition);
+					renderMazeTrace();
+				};
+
+				const pauseAutoplay = () => {
+					autoplayPaused = true;
+					window.clearInterval(autoplayTimer);
+					subtitle.textContent = 'Paused: adjust the slider to inspect a specific token position in the illustrative path.';
+				};
+
+				slider.addEventListener('input', () => {
+					pauseAutoplay();
+					renderMazeTrace();
+				});
+				slider.addEventListener('focus', pauseAutoplay);
+				slider.addEventListener('pointerdown', pauseAutoplay);
 				renderMazeTrace();
+				autoplayTimer = window.setInterval(autoplay, 1900);
 			}
 		</script>
 	</body>

@@ -311,10 +311,11 @@ hr {
 	border-radius: 8px;
 	margin-top: 1rem;
 	padding: 1rem;
+	overflow: hidden;
 }
 .trace-copy {
 	display: grid;
-	grid-template-columns: 16rem 1fr;
+	grid-template-columns: minmax(14rem, 0.55fr) minmax(0, 1fr);
 	gap: 1rem;
 	align-items: start;
 	margin-bottom: 1rem;
@@ -324,22 +325,34 @@ hr {
 	margin: 0;
 }
 .trace-copy p,
-.trace-note,
 .trace-controls p {
 	color: #6f6257;
 	font-size: 0.9rem;
 	line-height: 1.45;
 	margin: 0;
 }
+.trace-subtitle {
+	background: #2a211b;
+	border-radius: 8px;
+	color: #fff8f1;
+	font-size: 0.95rem;
+	font-weight: 700;
+	line-height: 1.4;
+	margin: 0 0 1rem;
+	padding: 0.75rem 0.9rem;
+}
 .trace-grid {
 	display: grid;
-	grid-template-columns: 16rem minmax(14rem, 1fr) minmax(16rem, 1fr);
+	grid-template-columns: minmax(0, 280px) minmax(0, 1fr) minmax(0, 1.05fr);
 	gap: 1rem;
+	align-items: stretch;
 }
 .maze-board {
 	display: grid;
 	grid-template-columns: repeat(8, 1fr);
 	gap: 0.25rem;
+	width: min(100%, 280px);
+	align-self: start;
 	background:
 		linear-gradient(90deg, rgba(42, 33, 27, 0.05) 1px, transparent 1px),
 		linear-gradient(rgba(42, 33, 27, 0.05) 1px, transparent 1px),
@@ -400,6 +413,7 @@ hr {
 	border: 1px solid #d8c2a8;
 	border-radius: 8px;
 	padding: 0.85rem;
+	min-width: 0;
 }
 .panel-label {
 	color: #a45632;
@@ -412,11 +426,11 @@ hr {
 .stream-lanes {
 	display: grid;
 	gap: 0.45rem;
-	margin-bottom: 0.75rem;
+	margin-bottom: 0;
 }
 .stream-lane {
 	display: grid;
-	grid-template-columns: 4.5rem 1fr;
+	grid-template-columns: 4.25rem minmax(0, 1fr);
 	gap: 0.65rem;
 	align-items: center;
 	color: #6f6257;
@@ -464,7 +478,7 @@ hr {
 }
 .trace-controls {
 	display: grid;
-	grid-template-columns: minmax(16rem, 0.9fr) 1fr;
+	grid-template-columns: minmax(14rem, 0.8fr) minmax(0, 1fr);
 	gap: 1rem;
 	align-items: center;
 	border-top: 1px solid rgba(141, 106, 79, 0.18);
@@ -585,6 +599,9 @@ footer span:last-child {
 	.trace-grid,
 	.trace-controls {
 		grid-template-columns: 1fr;
+	}
+	.maze-board {
+		width: min(100%, 340px);
 	}
 	.github-link {
 		display: none;

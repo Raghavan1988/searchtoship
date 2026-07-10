@@ -61,13 +61,15 @@ const mazeCells = Array.from({ length: 64 }, (_, index) => ({
 }));
 
 const mazeLayerProbeRows = [
-	{ layer: 'L0', trained: '4.9%', untrained: '4.4%', gap: '+0.6 pp', width: '3.6%' },
-	{ layer: 'L1', trained: '8.5%', untrained: '4.4%', gap: '+4.2 pp', width: '27.3%' },
-	{ layer: 'L2', trained: '16.3%', untrained: '4.5%', gap: '+11.8 pp', width: '77.6%' },
-	{ layer: 'L3', trained: '17.4%', untrained: '4.3%', gap: '+13.1 pp', width: '86.2%' },
-	{ layer: 'L4', trained: '18.5%', untrained: '4.2%', gap: '+14.3 pp', width: '94.1%' },
-	{ layer: 'L5', trained: '20.2%', untrained: '5.0%', gap: '+15.2 pp', width: '100%' },
+	{ layer: 'L0', trained: '4.9%', untrained: '4.4%', gap: '+0.6 percentage points', shortGap: '+0.6 pp', width: '3.6%' },
+	{ layer: 'L1', trained: '8.5%', untrained: '4.4%', gap: '+4.2 percentage points', shortGap: '+4.2 pp', width: '27.3%' },
+	{ layer: 'L2', trained: '16.3%', untrained: '4.5%', gap: '+11.8 percentage points', shortGap: '+11.8 pp', width: '77.6%' },
+	{ layer: 'L3', trained: '17.4%', untrained: '4.3%', gap: '+13.1 percentage points', shortGap: '+13.1 pp', width: '86.2%' },
+	{ layer: 'L4', trained: '18.5%', untrained: '4.2%', gap: '+14.3 percentage points', shortGap: '+14.3 pp', width: '94.1%' },
+	{ layer: 'L5', trained: '20.2%', untrained: '5.0%', gap: '+15.2 percentage points', shortGap: '+15.2 pp', width: '100%' },
 ];
+
+const attentionTokens = ['BOS', 'S', 'c2', 'c3', 'c4', 'C'];
 ---
 
 <!doctype html>
@@ -99,7 +101,7 @@ const mazeLayerProbeRows = [
 							<p class="project-area">{project.area}</p>
 							<h2>{project.title}</h2>
 							<p>{project.done}</p>
-							<a href={project.link}>{project.linkLabel}</a>
+							<a class="project-link" href={project.link}>{project.linkLabel}</a>
 							<details>
 								<summary>Key takeaways</summary>
 								<ul>
@@ -136,10 +138,11 @@ const mazeLayerProbeRows = [
 												<div class="stream-panel">
 													<p class="panel-label">Layer-by-layer start-cell probe accuracy</p>
 													<p class="layer-source-note">
-														Layer values come from
+														Source:
 														<a href="https://github.com/Raghavan1988/LatentWorldsGPT/blob/main/docs/results/results_maze_navigation.md">
 															results_maze_navigation.md</a
-														>. Best-layer summary comes from
+														>
+														and
 														<a href="https://github.com/Raghavan1988/LatentWorldsGPT/blob/main/docs/paper/report.md">
 															report.md</a
 														>.
@@ -154,21 +157,17 @@ const mazeLayerProbeRows = [
 																<span class="layer-bar" style={`--bar-width: ${row.width}`}>
 																	<i aria-hidden="true" />
 																</span>
-																<span class="layer-value">
-																	{row.trained} trained / {row.untrained} baseline / {row.gap} gap
+																<span class="layer-gap">{row.shortGap} gap</span>
+																<span class="layer-mini">
+																	trained {row.trained}; baseline {row.untrained}
 																</span>
 															</div>
 														))}
 													</div>
-													<div class="copy-mechanism" aria-label="Attention copy mechanism">
-														<span>first path token</span>
-														<i aria-hidden="true"></i>
-														<span>attention can read it</span>
-														<i aria-hidden="true"></i>
-														<span>residual stream carries it</span>
-														<i aria-hidden="true"></i>
-														<span>probe decodes start cell</span>
-													</div>
+													<p class="mechanism-caption">
+														The gap grows with depth: the start cell is increasingly
+														recoverable even after the path has moved on.
+													</p>
 												</div>
 											</div>
 
@@ -211,6 +210,48 @@ const mazeLayerProbeRows = [
 													</div>
 												</dl>
 											</div>
+
+											<details class="attention-details">
+												<summary>Show attention copy sketch</summary>
+												<div class="attention-visual">
+													<div>
+														<p class="panel-label">Toy attention matrix</p>
+														<div class="attention-matrix" aria-label="Toy attention matrix showing later tokens reading from the start token">
+															<span class="corner"></span>
+															{attentionTokens.map((token) => <span class="axis-token">{token}</span>)}
+															{attentionTokens.map((rowToken, rowIndex) => (
+																<>
+																	<span class="axis-token">{rowToken}</span>
+																	{attentionTokens.map((_, colIndex) => {
+																		const isStartColumn = colIndex === 1 && rowIndex > 1;
+																		const isDiagonal = rowIndex === colIndex;
+																		const className = isStartColumn
+																			? 'heat-cell reads-start'
+																			: isDiagonal
+																				? 'heat-cell diagonal'
+																				: 'heat-cell';
+																		return <span class={className}></span>;
+																	})}
+																</>
+															))}
+														</div>
+													</div>
+													<div class="attention-explain">
+														<h4>Why copying is cheap</h4>
+														<p>
+															In a causal transformer, later positions can attend backward to
+															earlier tokens. If the start cell sits in a stable early slot,
+															attention can keep reading that slot and writing a faint copy into
+															the residual stream.
+														</p>
+														<p>
+															The copper column is the start-token column. Its repeated vertical
+															activation is the visual metaphor for architectural carry-through:
+															easy to copy, not necessarily useful.
+														</p>
+													</div>
+												</div>
+											</details>
 										</div>
 									)
 								}

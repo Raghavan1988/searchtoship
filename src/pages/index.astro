@@ -10,7 +10,7 @@ const projects = [
 		theme: 'interpretability',
 		title: 'LatentWorldsGPT',
 		done:
-			'Small-transformer study, pre-registered across maze and HTTP domains, testing when residual-stream features are recoverable, useful, or merely cheap for the architecture to carry. The central update: probe recoverability is not the same thing as usefulness or causality.',
+			'Pre-registered small-transformer study across maze and HTTP domains. The work separates what a probe can recover from what the model actually uses, with concrete traces for architectural carry-through.',
 		link: 'https://github.com/Raghavan1988/LatentWorldsGPT',
 		linkLabel: 'GitHub',
 		takeaways: [
@@ -26,7 +26,7 @@ const projects = [
 		theme: 'evals',
 		title: 'SAGE: Scalable AI Governance & Evaluation',
 		done:
-			'Co-authored a KDD-accepted evaluation framework that turns calibrated human product judgment into scalable policy-aligned surrogate judges for industrial search.',
+			'KDD-accepted evaluation framework for turning calibrated human product judgment into scalable surrogate judges for industrial search, policy oversight, and regression detection.',
 		link: 'https://arxiv.org/abs/2602.07840',
 		linkLabel: 'arXiv 2602.07840',
 		takeaways: [
@@ -42,7 +42,7 @@ const projects = [
 		theme: 'search',
 		title: 'Unified Query Understanding for Semantic Search',
 		done:
-			'Co-authored a deployed structured query understanding system that consolidates search interpretation into schema-constrained generation with scalable annotation and evaluation.',
+			'Deployed structured query-understanding system that consolidates search interpretation into schema-constrained generation, scalable annotation, and evaluation for semantic search.',
 		link: 'https://arxiv.org/abs/2605.27441',
 		linkLabel: 'arXiv 2605.27441',
 		takeaways: [
@@ -156,12 +156,18 @@ const httpNotation = [
 		<Header />
 		<main class="home">
 			<section class="intro">
-				<p class="eyebrow">Search, evals, retrieval, interpretability</p>
+				<p class="eyebrow">Interpretability, evals, retrieval, production search</p>
 				<h1>Raghavan Muthuregunathan</h1>
 				<p class="lede">
-					Research-minded engineer building systems where model behavior, product judgment, and
-					production constraints meet.
+					I build and study AI systems at the boundary where model behavior has to become
+					inspectable, measurable, and useful in production.
 				</p>
+				<div class="intro-signals" aria-label="Work signals">
+					<span>Residual-stream probes</span>
+					<span>Policy-aligned evals</span>
+					<span>Semantic retrieval</span>
+					<span>Low-latency systems</span>
+				</div>
 				<div class="profile-links" aria-label="Profile links">
 					<a href="https://scholar.google.com/citations?user=grZULY8AAAAJ&hl=en">Google Scholar</a>
 					<a href="https://www.linkedin.com/in/raghavanmit">LinkedIn</a>

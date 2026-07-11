@@ -67,11 +67,13 @@ nav {
 }
 nav h2 {
 	margin: 0;
-	font-size: 0.95rem;
+	font-size: 0.9rem;
+	letter-spacing: 0;
 }
 nav h2 a,
 nav h2 a.active {
 	color: var(--ink);
+	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 	text-decoration: none;
 }
 nav a {
@@ -190,11 +192,29 @@ hr {
 	line-height: 1.42;
 	margin: 0.75rem 0 0;
 }
+.intro-signals {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.45rem;
+	margin-top: 1rem;
+	max-width: 820px;
+}
+.intro-signals span {
+	background: rgba(16, 23, 34, 0.045);
+	border: 1px solid rgba(17, 19, 24, 0.1);
+	border-radius: 999px;
+	color: #394150;
+	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+	font-size: 0.74rem;
+	font-weight: 700;
+	line-height: 1.15;
+	padding: 0.38rem 0.62rem;
+}
 .profile-links {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 0.55rem;
-	margin-top: 1rem;
+	margin-top: 0.85rem;
 }
 .profile-links a {
 	background: rgba(255, 253, 248, 0.82);

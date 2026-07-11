@@ -192,6 +192,30 @@ hr {
 	line-height: 1.42;
 	margin: 0.75rem 0 0;
 }
+.about-me {
+	max-width: 850px;
+	margin-top: 0.9rem;
+}
+.about-label {
+	color: var(--orange);
+	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+	font-size: 0.72rem;
+	font-weight: 700;
+	margin: 0 0 0.45rem;
+	text-transform: uppercase;
+}
+.about-me ul {
+	display: grid;
+	gap: 0.55rem;
+	margin: 0;
+	padding-left: 1.1rem;
+}
+.about-me li {
+	color: var(--muted);
+	font-size: clamp(1.02rem, 1.55vw, 1.18rem);
+	line-height: 1.45;
+	padding-left: 0.15rem;
+}
 .intro-signals {
 	display: flex;
 	flex-wrap: wrap;

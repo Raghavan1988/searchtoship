@@ -6,6 +6,24 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 
 const projects = [
 	{
+		area: 'From-scratch SLM',
+		theme: 'systems',
+		title: 'Legal SLM 125M',
+		done:
+			'Built a reproducible legal/financial small-language-model pipeline: public data curation, fresh tokenizer, 125M-parameter Llama-style pretraining, live inference, and a demo that makes the model limits visible.',
+		link: 'https://github.com/Raghavan1988/legal-slm-125m',
+		linkLabel: 'GitHub',
+		secondaryLink: 'https://raghavan.arena.labtoship.ai/',
+		secondaryLinkLabel: 'Live demo',
+		takeaways: [
+			'Trained a 125M-parameter Llama-style base model from scratch on legal and financial text, with fresh weights and a fresh 16K byte-level BPE tokenizer.',
+			'Built the full measured pipeline: stream, clean, near-dedup, decontaminate, tokenize, pack, pretrain, serve, and document each phase.',
+			'Used a legal-first corpus mix based on measured data yield: roughly 40% case law, 40% SEC filings, and 20% web text.',
+			'Ran 3 epochs on 8xH100 and reached 10.35 validation perplexity, with the full training run reported at about $27.',
+			'Designed the demo around honest capability boundaries: the base model completes legal-register text, but does not pretend to cite facts or answer grounded questions.',
+		],
+	},
+	{
 		area: 'Mechanistic Interpretability',
 		theme: 'interpretability',
 		title: 'LatentWorldsGPT',
@@ -192,7 +210,14 @@ const httpNotation = [
 							<p class="project-area">{project.area}</p>
 							<h2>{project.title}</h2>
 							<p>{project.done}</p>
-							<a class="project-link" href={project.link}>{project.linkLabel}</a>
+							<div class="project-actions">
+								<a class="project-link" href={project.link}>{project.linkLabel}</a>
+								{project.secondaryLink && (
+									<a class="project-link project-link-secondary" href={project.secondaryLink}>
+										{project.secondaryLinkLabel}
+									</a>
+								)}
+							</div>
 							<details>
 								<summary>Key takeaways</summary>
 								<ul>

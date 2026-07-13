@@ -309,11 +309,17 @@ hr {
 	line-height: 1.45;
 	margin: 0;
 }
-.project-card > .project-link {
+.project-actions {
 	grid-column: 4;
 	grid-row: 2;
 	justify-self: end;
 	align-self: start;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.4rem;
+	justify-content: flex-end;
+}
+.project-link {
 	background: var(--panel);
 	border: 1px solid var(--line-dark);
 	border-radius: 8px;
@@ -324,9 +330,19 @@ hr {
 	text-decoration: none;
 	white-space: nowrap;
 }
-.project-card > .project-link:hover {
+.project-link:hover {
 	background: var(--panel-soft);
 	color: #ffffff;
+}
+.project-link-secondary {
+	background: rgba(255, 253, 248, 0.9);
+	border-color: var(--line);
+	color: var(--ink);
+}
+.project-link-secondary:hover {
+	background: var(--ink);
+	border-color: var(--ink);
+	color: var(--paper-soft);
 }
 .project-card details {
 	grid-column: 2 / -1;
@@ -792,12 +808,41 @@ hr {
 .theme-interpretability .project-area {
 	color: #a45632;
 }
-.theme-interpretability > .project-link {
+.theme-systems {
+	background:
+		linear-gradient(180deg, rgba(248, 252, 255, 0.96), rgba(241, 245, 249, 0.9)),
+		#f8fafc;
+	border-color: #cbd5e1;
+}
+.theme-systems::before {
+	background: linear-gradient(90deg, #111318, #3b82f6, #10b981);
+}
+.theme-systems .project-area {
+	color: #0f766e;
+}
+.theme-systems .project-link {
+	background: #101722;
+	border-color: #2b394c;
+	color: #f8fafc;
+}
+.theme-systems .project-link:hover {
+	background: #162130;
+}
+.theme-systems .project-link-secondary {
+	background: #ffffff;
+	border-color: #cbd5e1;
+	color: #111318;
+}
+.theme-systems .project-link-secondary:hover {
+	background: #111318;
+	color: #ffffff;
+}
+.theme-interpretability .project-link {
 	background: #2a211b;
 	border-color: #5d4637;
 	color: #fff8f1;
 }
-.theme-interpretability > .project-link:hover {
+.theme-interpretability .project-link:hover {
 	background: #3a2b22;
 }
 .theme-evals {
@@ -812,12 +857,12 @@ hr {
 .theme-evals .project-area {
 	color: #4b5563;
 }
-.theme-evals > .project-link {
+.theme-evals .project-link {
 	background: #111318;
 	border-color: #111318;
 	color: #ffffff;
 }
-.theme-evals > .project-link:hover {
+.theme-evals .project-link:hover {
 	background: #2b3038;
 }
 .theme-search {
@@ -832,12 +877,12 @@ hr {
 .theme-search .project-area {
 	color: #2563eb;
 }
-.theme-search > .project-link {
+.theme-search .project-link {
 	background: #12326b;
 	border-color: #1d4ed8;
 	color: #f8fbff;
 }
-.theme-search > .project-link:hover {
+.theme-search .project-link:hover {
 	background: #164a96;
 }
 .attention-details {
@@ -945,13 +990,14 @@ footer span:last-child {
 	.project-area,
 	.project-card h2,
 	.project-card > p:not(.project-area),
-	.project-card > .project-link,
+	.project-actions,
 	.project-card details {
 		grid-column: 1;
 		grid-row: auto;
 	}
-	.project-card > .project-link {
+	.project-actions {
 		justify-self: start;
+		justify-content: flex-start;
 	}
 	.trace-copy,
 	.trace-grid,

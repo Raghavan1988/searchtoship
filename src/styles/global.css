@@ -1007,14 +1007,37 @@ footer span:last-child {
 	.http-metrics {
 		grid-template-columns: 1fr;
 	}
-	.layer-probe-row,
 	.probe-panel dl,
 	.attention-visual {
 		grid-template-columns: 1fr;
 	}
+	.notation-grid {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+	.layer-probe-row {
+		grid-template-columns: 2.4rem minmax(0, 1fr) auto;
+		gap: 0.3rem 0.6rem;
+	}
+	.layer-mini {
+		grid-column: 2 / -1;
+	}
 	.layer-gap,
 	.layer-mini {
 		white-space: normal;
+	}
+	.probe-panel div {
+		border-left: 0;
+		border-bottom: 1px solid rgba(141, 106, 79, 0.18);
+		padding: 0 0 0.6rem;
+	}
+	.probe-panel div:last-child {
+		border-bottom: 0;
+		padding-bottom: 0;
+	}
+	.project-card summary,
+	.visual-details > summary,
+	.attention-details summary {
+		padding: 0.35rem 0;
 	}
 	.maze-board {
 		width: min(100%, 340px);
@@ -1035,6 +1058,98 @@ footer span:last-child {
 	}
 	.github-link {
 		display: none;
+	}
+}
+@media (max-width: 520px) {
+	body {
+		font-size: 17px;
+		line-height: 1.6;
+	}
+	main {
+		max-width: 100%;
+		padding: 1.25rem 0.9rem 1.75rem;
+	}
+	nav {
+		flex-wrap: wrap;
+		gap: 0.15rem 1rem;
+		padding: 0.5rem 0;
+		min-height: 0;
+	}
+	nav h2 {
+		font-size: 0.78rem;
+	}
+	.internal-links {
+		font-size: 0.82rem;
+	}
+	h1 {
+		font-size: 2.1rem;
+		line-height: 1.12;
+	}
+	.eyebrow {
+		font-size: 0.68rem;
+		letter-spacing: 0.02em;
+	}
+	.about-me li {
+		font-size: 1rem;
+		line-height: 1.5;
+	}
+	.project-card {
+		padding: 0.85rem;
+		gap: 0.6rem;
+	}
+	.project-card h2 {
+		font-size: 1.3rem;
+	}
+	.project-actions {
+		width: 100%;
+	}
+	.project-link {
+		flex: 1 1 auto;
+		text-align: center;
+	}
+	.project-card ul {
+		font-size: 0.92rem;
+		padding-left: 1.05rem;
+	}
+	.maze-trace,
+	.http-trace {
+		margin-left: -0.35rem;
+		margin-right: -0.35rem;
+		padding: 0.75rem 0.65rem;
+	}
+	.visual-details {
+		padding: 0.65rem;
+	}
+	.trace-subtitle {
+		font-size: 0.85rem;
+		padding: 0.6rem 0.7rem;
+	}
+	.stream-panel,
+	.probe-panel,
+	.http-token-panel,
+	.http-step-panel {
+		padding: 0.7rem;
+	}
+	.notation-grid {
+		gap: 0.4rem;
+	}
+	.layer-probe-row {
+		font-size: 0.7rem;
+	}
+	.http-metrics {
+		grid-template-columns: 1fr;
+	}
+	.attention-explain {
+		padding: 0.75rem;
+	}
+	.attention-explain p {
+		font-size: 0.88rem;
+	}
+	.trace-controls {
+		gap: 0.75rem;
+	}
+	footer {
+		padding: 1.25em 0.9em;
 	}
 }
 

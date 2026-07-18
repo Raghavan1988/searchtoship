@@ -1108,6 +1108,20 @@ footer span:last-child {
 		font-size: 1rem;
 		line-height: 1.5;
 	}
+	.about-heading {
+		font-size: 1.75rem;
+	}
+	.about-page {
+		margin-top: 0.85rem;
+	}
+	.about-page ul {
+		gap: 0.65rem;
+		padding-left: 1rem;
+	}
+	.about-page li {
+		font-size: 0.98rem;
+		line-height: 1.55;
+	}
 	.project-card {
 		padding: 0.85rem;
 		gap: 0.6rem;

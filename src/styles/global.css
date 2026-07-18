@@ -270,6 +270,36 @@ hr {
 	border-color: var(--ink);
 	color: var(--paper-soft);
 }
+.profile-links a[href*='linkedin.com'] {
+	background: #0a66c2;
+	border-color: #004182;
+	color: #ffffff;
+}
+.profile-links a[href*='linkedin.com']:hover {
+	background: #004182;
+	border-color: #004182;
+	color: #ffffff;
+}
+.profile-links a[href*='scholar.google'] {
+	background: #4285f4;
+	border-color: #1a73e8;
+	color: #ffffff;
+}
+.profile-links a[href*='scholar.google']:hover {
+	background: #1a73e8;
+	border-color: #174ea6;
+	color: #ffffff;
+}
+.profile-links a[href*='github.com'] {
+	background: #24292f;
+	border-color: #1b1f24;
+	color: #ffffff;
+}
+.profile-links a[href*='github.com']:hover {
+	background: #000000;
+	border-color: #000000;
+	color: #ffffff;
+}
 .project-list {
 	display: grid;
 	grid-template-columns: minmax(0, 1fr);

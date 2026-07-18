@@ -281,13 +281,13 @@ hr {
 	color: #ffffff;
 }
 .profile-links a[href*='scholar.google'] {
-	background: #4285f4;
-	border-color: #1a73e8;
+	background: linear-gradient(135deg, #051094, #3d6cff, #7ba8ff);
+	border-color: #051094;
 	color: #ffffff;
 }
 .profile-links a[href*='scholar.google']:hover {
-	background: #1a73e8;
-	border-color: #174ea6;
+	background: linear-gradient(135deg, #030a63, #2b53d6, #5f8ef5);
+	border-color: #030a63;
 	color: #ffffff;
 }
 .profile-links a[href*='github.com'] {

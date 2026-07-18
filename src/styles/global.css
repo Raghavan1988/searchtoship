@@ -984,6 +984,21 @@ footer {
 	color: var(--muted);
 	text-align: center;
 }
+.footer-quote {
+	flex-basis: 100%;
+	color: var(--ink);
+	font-size: 1.02rem;
+	font-style: italic;
+	line-height: 1.45;
+	margin: 0 0 0.35rem;
+}
+.footer-quote-attribution {
+	color: var(--muted);
+	display: block;
+	font-size: 0.85rem;
+	font-style: normal;
+	margin-top: 0.25rem;
+}
 footer span:last-child {
 	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 	font-size: 0.78rem;

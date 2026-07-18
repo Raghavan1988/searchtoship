@@ -1,0 +1,62 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { SITE_TITLE } from '../consts';
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead
+			title={`About | ${SITE_TITLE}`}
+			description="About Raghavan Muthuregunathan: Senior Engineering Manager, Search AI at LinkedIn."
+		/>
+	</head>
+	<body>
+		<Header />
+		<main class="home">
+			<section class="intro">
+				<p class="eyebrow">About me</p>
+				<h1 class="about-heading">Raghavan Muthuregunathan</h1>
+				<div class="about-me about-page">
+					<ul>
+						<li>
+							Senior Engineering Manager, Search AI at LinkedIn — leading the teams behind global
+							typeahead, search results page optimization, and Knowledge Coach, LinkedIn's Premium
+							GenAI assistant.
+						</li>
+						<li>
+							Shipped AI-powered People Search to LinkedIn's 1.3B+ members: natural-language search
+							built on semantic retrieval, intelligent query routing, and fine-tuned small language
+							models.
+						</li>
+						<li>
+							10+ years in search and machine learning across LinkedIn and Microsoft Bing — query
+							understanding, ranking, retrieval, and whole-page optimization.
+						</li>
+						<li>
+							MS in Computer Science from Columbia University; B.Tech in Information Technology
+							from Anna University (MIT campus). Inventor on 5 patents.
+						</li>
+						<li>
+							Co-lead of GenAI Commons (applications, education &amp; outreach) at the Linux
+							Foundation, and volunteer with the UN AI for Good disaster-management focus group.
+						</li>
+						<li>
+							Interested in reliable AI-powered search and assistants: evaluating LLM experiences
+							for quality, latency, and cost — and helping engineers and managers grow in ML and
+							search.
+						</li>
+					</ul>
+				</div>
+				<div class="profile-links" aria-label="Profile links">
+					<a href="https://www.linkedin.com/in/raghavanmit">LinkedIn</a>
+					<a href="https://scholar.google.com/citations?user=grZULY8AAAAJ&hl=en">Google Scholar</a>
+					<a href="https://github.com/Raghavan1988">GitHub</a>
+				</div>
+			</section>
+		</main>
+		<Footer />
+	</body>
+</html>

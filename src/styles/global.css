@@ -992,6 +992,14 @@ footer {
 	line-height: 1.45;
 	margin: 0 0 0.35rem;
 }
+.footer-quote-fine {
+	color: var(--muted);
+	font-size: 0.78rem;
+	line-height: 1.4;
+}
+.footer-quote-fine .footer-quote-attribution {
+	font-size: 0.72rem;
+}
 .footer-quote-attribution {
 	color: var(--muted);
 	display: block;

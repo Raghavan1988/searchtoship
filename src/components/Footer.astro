@@ -1,16 +1,33 @@
 ---
 const today = new Date();
-const {
-	quote = 'What I cannot create, I do not understand.',
-	fine = false,
-} = Astro.props;
+const { fine = false } = Astro.props;
 ---
 
 <footer>
 	<p class:list={['footer-quote', { 'footer-quote-fine': fine }]}>
-		&ldquo;{quote}&rdquo;
+		<span data-quote-text>&ldquo;What I cannot create, I do not understand.&rdquo;</span>
 		<span class="footer-quote-attribution">&mdash; Richard Feynman</span>
 	</p>
 	<span>&copy; {today.getFullYear()} Raghavan Muthuregunathan</span>
 	<span>retrieval -> evals -> production</span>
 </footer>
+
+<script is:inline>
+	(() => {
+		const quotes = [
+			'What I cannot create, I do not understand.',
+			'The first principle is that you must not fool yourself — and you are the easiest person to fool.',
+			'I would rather have questions that can’t be answered than answers that can’t be questioned.',
+			'It doesn’t matter how beautiful your theory is. If it doesn’t agree with experiment, it’s wrong.',
+			'Study hard what interests you the most, in the most undisciplined, irreverent and original manner possible.',
+			'Nature cannot be fooled.',
+		];
+		const el = document.querySelector('[data-quote-text]');
+		if (!el) return;
+		let index = 0;
+		window.setInterval(() => {
+			index = (index + 1) % quotes.length;
+			el.textContent = `“${quotes[index]}”`;
+		}, 10000);
+	})();
+</script>

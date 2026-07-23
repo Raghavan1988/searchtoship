@@ -1,0 +1,680 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { SITE_TITLE } from '../consts';
+
+const pageTitle = 'Why the Bandit Can’t Win — Live Demo';
+const pageDescription =
+	'An interactive demo of acceptance-aware speculation: why a bandit that learns a draft length converges to the best fixed count, while a free confidence signal read before drafting beats it.';
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={`${pageTitle} | ${SITE_TITLE}`} description={pageDescription} />
+	</head>
+	<body>
+		<Header />
+		<main class="bvs">
+			<div class="prose">
+				<div class="kicker">Demo · Speculative decoding · Acceptance-aware speculation</div>
+				<h1>Why the bandit can't win — and a free signal can</h1>
+				<p class="lede">
+					In speculative decoding, a small draft model guesses several tokens at once and the big
+					target model verifies them in one pass. The question: <strong
+						>how many tokens should you draft each round?</strong
+					> This demo shows why "learning" the answer with a bandit hits a ceiling, and why a signal
+					that's free and available <em>before</em> drafting breaks through it.
+				</p>
+				<p class="backlink"><a href="/circuit-aware-speculation">← Read the full study</a></p>
+
+				<h2>The world: some rounds are easy, some are hard</h2>
+				<p>
+					Acceptance isn't uniform. When the draft model is on familiar ground (code syntax, numbers,
+					boilerplate) its guesses land ~90% of the time. On meaning-heavy spots (names, reasoning
+					turns) it drops to ~30%. Every drafted token that gets rejected is
+					<span class="wasted-word">wasted compute</span>; every accepted one is
+					<span class="accepted-word">free speedup</span>.
+				</p>
+
+				<h2>Three players, one race</h2>
+				<p>
+					<strong>Fixed</strong> always drafts 8 tokens. <strong>Bandit</strong> tries different counts
+					and learns which one pays best <em>on average</em>. <strong>Adaptive</strong> peeks at one
+					<span class="signal-word">free signal</span> — the draft model's own confidence, which it already
+					computes before drafting anything — and drafts long when confident, short when unsure.
+				</p>
+			</div>
+
+			<div class="panel" role="group" aria-label="Simulation">
+				<div class="controls">
+					<button class="primary" id="btn-run">▶ Run</button>
+					<button id="btn-step">Step one round</button>
+					<button id="btn-reset">Reset</button>
+					<span class="round-label" id="round-label">round 0</span>
+				</div>
+
+				<div class="lane" id="lane-fixed">
+					<div class="lane-head">
+						<span class="lane-name">Fixed k = 8</span>
+						<span class="lane-sub">the best single count, found by grid search</span>
+						<span class="lane-stats"
+							><span class="stat-eff" id="eff-fixed">eff —</span><span
+								class="stat-waste"
+								id="waste-fixed">waste —</span
+							></span
+						>
+					</div>
+					<div class="strip" id="strip-fixed"></div>
+				</div>
+
+				<div class="lane" id="lane-bandit">
+					<div class="lane-head">
+						<span class="lane-name">Bandit</span>
+						<span class="lane-sub">tries k ∈ &#123;2,4,6,8&#125;, learns the best average arm</span>
+						<span class="lane-stats"
+							><span class="stat-eff" id="eff-bandit">eff —</span><span
+								class="stat-waste"
+								id="waste-bandit">waste —</span
+							></span
+						>
+					</div>
+					<div class="strip" id="strip-bandit"></div>
+				</div>
+
+				<div class="lane" id="lane-adaptive">
+					<div class="lane-head">
+						<span class="lane-name">Adaptive</span>
+						<span class="lane-sub">reads the free confidence signal, then picks k = 8 or k = 2</span>
+						<span class="lane-stats"
+							><span class="stat-eff" id="eff-adaptive">eff —</span><span
+								class="stat-waste"
+								id="waste-adaptive">waste —</span
+							></span
+						>
+					</div>
+					<div class="strip" id="strip-adaptive"></div>
+				</div>
+
+				<div class="legend">
+					<span class="lg-ok">accepted token</span>
+					<span class="lg-waste">wasted (rejected) token</span>
+					<span class="lg-acc">confidence signal read before drafting</span>
+				</div>
+
+				<div class="bars" aria-label="Efficiency comparison">
+					<span class="bar-label">Fixed 8</span>
+					<div class="bar-track"><div class="bar-fill muted" id="bar-fixed"></div></div>
+					<span class="bar-val" id="bv-fixed">—</span>
+					<span class="bar-label">Bandit</span>
+					<div class="bar-track"><div class="bar-fill muted" id="bar-bandit"></div></div>
+					<span class="bar-val" id="bv-bandit">—</span>
+					<span class="bar-label">Adaptive</span>
+					<div class="bar-track"><div class="bar-fill" id="bar-adaptive"></div></div>
+					<span class="bar-val" id="bv-adaptive">—</span>
+				</div>
+				<p class="cap">
+					Efficiency = accepted tokens per unit of drafting + verify work. Higher is faster decoding
+					for the same output — the output text is bit-identical in all three lanes.
+				</p>
+			</div>
+
+			<div class="prose">
+				<h2>Watch what the bandit learns</h2>
+				<p>
+					The bandit's estimate for each arm converges — to <strong
+						>k = 8, the best fixed count</strong
+					>. That's the ceiling: a bandit gets its reward <em>after</em> the round, so it can only learn
+					"which count is best on average." It has no way to know <em>this</em> round is a hard one.
+				</p>
+			</div>
+
+			<div class="panel">
+				<div class="chart-wrap">
+					<canvas
+						id="chart"
+						width="900"
+						height="160"
+						role="img"
+						aria-label="Bandit arm value estimates converging over rounds"></canvas>
+				</div>
+				<p class="cap" id="chart-cap">
+					Bandit's estimated payoff per arm. Run the simulation to see all arms converge, with k = 8
+					on top — exactly the fixed baseline.
+				</p>
+			</div>
+
+			<div class="prose">
+				<div class="callout">
+					<p>
+						<strong>The idea in one line:</strong> a bandit optimizes the <em>average</em> round; the
+						free signal lets you optimize <em>each</em> round. Information available <em>before</em> the
+						decision beats any amount of learning that arrives after it.
+					</p>
+				</div>
+
+				<h2>Why "cheaper" matters</h2>
+				<p>
+					The confidence signal costs nothing: the draft model already produces its own token
+					probabilities as a by-product of drafting. In the real study, these free signals predict
+					acceptance with AUROC ≈ 0.87 — and probing the model's <em>internal hidden states</em>
+					(expensive, invasive) adds at most +0.006 on top. You don't need to open the model up; the
+					cheap signal it already emits is enough.
+				</p>
+				<p>
+					On real traces (302k tokens, 322 held-out prompts) this rule beat the best fixed count by
+					<strong class="accepted-word">+11.2% efficiency</strong> and cut wasted draft tokens by
+					<strong>62%</strong> — with the output text guaranteed identical to the target model decoding
+					alone. <a href="/circuit-aware-speculation">Full study →</a>
+				</p>
+			</div>
+		</main>
+		<Footer />
+	</body>
+</html>
+
+<style>
+	.bvs {
+		--bvs-paper: #f5f7f8;
+		--bvs-panel: #ffffff;
+		--bvs-panel-2: #eef1f3;
+		--bvs-ink: #101418;
+		--bvs-ink-soft: #4b555e;
+		--bvs-line: #d7dde1;
+		--bvs-accent: #0f766e;
+		--bvs-accent-soft: #0f766e22;
+		--bvs-good: #2e7d32;
+		--bvs-good-bg: #2e7d3222;
+		--bvs-bad: #c2410c;
+		--bvs-bad-bg: #c2410c22;
+		--bvs-verify: #6b7280;
+		max-width: 60rem;
+		margin: 0 auto;
+		padding: 2.5rem 1.25rem 5rem;
+		color: var(--bvs-ink);
+		line-height: 1.6;
+	}
+	@media (prefers-color-scheme: dark) {
+		.bvs {
+			--bvs-paper: #0e1114;
+			--bvs-panel: #161b20;
+			--bvs-panel-2: #1d242b;
+			--bvs-ink: #e8ecef;
+			--bvs-ink-soft: #9aa6af;
+			--bvs-line: #2b343c;
+			--bvs-accent: #2dd4bf;
+			--bvs-accent-soft: #2dd4bf22;
+			--bvs-good: #4ade80;
+			--bvs-good-bg: #4ade8022;
+			--bvs-bad: #fb923c;
+			--bvs-bad-bg: #fb923c22;
+			--bvs-verify: #8b949e;
+		}
+	}
+	.bvs .prose {
+		max-width: 42rem;
+	}
+	.bvs h1 {
+		font-size: clamp(1.6rem, 4vw, 2.2rem);
+		line-height: 1.2;
+		text-wrap: balance;
+		margin: 0 0 0.35rem;
+	}
+	.bvs .kicker {
+		font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+		font-size: 0.72rem;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--bvs-accent);
+		margin-bottom: 0.6rem;
+	}
+	.bvs .lede {
+		color: var(--bvs-ink-soft);
+		font-size: 1.05rem;
+		margin-top: 0.5rem;
+	}
+	.bvs .backlink {
+		font-size: 0.9rem;
+	}
+	.bvs h2 {
+		font-size: 1.25rem;
+		margin: 2.75rem 0 0.5rem;
+		text-wrap: balance;
+	}
+	.bvs p {
+		margin: 0.6rem 0;
+	}
+	.bvs .accepted-word {
+		color: var(--bvs-good);
+		font-weight: 600;
+	}
+	.bvs .wasted-word {
+		color: var(--bvs-bad);
+		font-weight: 600;
+	}
+	.bvs .signal-word {
+		color: var(--bvs-accent);
+		font-weight: 600;
+	}
+	.bvs .panel {
+		background: var(--bvs-panel);
+		border: 1px solid var(--bvs-line);
+		border-radius: 10px;
+		padding: 1.1rem 1.25rem 1.25rem;
+		margin: 1.25rem 0;
+	}
+	.bvs .controls {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.6rem;
+		align-items: center;
+		margin-bottom: 1rem;
+	}
+	.bvs button {
+		font: inherit;
+		font-weight: 600;
+		padding: 0.45rem 1.1rem;
+		border-radius: 7px;
+		border: 1px solid var(--bvs-line);
+		background: var(--bvs-panel-2);
+		color: var(--bvs-ink);
+		cursor: pointer;
+	}
+	.bvs button.primary {
+		background: var(--bvs-accent);
+		border-color: var(--bvs-accent);
+		color: var(--bvs-paper);
+	}
+	.bvs button:focus-visible {
+		outline: 2px solid var(--bvs-accent);
+		outline-offset: 2px;
+	}
+	.bvs .round-label {
+		margin-left: auto;
+		font-family: ui-monospace, monospace;
+		font-size: 0.8rem;
+		color: var(--bvs-ink-soft);
+	}
+	.bvs .lane {
+		border: 1px solid var(--bvs-line);
+		border-radius: 8px;
+		padding: 0.75rem 0.9rem;
+		margin-bottom: 0.75rem;
+		background: var(--bvs-panel);
+	}
+	.bvs .lane.winner {
+		border-color: var(--bvs-accent);
+		box-shadow: 0 0 0 1px var(--bvs-accent);
+	}
+	.bvs .lane-head {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.35rem 0.9rem;
+		align-items: baseline;
+		margin-bottom: 0.5rem;
+	}
+	.bvs .lane-name {
+		font-weight: 700;
+		font-size: 0.95rem;
+	}
+	.bvs .lane-sub {
+		font-size: 0.78rem;
+		color: var(--bvs-ink-soft);
+	}
+	.bvs .lane-stats {
+		margin-left: auto;
+		font-family: ui-monospace, monospace;
+		font-size: 0.82rem;
+		font-variant-numeric: tabular-nums;
+		display: flex;
+		gap: 1rem;
+	}
+	.bvs .stat-eff {
+		color: var(--bvs-accent);
+		font-weight: 700;
+	}
+	.bvs .stat-waste {
+		color: var(--bvs-bad);
+	}
+	.bvs .strip {
+		display: flex;
+		gap: 3px;
+		align-items: center;
+		flex-wrap: wrap;
+		min-height: 22px;
+	}
+	.bvs :global(.round-group) {
+		display: inline-flex;
+		gap: 3px;
+		align-items: center;
+		margin-right: 10px;
+	}
+	.bvs :global(.tok) {
+		width: 14px;
+		height: 18px;
+		border-radius: 3px;
+		background: var(--bvs-panel-2);
+		border: 1px solid var(--bvs-line);
+	}
+	.bvs :global(.tok.ok) {
+		background: var(--bvs-good-bg);
+		border-color: var(--bvs-good);
+	}
+	.bvs :global(.tok.waste) {
+		background: var(--bvs-bad-bg);
+		border-color: var(--bvs-bad);
+	}
+	.bvs :global(.sig-chip) {
+		font-family: ui-monospace, monospace;
+		font-size: 0.68rem;
+		letter-spacing: 0.05em;
+		padding: 0.1rem 0.45rem;
+		border-radius: 99px;
+		border: 1px solid var(--bvs-line);
+		color: var(--bvs-ink-soft);
+		margin-right: 0.35rem;
+	}
+	.bvs :global(.sig-chip.on) {
+		border-color: var(--bvs-accent);
+		color: var(--bvs-accent);
+		background: var(--bvs-accent-soft);
+	}
+	.bvs :global(.k-chip) {
+		font-family: ui-monospace, monospace;
+		font-size: 0.68rem;
+		color: var(--bvs-ink-soft);
+		margin-right: 0.35rem;
+	}
+	.bvs .bars {
+		display: grid;
+		grid-template-columns: max-content 1fr max-content;
+		gap: 0.45rem 0.7rem;
+		align-items: center;
+		margin-top: 0.75rem;
+	}
+	.bvs .bar-track {
+		background: var(--bvs-panel-2);
+		border-radius: 5px;
+		height: 16px;
+		overflow: hidden;
+	}
+	.bvs .bar-fill {
+		height: 100%;
+		background: var(--bvs-accent);
+		border-radius: 5px;
+		width: 0;
+		transition: width 0.3s;
+	}
+	.bvs .bar-fill.muted {
+		background: var(--bvs-verify);
+	}
+	.bvs .bar-label {
+		font-size: 0.82rem;
+	}
+	.bvs .bar-val {
+		font-family: ui-monospace, monospace;
+		font-size: 0.82rem;
+		font-variant-numeric: tabular-nums;
+	}
+	.bvs .chart-wrap {
+		overflow-x: auto;
+	}
+	.bvs canvas {
+		display: block;
+		width: 100%;
+		height: 160px;
+	}
+	.bvs .cap {
+		font-size: 0.8rem;
+		color: var(--bvs-ink-soft);
+		margin-top: 0.4rem;
+	}
+	.bvs .legend {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 1rem;
+		font-size: 0.78rem;
+		color: var(--bvs-ink-soft);
+		margin-top: 0.5rem;
+	}
+	.bvs .legend span::before {
+		content: '';
+		display: inline-block;
+		width: 10px;
+		height: 10px;
+		border-radius: 2px;
+		margin-right: 0.35rem;
+		vertical-align: -1px;
+	}
+	.bvs .lg-ok::before {
+		background: var(--bvs-good);
+	}
+	.bvs .lg-waste::before {
+		background: var(--bvs-bad);
+	}
+	.bvs .lg-acc::before {
+		background: var(--bvs-accent);
+	}
+	.bvs .callout {
+		border-left: 3px solid var(--bvs-accent);
+		background: var(--bvs-accent-soft);
+		padding: 0.75rem 1rem;
+		border-radius: 0 8px 8px 0;
+		margin: 1.25rem 0;
+	}
+	.bvs .callout p {
+		margin: 0.3rem 0;
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.bvs .bar-fill {
+			transition: none;
+		}
+	}
+</style>
+
+<script>
+	(() => {
+		'use strict';
+		// ---- world ----
+		const P_EASY = 0.9,
+			P_HARD = 0.3,
+			EASY_FRAC = 0.5;
+		const SIGNAL_ACC = 0.92; // signal reads the true regime 92% of the time
+		const ARMS = [2, 4, 6, 8];
+		const VERIFY_COST = 1; // one verify pass per round
+		const MAX_STRIP_ROUNDS = 6; // rounds visible per lane
+
+		let round = 0;
+		let timer: ReturnType<typeof setInterval> | null = null;
+		type Stat = { accepted: number; drafted: number; rounds: number; wasted: number };
+		const mk = (): Stat => ({ accepted: 0, drafted: 0, rounds: 0, wasted: 0 });
+		let stats: Record<string, Stat>;
+		let bandit: { n: number[]; q: number[] };
+		let history: number[][];
+
+		const $ = (id: string) => document.getElementById(id)!;
+
+		function reset() {
+			stats = { fixed: mk(), bandit: mk(), adaptive: mk() };
+			bandit = { n: ARMS.map(() => 0), q: ARMS.map(() => 0) };
+			history = [];
+			round = 0;
+			for (const id of ['strip-fixed', 'strip-bandit', 'strip-adaptive']) $(id).replaceChildren();
+			['fixed', 'bandit', 'adaptive'].forEach(updateStats);
+			$('round-label').textContent = 'round 0';
+			$('lane-adaptive').classList.remove('winner');
+			drawChart();
+		}
+
+		// draft k tokens in regime p: accepted = run until first reject
+		function playRound(k: number, p: number) {
+			let acc = 0;
+			while (acc < k && Math.random() < p) acc++;
+			return { acc, drafted: k };
+		}
+
+		const eff = (s: Stat) => (s.rounds ? s.accepted / (s.drafted + s.rounds * VERIFY_COST) : 0);
+		const wpk = (s: Stat) => (s.accepted ? s.wasted / s.accepted : 0);
+
+		function record(name: string, r: { acc: number; drafted: number }) {
+			const s = stats[name];
+			s.accepted += r.acc;
+			s.drafted += r.drafted;
+			s.wasted += r.drafted - r.acc;
+			s.rounds++;
+		}
+
+		function renderRound(
+			name: string,
+			r: { acc: number; drafted: number },
+			signal: boolean | null
+		) {
+			const strip = $('strip-' + name);
+			const group = document.createElement('span');
+			group.className = 'round-group';
+			if (signal != null) {
+				const chip = document.createElement('span');
+				chip.className = signal ? 'sig-chip on' : 'sig-chip';
+				chip.textContent = signal ? 'conf' : 'unsure';
+				group.appendChild(chip);
+			}
+			const kchip = document.createElement('span');
+			kchip.className = 'k-chip';
+			kchip.textContent = 'k=' + r.drafted;
+			group.appendChild(kchip);
+			for (let i = 0; i < r.drafted; i++) {
+				const t = document.createElement('span');
+				t.className = 'tok ' + (i < r.acc ? 'ok' : 'waste');
+				group.appendChild(t);
+			}
+			strip.appendChild(group);
+			while (strip.children.length > MAX_STRIP_ROUNDS) strip.removeChild(strip.firstChild!);
+		}
+
+		function updateStats(name: string) {
+			const s = stats[name];
+			$('eff-' + name).textContent = 'eff ' + (s.rounds ? eff(s).toFixed(2) : '—');
+			$('waste-' + name).textContent = 'waste ' + (s.rounds ? wpk(s).toFixed(2) : '—');
+			const e = eff(s);
+			($('bar-' + name) as HTMLElement).style.width = Math.min(100, e * 100) + '%';
+			$('bv-' + name).textContent = s.rounds ? e.toFixed(2) : '—';
+		}
+
+		function step() {
+			round++;
+			const easy = Math.random() < EASY_FRAC;
+			const p = easy ? P_EASY : P_HARD;
+
+			// fixed
+			const rf = playRound(8, p);
+			record('fixed', rf);
+			renderRound('fixed', rf, null);
+
+			// bandit: epsilon-greedy
+			const eps = Math.max(0.05, 1 - round / 60);
+			let armIdx: number;
+			if (Math.random() < eps) armIdx = Math.floor(Math.random() * ARMS.length);
+			else armIdx = bandit.q.indexOf(Math.max(...bandit.q));
+			const k = ARMS[armIdx];
+			const rb = playRound(k, p);
+			const reward = rb.acc / (k + VERIFY_COST);
+			bandit.n[armIdx]++;
+			bandit.q[armIdx] += (reward - bandit.q[armIdx]) / bandit.n[armIdx];
+			record('bandit', rb);
+			renderRound('bandit', rb, null);
+			history.push(bandit.q.slice());
+
+			// adaptive: read (noisy) signal BEFORE drafting
+			const signalSaysEasy = Math.random() < SIGNAL_ACC ? easy : !easy;
+			const ka = signalSaysEasy ? 8 : 2;
+			const ra = playRound(ka, p);
+			record('adaptive', ra);
+			renderRound('adaptive', ra, signalSaysEasy);
+
+			['fixed', 'bandit', 'adaptive'].forEach(updateStats);
+			$('round-label').textContent = 'round ' + round;
+			if (round > 30 && eff(stats.adaptive) > eff(stats.fixed) && eff(stats.adaptive) > eff(stats.bandit)) {
+				$('lane-adaptive').classList.add('winner');
+			}
+			drawChart();
+		}
+
+		function drawChart() {
+			const cv = $('chart') as HTMLCanvasElement;
+			const ctx = cv.getContext('2d')!;
+			const css = getComputedStyle(document.querySelector('.bvs')!);
+			const col = (v: string) => css.getPropertyValue(v).trim();
+			ctx.clearRect(0, 0, cv.width, cv.height);
+			const W = cv.width,
+				H = cv.height,
+				pad = 28;
+			ctx.strokeStyle = col('--bvs-line');
+			ctx.lineWidth = 1;
+			ctx.beginPath();
+			for (let g = 0; g <= 4; g++) {
+				const y = pad + ((H - 2 * pad) * g) / 4;
+				ctx.moveTo(pad, y);
+				ctx.lineTo(W - 8, y);
+			}
+			ctx.stroke();
+			if (!history.length) return;
+			const maxQ = 0.85;
+			const colors = [col('--bvs-verify'), col('--bvs-verify'), col('--bvs-verify'), col('--bvs-accent')];
+			const n = history.length;
+			ARMS.forEach((arm, ai) => {
+				ctx.strokeStyle = colors[ai];
+				ctx.lineWidth = ai === 3 ? 2.5 : 1.25;
+				ctx.globalAlpha = ai === 3 ? 1 : 0.55;
+				ctx.beginPath();
+				history.forEach((q, i) => {
+					const x = pad + (W - pad - 8) * (n === 1 ? 0 : i / (n - 1));
+					const y = H - pad - (H - 2 * pad) * Math.min(1, q[ai] / maxQ);
+					i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+				});
+				ctx.stroke();
+				const last = history[n - 1][ai];
+				const y = H - pad - (H - 2 * pad) * Math.min(1, last / maxQ);
+				ctx.globalAlpha = 1;
+				ctx.fillStyle = colors[ai];
+				ctx.font = '12px ui-monospace, monospace';
+				ctx.fillText('k=' + arm, W - 42, Math.max(12, Math.min(H - 4, y + 4)));
+			});
+			ctx.globalAlpha = 1;
+		}
+
+		const runBtn = $('btn-run');
+		function stopTimer() {
+			if (timer) {
+				clearInterval(timer);
+				timer = null;
+				runBtn.textContent = '▶ Run';
+			}
+		}
+		$('btn-step').addEventListener('click', () => {
+			stopTimer();
+			step();
+		});
+		$('btn-reset').addEventListener('click', () => {
+			stopTimer();
+			reset();
+		});
+		runBtn.addEventListener('click', () => {
+			if (timer) {
+				stopTimer();
+				return;
+			}
+			runBtn.textContent = '❚❚ Pause';
+			const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+			timer = setInterval(
+				() => {
+					step();
+					if (round >= 200) stopTimer();
+				},
+				reduced ? 400 : 220
+			);
+		});
+
+		reset();
+	})();
+</script>

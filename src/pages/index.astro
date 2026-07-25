@@ -10,17 +10,17 @@ const projects = [
 		theme: 'systems',
 		title: 'Legal SLM 125M',
 		done:
-			'Built a reproducible legal/financial small-language-model pipeline: public data curation, fresh tokenizer, 125M-parameter Llama-style pretraining, live inference, and a demo that makes the model limits visible.',
+			'A small language model for legal and finance text, built end to end. Public data, a fresh tokenizer, a 125M Llama-style model trained from scratch, live serving, and a demo that shows where the model stops.',
 		link: 'https://github.com/Raghavan1988/legal-slm-125m',
 		linkLabel: 'GitHub',
 		secondaryLink: 'https://raghavan.arena.labtoship.ai/',
 		secondaryLinkLabel: 'Live demo',
 		takeaways: [
-			'Trained a 125M-parameter Llama-style base model from scratch on legal and financial text, with fresh weights and a fresh 16K byte-level BPE tokenizer.',
-			'Built the full measured pipeline: stream, clean, near-dedup, decontaminate, tokenize, pack, pretrain, serve, and document each phase.',
-			'Used a legal-first corpus mix based on measured data yield: roughly 40% case law, 40% SEC filings, and 20% web text.',
-			'Ran 3 epochs on 8xH100 and reached 10.35 validation perplexity, with the full training run reported at about $27.',
-			'Designed the demo around honest capability boundaries: the base model completes legal-register text, but does not pretend to cite facts or answer grounded questions.',
+			'Trained a 125M Llama-style base model from scratch on legal and finance text. Fresh weights. A fresh 16K byte-level BPE tokenizer.',
+			'Built the whole chain and timed each step: stream, clean, drop near-copies, strip test data, tokenize, pack, train, serve, and write it up.',
+			'Chose a legal-first data mix from measured yield. Roughly 40% case law, 40% SEC filings, and 20% web text.',
+			'Ran 3 epochs on 8xH100. Reached 10.35 perplexity on held-out text. The whole run cost about $27.',
+			'Built the demo around honest limits. The base model finishes legal-style text. It does not pretend to cite facts or answer grounded questions.',
 		],
 	},
 	{
@@ -28,15 +28,15 @@ const projects = [
 		theme: 'interpretability',
 		title: 'LatentWorldsGPT',
 		done:
-			'Pre-registered small-transformer study across maze and HTTP domains. The work separates what a probe can recover from what the model actually uses, with concrete traces for architectural carry-through.',
+			'A pre-registered study of small transformers, on maze and HTTP data. It splits what a probe can read out from what the model in fact uses. It ships traces that show how a feature gets carried along.',
 		link: 'https://github.com/Raghavan1988/LatentWorldsGPT',
 		linkLabel: 'GitHub',
 		takeaways: [
-			'Pre-registered maze and HTTP predictions before running the probes, making failures easier to inspect.',
-			'Tested whether small next-token transformers develop linearly recoverable latent task representations.',
-			'Falsified the strict N-criterion: recoverability is not the same as predictive usefulness.',
-			'Identified architectural carry-through: information at positionally distinct input slots can remain decodable later.',
-			'Uses multi-seed probes, destroyed-structure controls, per-layer ablations, and position-controlled probing.',
+			'Wrote down the maze and HTTP calls before running any probe. That makes a miss easy to spot.',
+			'Asked whether small next-token models learn task facts that a linear probe can read out.',
+			'Ruled out the strict N-criterion. What a probe can read is not what the model uses.',
+			'Found carry-through baked into the design. A fact from one input slot can still be read much later.',
+			'Uses probes over many seeds, broken-structure controls, layer-by-layer ablations, and position controls.',
 		],
 	},
 	{
@@ -44,14 +44,14 @@ const projects = [
 		theme: 'evals',
 		title: 'SAGE: Scalable AI Governance & Evaluation',
 		done:
-			'KDD-accepted evaluation framework for turning calibrated human product judgment into scalable surrogate judges for industrial search, policy oversight, and regression detection.',
+			'A KDD-accepted way to turn human product judgment into judges you can run at scale. Built for search at work, for policy review, and for catching regressions.',
 		link: 'https://arxiv.org/abs/2602.07840',
 		linkLabel: 'arXiv 2602.07840',
 		takeaways: [
-			'Addresses the governance gap between nuanced human oversight and high-throughput production search evaluation.',
-			'Operationalizes product judgment through Policy, curated Precedent, and an LLM Surrogate Judge calibration loop.',
-			'Uses teacher-student distillation to move high-fidelity judgments into compact student surrogates at lower cost.',
-			'Deployed within LinkedIn Search ecosystems for offline evaluation, policy oversight, and regression detection.',
+			'Closes the gap between careful human review and search checks that must run at high volume.',
+			'Turns product judgment into three parts: a policy, a set of picked precedents, and an LLM judge you tune against them.',
+			'Uses teacher-student distillation. A big careful judge trains a small cheap one.',
+			'Runs inside LinkedIn Search for offline checks, policy review, and catching regressions.',
 			'Published in the KDD 2026 proceedings.',
 		],
 	},
@@ -60,15 +60,15 @@ const projects = [
 		theme: 'search',
 		title: 'Unified Query Understanding for Semantic Search',
 		done:
-			'Deployed structured query-understanding system that consolidates search interpretation into schema-constrained generation, scalable annotation, and evaluation for semantic search.',
+			'A shipped system that works out what a query means. It folds search parsing into one model that must emit a fixed schema. It adds labeling and tests that scale.',
 		link: 'https://arxiv.org/abs/2605.27441',
 		linkLabel: 'arXiv 2605.27441',
 		takeaways: [
-			'Consolidates disparate query-understanding components into a single Small Language Model.',
-			'Uses schema-constrained generation so query interpretations are structured for downstream search systems.',
-			'Introduces Query Illuminator for high-quality auto-annotation, distillation, and scalable evaluation.',
+			'Folds many separate query parts into one Small Language Model.',
+			'Makes the model emit a fixed schema. So what comes out is ready for the rest of the search stack.',
+			'Adds Query Illuminator. It labels data well, feeds distillation, and lets tests scale.',
 			'Validated through offline and online tests in LinkedIn Job Search.',
-			'Shows horizontal extensibility through a People Search case study under low-latency serving constraints.',
+			'Shows the same setup carries to People Search, under tight latency limits.',
 		],
 	},
 ];
@@ -101,7 +101,7 @@ const httpSteps = [
 		pp: '+80.9 percentage points',
 		width: '100%',
 		explain:
-			'p_k is two fields before sz_k inside the same request record, so the model can read local request context.',
+			'p_k sits two fields before sz_k in the same record. So the model can just read nearby context.',
 	},
 	{
 		id: 'previous',
@@ -127,7 +127,7 @@ const httpSteps = [
 		pp: '+62.1 percentage points',
 		width: '76.8%',
 		explain:
-			'p_j is content-selected: j is the most recent earlier request whose response-size bin is at least 5.',
+			'p_j is picked by content. j is the latest earlier request whose size bin is at least 5.',
 	},
 	{
 		id: 'recent-lag',
@@ -140,7 +140,7 @@ const httpSteps = [
 		pp: '+51.4 percentage points',
 		width: '63.5%',
 		explain:
-			'Even when the selected earlier large response is at least 3 request records back, the feature remains recoverable.',
+			'The feature can still be read even when that earlier big response is 3 or more records back.',
 	},
 ];
 
@@ -217,14 +217,14 @@ const httpNotation = [
 											<div class="trace-copy">
 												<h3>MAZE carry-through trace</h3>
 												<p>
-													An illustrative 8 x 8 cell path showing the central finding: the
-													current token moves away from the start cell, but the start-cell
-													feature remains decodable from the residual stream.
+													A sample path on an 8 x 8 grid, showing the main finding. The
+													current token moves away from the start cell. But the start cell
+													can still be read from the residual stream.
 												</p>
 											</div>
 											<p class="trace-subtitle" data-trace-subtitle>
-												Autoplay: the path starts at row 1, column 2 while the copper start-cell
-												signal is carried forward.
+												Autoplay: the path starts at row 1, column 2. The copper start-cell
+												signal rides along with it.
 											</p>
 
 											<div class="trace-grid">
@@ -269,8 +269,8 @@ const httpNotation = [
 														))}
 													</div>
 													<p class="mechanism-caption">
-														The gap grows with depth: the start cell is increasingly
-														recoverable even after the path has moved on.
+														The gap grows with depth. The start cell gets easier to read,
+														even after the path has moved on.
 													</p>
 												</div>
 											</div>
@@ -343,15 +343,15 @@ const httpNotation = [
 													<div class="attention-explain">
 														<h4>Why copying is cheap</h4>
 														<p>
-															In a causal transformer, later positions can attend backward to
-															earlier tokens. If the start cell sits in a stable early slot,
-															attention can keep reading that slot and writing a faint copy into
-															the residual stream.
+															In a causal transformer, a later spot can look back at earlier
+															tokens. Say the start cell sits in a fixed early slot. Then
+															attention can keep reading that slot and writing a faint copy
+															into the residual stream.
 														</p>
 														<p>
-															The copper column is the start-token column. Its repeated vertical
-															activation is the visual metaphor for architectural carry-through:
-															easy to copy, not necessarily useful.
+															The copper column is the start-token column. It lights up again and
+															again. That is the picture of carry-through: easy to copy, and not
+															always useful.
 														</p>
 													</div>
 												</div>
@@ -364,9 +364,9 @@ const httpNotation = [
 												<div class="trace-copy">
 													<h3>HTTP carry-through beyond first slots</h3>
 													<p>
-														The HTTP sequence is a repeated request record. This walkthrough
-														shows how path-category information can remain recoverable at the
-														current response-size token even when the source is not a first slot.
+														The HTTP stream is one request record after another. This walkthrough
+														shows how the path category can still be read at the current size
+														token. It holds even when the source is not a first slot.
 													</p>
 												</div>
 												<div class="notation-grid" aria-label="HTTP notation definitions">
@@ -395,8 +395,8 @@ const httpNotation = [
 															<span class="http-arc"></span>
 														</div>
 														<p class="mechanism-caption">
-															Copper is the source path token. Blue is the current response-size
-															token where the probe reads the residual stream.
+															Copper is the source path token. Blue is the current size token.
+															That is where the probe reads.
 														</p>
 													</div>
 													<div class="http-step-panel">
@@ -479,13 +479,13 @@ const httpNotation = [
 													<div class="attention-explain">
 														<h4>How to read this</h4>
 														<p>
-															Rows are readout positions, columns are tokens that can be read.
-															The bottom row is <code>sz_k</code>, the current response-size token.
+															Rows are readout spots. Columns are tokens that can be read. The
+															bottom row is <code>sz_k</code>, the current size token.
 														</p>
 														<p>
-															Copper cells show <code>sz_k</code> reading earlier path-category
-															tokens. That is the visual point: attention can cheaply route
-															non-first-slot path information into the residual stream.
+															Copper cells show <code>sz_k</code> reading earlier path tokens.
+															That is the point of the picture. Attention can route path facts
+															into the residual stream cheaply, from any slot.
 														</p>
 													</div>
 												</div>

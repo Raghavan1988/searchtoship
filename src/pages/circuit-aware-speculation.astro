@@ -16,13 +16,17 @@ const headline = [
 		tone: 'win',
 	},
 	{ value: '2 – 10×', label: 'Steering the direction disrupts real acceptance vs. matched controls', tone: 'win' },
-	{ value: '0.53 – 0.56', label: 'Equal-capacity random controls — the lift is information, not size', tone: 'neutral' },
+	{
+		value: '0.53 – 0.56',
+		label: 'Equal-capacity random controls, so the lift is information rather than size',
+		tone: 'neutral',
+	},
 ];
 
 const timeline = [
 	{
 		step: 'Round r−1 is checked',
-		body: "The target's forward pass builds a state for every token it reads. At the last kept token — the frontier — that state is left sitting in memory.",
+		body: "The target's forward pass builds a state for every token it reads. At the last kept token, which we call the frontier, that state is left sitting in memory.",
 		mark: 'free',
 	},
 	{
@@ -32,7 +36,7 @@ const timeline = [
 	},
 	{
 		step: 'Round r drafts',
-		body: 'Every control signal we could find in prior work — draft entropy, acceptance heads, confidence schedulers, tree pruners — first becomes readable here, after the cost is paid.',
+		body: 'Every control signal we could find in prior work (draft entropy, acceptance heads, confidence schedulers, tree pruners) first becomes readable here, after the cost is paid.',
 		mark: 'prior',
 	},
 ];
@@ -80,25 +84,25 @@ const lengthRows = [
 
 const atlasRows = [
 	{
-		criterion: 'T1 — overall HIGH − LOW contrast',
+		criterion: 'T1. Overall HIGH − LOW contrast',
 		qwen1: '+0.1947 [+0.172, +0.216]',
 		qwen2: '+0.2104 [+0.193, +0.228]',
 		llama: '+0.1177 [+0.103, +0.134]',
 	},
 	{
-		criterion: 'T2 — positive and CI-clean in every domain cell',
+		criterion: 'T2. Positive and CI-clean in every domain cell',
 		qwen1: '4 / 4',
 		qwen2: '7 / 7',
 		llama: '4 / 4',
 	},
 	{
-		criterion: 'T3 — tail stability vs. the setting marginal',
+		criterion: 'T3. Tail stability vs. the setting marginal',
 		qwen1: 'PASS (0.742)',
 		qwen2: 'PASS (0.688)',
 		llama: 'PASS (0.833)',
 	},
 	{
-		criterion: 'T4 — phase spread (registered as an expected null)',
+		criterion: 'T4. Phase spread (registered as an expected null)',
 		qwen1: '0.0084 PASS',
 		qwen2: '0.0036 PASS',
 		llama: '0.0589 (descriptive)',
@@ -108,7 +112,7 @@ const atlasRows = [
 const methodology = [
 	{
 		title: 'A verified lossless engine',
-		body: 'Exact-match, greedy target–drafter decoding. In fp32 the engine passes bit-identity gates against target-only greedy decoding across every test and both families — 118 of 118 on the Llama pair — covering skip, stop-rule and end-of-sequence edge cases. In bf16 the math is not exact: parallel-verify and sequential-decode diverge at the ~0.7%/token level through argmax ties. We log that per request rather than remove it; the acceptance labels stay exact in-context ground truth either way.',
+		body: 'Exact-match, greedy target–drafter decoding. In fp32 the engine passes bit-identity gates against target-only greedy decoding across every test and both families (118 of 118 on the Llama pair), covering skip, stop-rule and end-of-sequence edge cases. In bf16 the math is not exact: parallel-verify and sequential-decode diverge at the ~0.7%/token level through argmax ties. We log that per request rather than remove it; the acceptance labels stay exact in-context ground truth either way.',
 	},
 	{
 		title: 'Two families, two corpora',
@@ -116,7 +120,7 @@ const methodology = [
 	},
 	{
 		title: 'Sealed traces, scripted numbers',
-		body: 'Fixed draft length L=8, max_new=256, bf16, batch size 1, A100-class hardware. Captures are domain-stratified over 400 prompts, giving 23,568 / 14,122 / 19,269 rows per setting, each at four layers. Every reported number comes from a versioned script reading immutable artifacts — none is derived by hand.',
+		body: 'Fixed draft length L=8, max_new=256, bf16, batch size 1, A100-class hardware. Captures are domain-stratified over 400 prompts, giving 23,568 / 14,122 / 19,269 rows per setting, each at four layers. Every reported number comes from a versioned script reading immutable artifacts. None is derived by hand.',
 	},
 	{
 		title: 'A deliberately hard bar',
@@ -124,7 +128,7 @@ const methodology = [
 	},
 	{
 		title: 'Prompt-grouped everything',
-		body: 'Splits are 50/50 dev/test by prompt, never by token — no split anywhere is random at the row level. Probes are ℓ2-penalized logistic models (C=0.1, chosen on dev for convergence stability) fit under 5-fold GroupKFold with per-fold standardization. Error bars are 95% prompt-grouped bootstrap CIs on ΔAUROC over 1,000 resamples, or 2,000 for the length probes.',
+		body: 'Splits are 50/50 dev/test by prompt, never by token, so no split anywhere is random at the row level. Probes are ℓ2-penalized logistic models (C=0.1, chosen on dev for convergence stability) fit under 5-fold GroupKFold with per-fold standardization. Error bars are 95% prompt-grouped bootstrap CIs on ΔAUROC over 1,000 resamples, or 2,000 for the length probes.',
 	},
 	{
 		title: 'Equal-capacity controls',
@@ -136,7 +140,7 @@ const negatives = [
 	{
 		kind: 'negative',
 		title: "Draft-side states don't beat surface signals",
-		body: "On the same traces, a linear probe on the drafter's residual stream (best layer) reaches 0.803 AUROC. A surface stack of entropy, margin, history and position reaches 0.870, and adding the draft probe to it gains at most +0.006. So this is not a general 'probes beat baselines' result — it is the target-side, pre-round framing that does the work.",
+		body: "On the same traces, a linear probe on the drafter's residual stream (best layer) reaches 0.803 AUROC. A surface stack of entropy, margin, history and position reaches 0.870, and adding the draft probe to it gains at most +0.006. So this is not a general 'probes beat baselines' result. It is the target-side, pre-round framing that does the work.",
 	},
 	{
 		kind: 'negative',
@@ -151,7 +155,7 @@ const negatives = [
 	{
 		kind: 'context',
 		title: 'No wall-clock claim',
-		body: 'The decision analysis is a calibrated proxy over sealed traces. We did not run the end-to-end wall-clock test with the probe in the serving path — that test is the systems gate, and until it runs we make no wall-clock claim. Separately, serving engines do not expose frontier states from many layers today; shipping this needs either that exposure (cheap) or the compact statistic above (open).',
+		body: 'The decision analysis is a calibrated proxy over sealed traces. We did not run the end-to-end wall-clock test with the probe in the serving path. That test is the systems gate, and until it runs we make no wall-clock claim. Separately, serving engines do not expose frontier states from many layers today; shipping this needs either that exposure (cheap) or the compact statistic above (open).',
 	},
 ];
 
@@ -166,7 +170,7 @@ const contextQuestions = [
 		question: 'Do off-the-shelf topic-specialist draft models help?',
 		answer: 'No',
 		tone: 'no',
-		why: 'The off-the-shelf Qwen2.5-Coder specialist only ties the same-size Qwen2.5 generalist on code, and the off-the-shelf Qwen2.5-Math specialist is beaten by the generalist even on math. No fine-tuning or distillation toward the target was attempted — this is a result about the released checkpoints, not about specialization in principle.',
+		why: 'The off-the-shelf Qwen2.5-Coder specialist only ties the same-size Qwen2.5 generalist on code, and the off-the-shelf Qwen2.5-Math specialist is beaten by the generalist even on math. No fine-tuning or distillation toward the target was attempted, so this is a result about the released checkpoints, not about specialization in principle.',
 	},
 	{
 		question: 'Does combining both ideas beat the best fixed setup?',
@@ -183,18 +187,18 @@ const rq2Rows = [
 ];
 
 const specialistRows = [
-	{ model: 'Qwen2.5 0.5B — generalist', chat: '0.738', code: '0.898', math: '0.910', sum: '0.672', best: false },
-	{ model: 'Qwen2.5-Coder 0.5B — off-the-shelf', chat: '0.675', code: '0.899', math: '0.877', sum: '0.603', best: false },
-	{ model: 'Qwen2.5 1.5B — generalist', chat: '0.789', code: '0.917', math: '0.928', sum: '0.736', best: true },
-	{ model: 'Qwen2.5-Math 1.5B — off-the-shelf', chat: '0.662', code: '0.862', math: '0.919', sum: '0.554', best: false },
-	{ model: 'Qwen2.5-Coder 1.5B — off-the-shelf', chat: '0.753', code: '0.917', math: '0.917', sum: '0.695', best: false },
+	{ model: 'Qwen2.5 0.5B (generalist)', chat: '0.738', code: '0.898', math: '0.910', sum: '0.672', best: false },
+	{ model: 'Qwen2.5-Coder 0.5B (off-the-shelf)', chat: '0.675', code: '0.899', math: '0.877', sum: '0.603', best: false },
+	{ model: 'Qwen2.5 1.5B (generalist)', chat: '0.789', code: '0.917', math: '0.928', sum: '0.736', best: true },
+	{ model: 'Qwen2.5-Math 1.5B (off-the-shelf)', chat: '0.662', code: '0.862', math: '0.919', sum: '0.554', best: false },
+	{ model: 'Qwen2.5-Coder 1.5B (off-the-shelf)', chat: '0.753', code: '0.917', math: '0.917', sum: '0.695', best: false },
 ];
 
 const limitations = [
 	'First token only. No claim about run length; the length-aware controller does not benefit.',
 	'The full frontier state is used. A cheap, deploy-ready variant is still open.',
 	'One decoding mode: greedy exact match. Acceptance under sampling is untested.',
-	'Two families, one drafter each. EAGLE-class trained heads are out of scope by design — ours is the independent-drafter cell.',
+	'Two families, one drafter each. EAGLE-class trained heads are out of scope by design. Ours is the independent-drafter cell.',
 	'Layers {6, 12, 18, 24} were picked for the drafter depth and reused for the deeper targets. A target-tuned layer sweep may strengthen the result, or localize it.',
 	'The decision analysis is a proxy over sealed traces. No end-to-end wall-clock test was run.',
 	'Batch-size-1 harness. Cross-request batch interference was not measured.',
@@ -218,7 +222,7 @@ const limitations = [
 				<p class="lede">
 					A small drafter guesses the next few tokens; the big target model checks them in one pass and
 					keeps what it agrees with. Rejected guesses waste the draft compute. So it pays to know, up
-					front, whether a round is worth drafting at all — but every signal used for this today is
+					front, whether a round is worth drafting at all. But every signal used for this today is
 					computed <em>after</em> the draft exists, once the cost is already paid. The target holds the
 					answer one round early: a linear probe on the state it left cached at the last accepted token
 					predicts whether the <em>next</em> round's first token will be accepted, before any draft runs.
@@ -252,7 +256,7 @@ const limitations = [
 				<h2>Where the signal sits in the round</h2>
 				<p>
 					When the target checks round <em>r−1</em>, it builds an internal state for every token in the
-					prefix. Take that state at the last kept token — the <strong>frontier</strong> — at four depths
+					prefix. Take that state at the last kept token, the <strong>frontier</strong>, at four depths
 					(layers 6, 12, 18, 24) and concatenate: 14,336 numbers for the Qwen pair, 16,384 for Llama. It
 					is the <em>target's</em> state, not the drafter's. It is free, because the check that just ran
 					already built it. And it is in memory <em>before</em> the next round drafts.
@@ -273,13 +277,13 @@ const limitations = [
 			</section>
 
 			<section class="cas-block">
-				<h2>Main result — the cached state predicts next-round acceptance</h2>
+				<h2>Main result: the cached state predicts next-round acceptance</h2>
 				<p>
 					Work on the dev split left exactly one candidate alive: the raw frontier state. The frozen test
 					split was then scored <strong>once per protocol</strong>, against a spec registered in advance,
 					with no test-side selection. <strong>P1</strong> runs the dev-frozen pipeline under
 					prompt-grouped out-of-fold scoring within the test rows. <strong>P2</strong> is the strict
-					dev→test transfer — scaler, probe, control columns, imputation means, domain vocabulary and
+					dev→test transfer: scaler, probe, control columns, imputation means, domain vocabulary and
 					calibrator all fit on dev only, test scored exactly once. P2 is the deployment-faithful one.
 				</p>
 				<div class="cas-table-wrap">
@@ -317,14 +321,14 @@ const limitations = [
 				<p class="cas-note">
 					Every interval clears zero, with P(Δ≤0) = 0.000 in every cell. On the dev split the same pattern
 					holds: 0.670 → 0.742 (Qwen-v1), 0.618 → 0.731 (Qwen-v2), 0.696 → 0.765 (Llama-v1). Reported
-					numbers reproduce across independent containers to ~±0.001 AUROC — BLAS reduction-order noise,
-					an order of magnitude below the CI half-widths.
+					numbers reproduce across independent containers to ~±0.001 AUROC. That spread is BLAS
+					reduction-order noise, an order of magnitude below the CI half-widths.
 				</p>
 				<p class="cas-note">
 					<strong>What this rules out.</strong> The baseline already holds domain one-hots and the captures
 					are domain-stratified, so the lift is not the probe telling domains apart. The baseline also
-					holds the target's entropy and top-1/top-2 margin from the round before — in theory the free
-					variables that govern greedy acceptance. So the result says something specific:
+					holds the target's entropy and top-1/top-2 margin from the round before, which in theory are
+					the free variables that govern greedy acceptance. So the result says something specific:
 					<em>entropy and margin are not a sufficient statistic for pre-round acceptance. The cached state
 					carries more that bears on the decision.</em>
 				</p>
@@ -352,15 +356,15 @@ const limitations = [
 				<h2>Steering the direction disrupts real acceptance</h2>
 				<p>
 					A lift in what can be predicted cannot, on its own, tell a load-bearing state from a shadow. So
-					on held-out test rounds we steer the target's residual stream at the frontier with forward hooks
-					— <em>h</em> ← <em>h</em> + α·σ·<em>d̂</em>, where <em>d̂</em> is the acceptance direction fit on
+					on held-out test rounds we steer the target's residual stream at the frontier with forward hooks:
+					<em>h</em> ← <em>h</em> + α·σ·<em>d̂</em>, where <em>d̂</em> is the acceptance direction fit on
 					dev, σ is the mean frontier-state norm, and α ∈ {'{'}−2, −1, 0, +1, +2{'}'}. Each layer gets
 					controls: random directions matched on norm, and shuffled ones. A no-op check confirms the hook
 					site (fidelity 0.95 Qwen-v1, 1.00 Llama).
 				</p>
 				<p class="cas-note">
 					Steering along <em>d̂</em> disrupts measured first-token acceptance <strong>2–10×</strong> more
-					than matched controls. The damage tracks the dose — an inverted U peaking at α=0 — and holds at
+					than matched controls. The damage tracks the dose, an inverted U peaking at α=0, and holds at
 					all four probed layers in both families; on Llama the real hit is 0.32–0.40 against controls at
 					≈0. The gap survives conditioning on the induced entropy change, so the effect is not routed
 					through entropy alone. We read this strictly at the representation level: the probed direction
@@ -370,25 +374,25 @@ const limitations = [
 			</section>
 
 			<section class="cas-block">
-				<h2>Calibration — the odds are honest, and where they aren't</h2>
+				<h2>Calibration: where the odds are honest, and where they aren't</h2>
 				<p>
 					Raw probes over many dimensions are overconfident: before calibration the combined ECE runs as
 					high as <strong>0.14</strong>. One global Platt map fixes most of it. The map is monotone, so
 					AUROC is untouched, and it is leak-safe. Under P1 the test ECE comes back to
 					<strong>0.016–0.024</strong>. Under P2 the map is frozen on dev out-of-fold scores and applied
 					to test scores from a model fit on all of dev; that shift in score spread costs calibration
-					quality on one setting — combined test ECE is <strong>0.037</strong> on Qwen-v1 against 0.024
+					quality on one setting: combined test ECE is <strong>0.037</strong> on Qwen-v1 against 0.024
 					and 0.021 on v2 and Llama. We report that rather than patch it after the fact. Ranking metrics
 					do not move.
 				</p>
 			</section>
 
 			<section class="cas-block">
-				<h2>Where the signal stops — first token only</h2>
+				<h2>Where the signal stops: first token only</h2>
 				<p>
 					Per-length survival probes show exactly where the signal lives. The lift is strong and CI-clean
 					at k=1 in all three settings. By k≥4 it is null to <em>harmful</em>, significantly worse than
-					the baseline on v2 and Llama at k=8 — the point where domain and history already predict long
+					the baseline on v2 and Llama at k=8, the point where domain and history already predict long
 					runs. A length controller driven by the survival probe likewise fails to beat one driven by the
 					baseline, with one small exception at a single draft-cost point.
 				</p>
@@ -419,7 +423,7 @@ const limitations = [
 				<p class="cas-note">
 					ΔAUROC on the development split, domain-controlled, 2,000-resample grouped bootstrap. Green is a
 					CI-clean gain; red is a CI-clean <em>loss</em>. The frontier state answers "will speculation
-					connect at all next round?" — not "for how long?". That is a clean split from pre-draft
+					connect at all next round?", not "for how long?". That is a clean split from pre-draft
 					<em> length</em> regression, whose own ablations find that treating length as a class label does
 					worse, and it points at the skip/admission decision as the natural consumer of the signal.
 				</p>
@@ -428,15 +432,15 @@ const limitations = [
 			<section class="cas-block">
 				<h2>What it costs, and where it actually matters</h2>
 				<p>
-					Reading the frontier state is free on the capture path — the states fall out of the check
+					Reading the frontier state is free on the capture path, since the states fall out of the check
 					anyway. The probe is one 14k-dimensional dot product: <strong>~16 µs per round</strong>, about
 					<strong> 0.015%</strong> of a decode round. The honest caveat is engineering, not compute.
 				</p>
 				<p class="cas-note">
 					<strong>The decision proxy.</strong> Sweeping a calibrated skip/draft choice across draft-cost
 					ratios: when drafting is cheap (≤0.2× verify) every calibrated model picks "always draft", so no
-					pre-round signal changes any decision — and adding a skip arm under cheap serving costs actually
-					<em> hurts</em> (−0.3% to −0.7%). At draft cost ≥1× verify, the regret reduction from the probe
+					pre-round signal changes any decision. Adding a skip arm under cheap serving costs actually
+					<em> hurts</em> there (−0.3% to −0.7%). At draft cost ≥1× verify, the regret reduction from the probe
 					is CI-robust across a range of costs on Qwen-v2 and Llama under both protocols, and on Qwen-v1
 					under P1; under P2 Qwen-v1 clears the bar at a single cost point, a protocol sensitivity we
 					report rather than hide. So the signal is decision-relevant exactly where drafting is expensive:
@@ -444,7 +448,7 @@ const limitations = [
 				</p>
 				<p class="cas-note">
 					<strong>It adds to within-round control; it does not replace it.</strong> For adaptive
-					<em> length</em>, a within-round draft-entropy stop remains stronger — it beats the best fixed
+					<em> length</em>, a within-round draft-entropy stop remains stronger. It beats the best fixed
 					length by +6.7% to +11.2% serving-efficiency across the three settings (+11.2%, 95% CI [+10.3%,
 					+12.1%] on Qwen-v1). A pre-round frontier-entropy gate recovers only about a third to a half of
 					that. The two signals pair by timing: one is pre-round admission, skip and scheduling; the other
@@ -453,13 +457,13 @@ const limitations = [
 			</section>
 
 			<section class="cas-block">
-				<h2>Acceptance itself has shape — the atlas</h2>
+				<h2>Acceptance itself has shape: the atlas</h2>
 				<p>
 					A second, purely <em>behavioral</em> question, with no probes and no internal states: does
-					acceptance have a readable structure? We pre-registered one contrast on dev — HIGH
+					acceptance have a readable structure? We pre-registered one contrast on dev, HIGH
 					(<code>code_delimiter</code>, <code>operator</code>, <code>number</code>, pooled) minus LOW
-					(<code>named_entity</code>, <code>reasoning_transition</code>, pooled) — fixed criteria T1–T4 and
-					the rule mapping each to an outcome, and committed all of it before the test split was
+					(<code>named_entity</code>, <code>reasoning_transition</code>, pooled). We then fixed criteria
+					T1–T4 and the rule mapping each to an outcome, and committed all of it before the test split was
 					unblinded. A script did the scoring. <strong>PASS 3/3.</strong>
 				</p>
 				<div class="cas-table-wrap">
@@ -489,7 +493,7 @@ const limitations = [
 				<p>
 					The contrast runs <strong>+0.12 to +0.21</strong> in acceptance rate, and it is not domain
 					identity in disguise: it is CI-clean positive in <strong>all 15</strong> domain cells across the
-					three settings. The tails are stable across families — <code>code_delimiter</code>,
+					three settings. The tails are stable across families too: <code>code_delimiter</code>,
 					<code>operator</code>, <code>number</code>, <code>clause_boundary</code> and
 					<code>punctuation</code> sit above the marginal in every setting; <code>named_entity</code> sits
 					below it in every setting. The reading is plain: a small drafter is good at tokens that syntax
@@ -501,7 +505,7 @@ const limitations = [
 				<p class="cas-note">
 					<strong>The half that failed.</strong> The claim as first posed had a second axis: that
 					acceptance would vary across phases of generation. It did not survive. On both Qwen settings the
-					phase spread is flat by a wide margin — 0.0084 and 0.0036 against a pre-set bar of ≤0.03. Llama
+					phase spread is flat by a wide margin, 0.0084 and 0.0036 against a pre-set bar of ≤0.03. Llama
 					shows a monotone rise (prefix 0.794 → mid 0.824 → late 0.853), but that is one family alone and
 					a length or mix confound is plausible, so we record it descriptively and claim nothing from it.
 					The atlas result is narrowed to the category axis only.
@@ -509,7 +513,7 @@ const limitations = [
 				<p class="cas-note">
 					<strong>Two disclosures.</strong> First, a cell we had registered in advance as free to be null
 					came out positive: Llama-code was flat on dev (−0.006, at a 0.913 acceptance ceiling) but landed
-					at +0.0674 [+0.0304, +0.1097] on test — the dev null was ceiling noise. Second, the weakest
+					at +0.0674 [+0.0304, +0.1097] on test. The dev null was ceiling noise. Second, the weakest
 					surviving cell is Qwen-v1 summarization at +0.0544, P(Δ≤0) = 0.027, percentile CI lower bound
 					−0.002. It clears the p&lt;0.05 bar set in advance; we flag it as the margin to watch in any
 					re-run. One further oddity we record but do not explain: on Llama the <code>special</code>
@@ -536,7 +540,7 @@ const limitations = [
 			</section>
 
 			<section class="cas-block cas-context">
-				<h2>Context — the earlier phase of this work</h2>
+				<h2>Context: the earlier phase of this work</h2>
 				<p>
 					Before the pre-round question, the same traces were used to ask whether draft <em>length</em>
 					and draft <em>model choice</em> could be adapted. Those results are not claims of this paper,
@@ -557,12 +561,12 @@ const limitations = [
 					}
 				</div>
 
-				<h3 class="cas-sub">Adaptive draft length — the within-round baseline</h3>
+				<h3 class="cas-sub">Adaptive draft length, the within-round baseline</h3>
 				<p>
 					Replaying draft-length policies on the frozen exam set, a within-round entropy stop beats the
 					best fixed count by +11.2% efficiency on Qwen-v1 (95% CI [+10.3%, +12.1%]), and +6.7% to +11.2%
-					across the three settings. This is the number the pre-round gate is compared to above — and it
-					wins, for length. It is a within-round signal: it reads the drafter's uncertainty after drafting
+					across the three settings. This is the number the pre-round gate is compared to above, and for
+					length it wins. It is a within-round signal: it reads the drafter's uncertainty after drafting
 					has begun.
 				</p>
 				<div class="cas-table-wrap">
@@ -596,10 +600,10 @@ const limitations = [
 					pre-round baseline for the same reason. <a href="/bandit-vs-signal">See the interactive demo →</a>
 				</p>
 
-				<h3 class="cas-sub">Off-the-shelf specialist drafters — a tested dead end</h3>
+				<h3 class="cas-sub">Off-the-shelf specialist drafters: a tested dead end</h3>
 				<p>
 					Five <strong>off-the-shelf, released checkpoints</strong> scored across four topics, each
-					against the same target output — no fine-tuning, distillation or alignment toward the target
+					against the same target output. No fine-tuning, distillation or alignment toward the target
 					was performed on any of them. The same-size <strong>Qwen2.5-Coder</strong> specialist merely
 					<strong> ties</strong> the Qwen2.5 generalist on code; the <strong>Qwen2.5-Math</strong>
 					specialist is <strong>worse</strong> than the same-size Qwen2.5 generalist even on math. The
@@ -610,7 +614,7 @@ const limitations = [
 				</p>
 				<p class="cas-note">
 					<strong>Scope of this negative.</strong> It says that swapping in a published domain checkpoint
-					is not a lever for acceptance. It does <em>not</em> say specialization can never help — a
+					is not a lever for acceptance. It does <em>not</em> say specialization can never help. A
 					drafter trained or distilled to imitate <em>this</em> target is a different experiment, and one
 					we did not run.
 				</p>
@@ -673,7 +677,7 @@ const limitations = [
 					</li>
 					<li>
 						<strong>One result stands with no appeal to internal states.</strong> Acceptance is shaped by
-						token category — structural tokens beat entity tokens by +0.12 to +0.21 in all 15 domain
+						token category: structural tokens beat entity tokens by +0.12 to +0.21 in all 15 domain
 						cells, against criteria registered before unblinding. At the grain tested, it is
 						<em> not</em> shaped by generation phase, and we report that failed half too.
 					</li>

@@ -9,16 +9,16 @@ const pageDescription =
 	'In speculative decoding, every control signal in use is computed after the draft compute is spent. The target model already holds the answer one round early: a linear probe on its cached frontier state predicts next-round acceptance before any draft runs, adding +0.04 to +0.11 AUROC over a hardened baseline.';
 
 const headline = [
-	{ value: '+0.04 – +0.11', label: 'AUROC added over a hardened pre-round baseline, all three settings', tone: 'win' },
+	{ value: '+0.04 – +0.11', label: 'AUROC the probe adds on top of a hard baseline, in all three settings', tone: 'win' },
 	{
 		value: 'Scored once',
-		label: 'Frozen test under strict dev→test transfer: +0.056 / +0.103 / +0.039',
+		label: 'Frozen test, strict dev to test. The gains are +0.056, +0.103 and +0.039.',
 		tone: 'win',
 	},
-	{ value: '2 – 10×', label: 'Steering the direction disrupts real acceptance vs. matched controls', tone: 'win' },
+	{ value: '2 – 10×', label: 'How much more steering the state hurts acceptance than matched controls do', tone: 'win' },
 	{
 		value: '0.53 – 0.56',
-		label: 'Equal-capacity random controls, so the lift is information rather than size',
+		label: 'What random columns of the same width score. So the gain is signal, not size.',
 		tone: 'neutral',
 	},
 ];
@@ -26,17 +26,17 @@ const headline = [
 const timeline = [
 	{
 		step: 'Round r−1 is checked',
-		body: "The target's forward pass builds a state for every token it reads. At the last kept token, which we call the frontier, that state is left sitting in memory.",
+		body: 'The target reads the whole prefix in one pass. It builds a state for each token. At the last kept token, that state just sits there in memory. We call the spot the frontier.',
 		mark: 'free',
 	},
 	{
 		step: 'Read the frontier state',
-		body: 'One 14k-dimensional dot product, ~16 µs, about 0.015% of a decode round. No draft compute has been spent yet. This is where our signal lives.',
+		body: 'One dot product over 14k numbers. It takes about 16 µs. That is 0.015% of a round. No draft compute has been spent yet. This is where our signal lives.',
 		mark: 'ours',
 	},
 	{
 		step: 'Round r drafts',
-		body: 'Every control signal we could find in prior work (draft entropy, acceptance heads, confidence schedulers, tree pruners) first becomes readable here, after the cost is paid.',
+		body: 'Now the drafter runs. Every control signal we found in prior work shows up here, and not before. That list covers draft entropy, acceptance heads, confidence schedulers and tree pruners. By then the cost is paid.',
 		mark: 'prior',
 	},
 ];
@@ -112,27 +112,27 @@ const atlasRows = [
 const methodology = [
 	{
 		title: 'A verified lossless engine',
-		body: 'Exact-match, greedy target–drafter decoding. In fp32 the engine passes bit-identity gates against target-only greedy decoding across every test and both families (118 of 118 on the Llama pair), covering skip, stop-rule and end-of-sequence edge cases. In bf16 the math is not exact: parallel-verify and sequential-decode diverge at the ~0.7%/token level through argmax ties. We log that per request rather than remove it; the acceptance labels stay exact in-context ground truth either way.',
+		body: 'The engine is greedy and exact match, with one target and one drafter. In fp32 it passes bit-identity gates against target-only decoding. It passes in every test, in both families, 118 of 118 on the Llama pair. The gates cover skip, stop-rule and end-of-sequence cases. In bf16 the math is not exact. Batch check and step-by-step decode drift apart on about 0.7% of tokens, through argmax ties. We log that per request rather than hide it. Either way the acceptance labels stay exact.',
 	},
 	{
 		title: 'Two families, two corpora',
-		body: 'Main pair Qwen2.5-7B-Instruct / 0.5B-Instruct; replication pair Llama-3.1-8B-Instruct / 3.2-1B-Instruct, revisions pinned. Corpus v1 is 644 prompts over chat, code, math and summarization. Corpus v2 is 1,494 prompts over seven axes, adding translation, retrieval-grounded QA and structured generation. Three settings are reported throughout: (Qwen, v1), (Qwen, v2), (Llama, v1).',
+		body: 'Main pair: Qwen2.5-7B-Instruct with the 0.5B drafter. Second pair: Llama-3.1-8B-Instruct with the 3.2-1B drafter. Model revisions are pinned. Corpus v1 has 644 prompts over chat, code, math and summaries. Corpus v2 has 1,494 prompts over seven axes. It adds translation, grounded QA and structured output. We report three settings all the way through: Qwen-v1, Qwen-v2 and Llama-v1.',
 	},
 	{
 		title: 'Sealed traces, scripted numbers',
-		body: 'Fixed draft length L=8, max_new=256, bf16, batch size 1, A100-class hardware. Captures are domain-stratified over 400 prompts, giving 23,568 / 14,122 / 19,269 rows per setting, each at four layers. Every reported number comes from a versioned script reading immutable artifacts. None is derived by hand.',
+		body: 'Draft length is fixed at 8. Max new tokens is 256. We run bf16, one request per batch, on A100-class cards. Captures are spread evenly by domain over 400 prompts. That gives 23,568, 14,122 and 19,269 rows per setting, each at four layers. A versioned script reads locked files and prints every number here. None of them is worked out by hand.',
 	},
 	{
 		title: 'A deliberately hard bar',
-		body: "The baseline holds every free pre-round signal we could find: an EMA of acceptance over strictly earlier rounds, the target's next-token entropy at the frontier from the round before, its top-1/top-2 margin, per-column missing flags with mean fill-in, and domain one-hots. Certificate theory makes margin the governing term for greedy acceptance, so omitting it would make any claimed gain meaningless.",
+		body: "The baseline holds every free pre-round signal we could find. A running mean of acceptance over earlier rounds. The target's entropy at the frontier, from the round before. Its top-1 to top-2 margin. Flags for missing values, with mean fill-in. And one-hots for the domain. Theory says margin is the term that governs greedy acceptance. Drop it and a claimed gain would mean nothing.",
 	},
 	{
 		title: 'Prompt-grouped everything',
-		body: 'Splits are 50/50 dev/test by prompt, never by token, so no split anywhere is random at the row level. Probes are ℓ2-penalized logistic models (C=0.1, chosen on dev for convergence stability) fit under 5-fold GroupKFold with per-fold standardization. Error bars are 95% prompt-grouped bootstrap CIs on ΔAUROC over 1,000 resamples, or 2,000 for the length probes.',
+		body: 'We split 50/50 into dev and test by prompt, never by token. So no split here is random at the row level. Probes are logistic models with an l2 penalty. We set C=0.1 on dev, so that fits repeat run to run. Each is fit under 5-fold GroupKFold, with columns scaled inside each fold. Error bars are 95% grouped bootstrap CIs on the AUROC gain, over 1,000 resamples. The length probes use 2,000.',
 	},
 	{
 		title: 'Equal-capacity controls',
-		body: 'Every candidate is scored against two controls with exactly as many columns as the candidate: i.i.d. Gaussian, raw and per-column std-matched. A lift that random columns of the same width can match is not a lift. Ours sit at 0.53–0.56 AUROC, at or below the baseline.',
+		body: 'Each candidate is scored against two fakes of the same width. Both are random Gaussian columns. One is raw, one is matched per column for spread. A gain that random columns can match is not a gain. Ours sit at 0.53 to 0.56 AUROC, at or below the baseline.',
 	},
 ];
 
@@ -140,22 +140,22 @@ const negatives = [
 	{
 		kind: 'negative',
 		title: "Draft-side states don't beat surface signals",
-		body: "On the same traces, a linear probe on the drafter's residual stream (best layer) reaches 0.803 AUROC. A surface stack of entropy, margin, history and position reaches 0.870, and adding the draft probe to it gains at most +0.006. So this is not a general 'probes beat baselines' result. It is the target-side, pre-round framing that does the work.",
+		body: "On the same traces we probed the drafter's own states. The best layer reaches 0.803 AUROC. But cheap surface signals reach 0.870: entropy, margin, history and position. Add the draft probe on top of those and it gains at most +0.006. So this is not a story about probes beating baselines. What does the work is where you read, and when.",
 	},
 	{
 		kind: 'negative',
 		title: 'Cheap compressions lose the signal',
-		body: 'Low-rank projections (k=16), norm summaries, layer-alignment features and drift speeds add only +0.01 to +0.04, and are unstable across settings. Only the full frontier state clears the bar in all three. A compact sufficient statistic is the main open problem for anyone shipping this.',
+		body: 'We tried cheaper stand-ins for the full state. Low-rank projections at k=16. Norm summaries. Layer-alignment features. Drift speeds. Each adds only +0.01 to +0.04, and none holds up across settings. Only the full state clears the bar in all three. A small stand-in that works is the main open problem here.',
 	},
 	{
 		kind: 'negative',
 		title: 'History-only control is weak',
-		body: 'The acceptance EMA is already in our baseline. Stationary bandit controllers over length arms learn the best single arm and therefore tie best-fixed by design in replay: 2.4015 serving-efficiency against 2.4022. The contextual entropy stop reaches 2.6715. That is context for representation-level signals, not a contest.',
+		body: 'Our baseline already holds the acceptance history. A fixed bandit over length arms just learns the best single arm. So in replay it ties best-fixed by design: 2.4015 against 2.4022. The entropy stop that reads context reaches 2.6715. That is context for state-level signals, not a contest.',
 	},
 	{
 		kind: 'context',
 		title: 'No wall-clock claim',
-		body: 'The decision analysis is a calibrated proxy over sealed traces. We did not run the end-to-end wall-clock test with the probe in the serving path. That test is the systems gate, and until it runs we make no wall-clock claim. Separately, serving engines do not expose frontier states from many layers today; shipping this needs either that exposure (cheap) or the compact statistic above (open).',
+		body: 'The decision study is a calibrated proxy run over sealed traces. We did not put the probe in a live serving path and time it. That test is the systems gate. Until it runs, we claim no speedup in clock terms. One more gap: engines today do not hand you frontier states from many layers. Shipping this needs that hook, which is cheap, or the small stand-in above, which is open.',
 	},
 ];
 
@@ -164,19 +164,19 @@ const contextQuestions = [
 		question: 'Can we pick a smart number of tokens to draft each round instead of a fixed number?',
 		answer: 'Yes',
 		tone: 'yes',
-		why: 'A within-round entropy stop beats the best fixed count and cuts wasted draft tokens sharply. It holds on fresh held-out prompts without re-tuning.',
+		why: 'A stop rule inside the round beats the best fixed count and cuts waste sharply. The gain holds on fresh held-out prompts, with no re-tuning.',
 	},
 	{
 		question: 'Do off-the-shelf topic-specialist draft models help?',
 		answer: 'No',
 		tone: 'no',
-		why: 'The off-the-shelf Qwen2.5-Coder specialist only ties the same-size Qwen2.5 generalist on code, and the off-the-shelf Qwen2.5-Math specialist is beaten by the generalist even on math. No fine-tuning or distillation toward the target was attempted, so this is a result about the released checkpoints, not about specialization in principle.',
+		why: 'The Qwen2.5-Coder model only ties the same-size Qwen2.5 generalist on code. The Qwen2.5-Math model loses to that generalist even on math. We ran them as shipped. There was no fine-tuning and no distillation toward the target. So this is a result about the released weights, not about specialists in principle.',
 	},
 	{
 		question: 'Does combining both ideas beat the best fixed setup?',
 		answer: 'Collapses to the first question',
 		tone: 'shrink',
-		why: 'Off-the-shelf specialists add nothing, so the only live lever from this phase is adaptive draft length.',
+		why: 'Off-the-shelf specialists add nothing. So the only live lever from that phase is draft length.',
 	},
 ];
 
@@ -195,16 +195,16 @@ const specialistRows = [
 ];
 
 const limitations = [
-	'First token only. No claim about run length; the length-aware controller does not benefit.',
-	'The full frontier state is used. A cheap, deploy-ready variant is still open.',
-	'One decoding mode: greedy exact match. Acceptance under sampling is untested.',
-	'Two families, one drafter each. EAGLE-class trained heads are out of scope by design. Ours is the independent-drafter cell.',
-	'Layers {6, 12, 18, 24} were picked for the drafter depth and reused for the deeper targets. A target-tuned layer sweep may strengthen the result, or localize it.',
-	'The decision analysis is a proxy over sealed traces. No end-to-end wall-clock test was run.',
-	'Batch-size-1 harness. Cross-request batch interference was not measured.',
-	'Under the strict protocol, calibration degrades on one setting. We report it rather than patch it.',
-	'bf16 argmax-tie trajectory divergence is described and logged, not removed.',
-	'The atlas uses one overlapping taxonomy (v1.0.0), covers two families and two corpora, and its phase half is narrowed out. It describes behavior only and is not linked to the probe evidence.',
+	'First token only. We make no claim about run length. A controller that picks length gets no help from it.',
+	'We use the whole frontier state. A cheap version you could ship is still open.',
+	'One decoding mode: greedy exact match. We did not test acceptance under sampling.',
+	'Two families, one drafter each. Trained heads of the EAGLE class are out of scope by design. Ours is the cell where the drafter stands alone.',
+	'We picked layers 6, 12, 18 and 24 for the drafter depth, then reused them on the deeper targets. A sweep tuned to the target may make the result stronger. It may also pin it to fewer layers.',
+	'The decision study is a proxy over sealed traces. No end-to-end timing test was run.',
+	'The harness runs one request at a time. We did not measure how batches interfere.',
+	'Under the strict protocol, calibration gets worse on one setting. We report that rather than patch it.',
+	'We describe and log the bf16 tie-breaking drift. We do not remove it.',
+	'The atlas leans on one taxonomy, v1.0.0, whose categories overlap. It covers two families and two corpora. Its phase half did not survive. It describes behavior only. We do not tie it to the probe evidence.',
 ];
 ---
 

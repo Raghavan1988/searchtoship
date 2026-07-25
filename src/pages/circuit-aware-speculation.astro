@@ -155,6 +155,27 @@ const negatives = [
 	},
 ];
 
+const contextQuestions = [
+	{
+		question: 'Can we pick a smart number of tokens to draft each round instead of a fixed number?',
+		answer: 'Yes',
+		tone: 'yes',
+		why: 'A within-round entropy stop beats the best fixed count and cuts wasted draft tokens sharply. It holds on fresh held-out prompts without re-tuning.',
+	},
+	{
+		question: 'Do off-the-shelf topic-specialist draft models help?',
+		answer: 'No',
+		tone: 'no',
+		why: 'The off-the-shelf Qwen2.5-Coder specialist only ties the same-size Qwen2.5 generalist on code, and the off-the-shelf Qwen2.5-Math specialist is beaten by the generalist even on math. No fine-tuning or distillation toward the target was attempted — this is a result about the released checkpoints, not about specialization in principle.',
+	},
+	{
+		question: 'Does combining both ideas beat the best fixed setup?',
+		answer: 'Collapses to the first question',
+		tone: 'shrink',
+		why: 'Off-the-shelf specialists add nothing, so the only live lever from this phase is adaptive draft length.',
+	},
+];
+
 const rq2Rows = [
 	{ rule: 'Best fixed count (8)', round: '4.32', waste: '1.08', eff: '2.40', highlight: false },
 	{ rule: 'Within-round entropy stop', round: '3.85', waste: '0.41', eff: '2.67 (+11.2%)', highlight: true },
@@ -162,11 +183,11 @@ const rq2Rows = [
 ];
 
 const specialistRows = [
-	{ model: 'general 0.5B', chat: '0.738', code: '0.898', math: '0.910', sum: '0.672', best: false },
-	{ model: 'Coder 0.5B', chat: '0.675', code: '0.899', math: '0.877', sum: '0.603', best: false },
-	{ model: 'general 1.5B', chat: '0.789', code: '0.917', math: '0.928', sum: '0.736', best: true },
-	{ model: 'Math 1.5B', chat: '0.662', code: '0.862', math: '0.919', sum: '0.554', best: false },
-	{ model: 'Coder 1.5B', chat: '0.753', code: '0.917', math: '0.917', sum: '0.695', best: false },
+	{ model: 'Qwen2.5 0.5B — generalist', chat: '0.738', code: '0.898', math: '0.910', sum: '0.672', best: false },
+	{ model: 'Qwen2.5-Coder 0.5B — off-the-shelf', chat: '0.675', code: '0.899', math: '0.877', sum: '0.603', best: false },
+	{ model: 'Qwen2.5 1.5B — generalist', chat: '0.789', code: '0.917', math: '0.928', sum: '0.736', best: true },
+	{ model: 'Qwen2.5-Math 1.5B — off-the-shelf', chat: '0.662', code: '0.862', math: '0.919', sum: '0.554', best: false },
+	{ model: 'Qwen2.5-Coder 1.5B — off-the-shelf', chat: '0.753', code: '0.917', math: '0.917', sum: '0.695', best: false },
 ];
 
 const limitations = [
@@ -520,8 +541,21 @@ const limitations = [
 					Before the pre-round question, the same traces were used to ask whether draft <em>length</em>
 					and draft <em>model choice</em> could be adapted. Those results are not claims of this paper,
 					but they set the bar the pre-round signal is measured against, and one of them is a clean dead
-					end worth recording.
+					end worth recording. The questions that phase asked:
 				</p>
+				<div class="cas-questions">
+					{
+						contextQuestions.map((q) => (
+							<article class={`cas-q tone-${q.tone}`}>
+								<div class="cas-q-head">
+									<span class="cas-q-answer">{q.answer}</span>
+								</div>
+								<p class="cas-q-question">{q.question}</p>
+								<p class="cas-q-why">{q.why}</p>
+							</article>
+						))
+					}
+				</div>
 
 				<h3 class="cas-sub">Adaptive draft length — the within-round baseline</h3>
 				<p>
@@ -562,14 +596,23 @@ const limitations = [
 					pre-round baseline for the same reason. <a href="/bandit-vs-signal">See the interactive demo →</a>
 				</p>
 
-				<h3 class="cas-sub">Topic-specialist drafters — a tested dead end</h3>
+				<h3 class="cas-sub">Off-the-shelf specialist drafters — a tested dead end</h3>
 				<p>
-					Five draft models scored across four topics, each against the same target output. Same-size code
-					specialists merely <strong>tie</strong> the generalist on code; the math specialist is
-					<strong> worse</strong> than the generalist even on math. The best possible router would pick
-					the general 1.5B everywhere. Acceptance is about matching the <em>target's own style</em>, and a
-					same-family generalist matches a generalist target better than a narrow expert does.
-					<strong> Bigger helps; specializing doesn't.</strong>
+					Five <strong>off-the-shelf, released checkpoints</strong> scored across four topics, each
+					against the same target output — no fine-tuning, distillation or alignment toward the target
+					was performed on any of them. The same-size <strong>Qwen2.5-Coder</strong> specialist merely
+					<strong> ties</strong> the Qwen2.5 generalist on code; the <strong>Qwen2.5-Math</strong>
+					specialist is <strong>worse</strong> than the same-size Qwen2.5 generalist even on math. The
+					best possible router over this set would pick the generalist 1.5B everywhere. Acceptance is
+					about matching the <em>target's own style</em>, and a same-family generalist matches a
+					generalist target better than a narrow expert does.
+					<strong> Bigger helps; picking an off-the-shelf specialist doesn't.</strong>
+				</p>
+				<p class="cas-note">
+					<strong>Scope of this negative.</strong> It says that swapping in a published domain checkpoint
+					is not a lever for acceptance. It does <em>not</em> say specialization can never help — a
+					drafter trained or distilled to imitate <em>this</em> target is a different experiment, and one
+					we did not run.
 				</p>
 				<div class="cas-table-wrap">
 					<table class="cas-table">
@@ -624,8 +667,9 @@ const limitations = [
 					</li>
 					<li>
 						<strong>Negatives that do work.</strong> Draft-side states don't beat free surface signals,
-						cheap compressions of the frontier state lose most of the gain, and topic-specialist drafters
-						don't beat a same-size generalist. Each one narrows where the remaining headroom actually is.
+						cheap compressions of the frontier state lose most of the gain, and off-the-shelf
+						topic-specialist drafters don't beat a same-size generalist. Each one narrows where the
+						remaining headroom actually is.
 					</li>
 					<li>
 						<strong>One result stands with no appeal to internal states.</strong> Acceptance is shaped by
@@ -752,6 +796,61 @@ const limitations = [
 		color: var(--muted);
 		font-size: 0.92rem;
 		line-height: 1.5;
+	}
+
+	.cas-questions {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+		gap: 0.85rem;
+		margin: 0.9rem 0 0.4rem;
+	}
+	.cas-q {
+		border: 1px solid var(--line);
+		border-left: 4px solid var(--line);
+		border-radius: 12px;
+		padding: 0.95rem 1rem;
+		background: rgba(255, 253, 248, 0.6);
+	}
+	.cas-q.tone-yes {
+		border-left-color: #0f7a52;
+	}
+	.cas-q.tone-no {
+		border-left-color: #b4462f;
+	}
+	.cas-q.tone-shrink {
+		border-left-color: var(--orange);
+	}
+	.cas-q-head {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		margin-bottom: 0.4rem;
+	}
+	.cas-q-answer {
+		font-weight: 800;
+		font-size: 0.95rem;
+	}
+	.cas-q.tone-yes .cas-q-answer {
+		color: #0f7a52;
+	}
+	.cas-q.tone-no .cas-q-answer {
+		color: #b4462f;
+	}
+	.cas-q.tone-shrink .cas-q-answer {
+		color: var(--orange);
+	}
+	.cas-q-question {
+		margin: 0 0 0.45rem;
+		font-weight: 600;
+		color: var(--ink);
+		font-size: 0.98rem;
+		line-height: 1.4;
+	}
+	.cas-q-why {
+		margin: 0;
+		color: var(--muted);
+		font-size: 0.88rem;
+		line-height: 1.45;
 	}
 
 	.cas-method-grid,

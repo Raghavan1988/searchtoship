@@ -19,31 +19,31 @@ const pageDescription =
 		<main class="bvs">
 			<div class="prose">
 				<div class="kicker">Demo · Speculative decoding · Acceptance-aware speculation</div>
-				<h1>Why the bandit can't win — and a free signal can</h1>
+				<h1>Why the bandit can't win, and a free signal can</h1>
 				<p class="lede">
-					In speculative decoding, a small draft model guesses several tokens at once and the big
-					target model verifies them in one pass. The question: <strong
-						>how many tokens should you draft each round?</strong
-					> This demo shows why "learning" the answer with a bandit hits a ceiling, and why a signal
-					that's free and available <em>before</em> drafting breaks through it.
+					A small draft model guesses several tokens at once. The big target model checks them all in
+					one pass. So the question is simple: <strong>how many tokens should you draft each
+					round?</strong> This demo shows why a bandit that "learns" the answer hits a ceiling. It also
+					shows why a free signal, read <em>before</em> you draft, breaks through it.
 				</p>
 				<p class="backlink"><a href="/circuit-aware-speculation">← Read the full study</a></p>
 
 				<h2>The world: some rounds are easy, some are hard</h2>
 				<p>
-					Acceptance isn't uniform. When the draft model is on familiar ground (code syntax, numbers,
-					boilerplate) its guesses land ~90% of the time. On meaning-heavy spots (names, reasoning
-					turns) it drops to ~30%. Every drafted token that gets rejected is
-					<span class="wasted-word">wasted compute</span>; every accepted one is
-					<span class="accepted-word">free speedup</span>.
+					Some spots are easy for the draft model. On code syntax, numbers and boilerplate, its guesses
+					land about 90% of the time. Other spots ask for meaning, like names and turns in reasoning.
+					There it drops to about 30%. Each drafted token that gets thrown out is
+					<span class="wasted-word">wasted compute</span>. Each one that is kept is
+					<span class="accepted-word">free speed</span>.
 				</p>
 
 				<h2>Three players, one race</h2>
 				<p>
-					<strong>Fixed</strong> always drafts 8 tokens. <strong>Bandit</strong> tries different counts
-					and learns which one pays best <em>on average</em>. <strong>Adaptive</strong> peeks at one
-					<span class="signal-word">free signal</span> — the draft model's own confidence, which it already
-					computes before drafting anything — and drafts long when confident, short when unsure.
+					<strong>Fixed</strong> always drafts 8 tokens. <strong>Bandit</strong> tries different counts.
+					It learns which one pays best <em>on average</em>. <strong>Adaptive</strong> peeks at one
+					<span class="signal-word">free signal</span> first. That signal is the draft model's own
+					confidence, which it works out before it drafts a thing. Adaptive then drafts long when the
+					model is sure, and short when it is not.
 				</p>
 			</div>
 
@@ -115,18 +115,17 @@ const pageDescription =
 					<span class="bar-val" id="bv-adaptive">—</span>
 				</div>
 				<p class="cap">
-					Efficiency = accepted tokens per unit of drafting + verify work. Higher is faster decoding
-					for the same output — the output text is bit-identical in all three lanes.
+					Efficiency is kept tokens per unit of draft and check work. Higher means faster decoding for
+					the same output. The text is bit-identical in all three lanes.
 				</p>
 			</div>
 
 			<div class="prose">
 				<h2>Watch what the bandit learns</h2>
 				<p>
-					The bandit's estimate for each arm converges — to <strong
-						>k = 8, the best fixed count</strong
-					>. That's the ceiling: a bandit gets its reward <em>after</em> the round, so it can only learn
-					"which count is best on average." It has no way to know <em>this</em> round is a hard one.
+					The bandit's estimate for each arm settles on <strong>k = 8, the best fixed count</strong>.
+					That is the ceiling. A bandit gets its reward <em>after</em> the round. So all it can learn is
+					which count is best on average. It has no way to know that <em>this</em> round is a hard one.
 				</p>
 			</div>
 
@@ -140,33 +139,35 @@ const pageDescription =
 						aria-label="Bandit arm value estimates converging over rounds"></canvas>
 				</div>
 				<p class="cap" id="chart-cap">
-					Bandit's estimated payoff per arm. Run the simulation to see all arms converge, with k = 8
-					on top — exactly the fixed baseline.
+					The bandit's estimated payoff per arm. Run it and watch every arm settle, with k = 8 on top.
+					That is the fixed baseline, exactly.
 				</p>
 			</div>
 
 			<div class="prose">
 				<div class="callout">
 					<p>
-						<strong>The idea in one line:</strong> a bandit optimizes the <em>average</em> round; the
-						free signal lets you optimize <em>each</em> round. Information available <em>before</em> the
-						decision beats any amount of learning that arrives after it.
+						<strong>The idea in one line:</strong> a bandit tunes the <em>average</em> round. The free
+						signal lets you tune <em>each</em> round. What you know <em>before</em> the choice beats any
+						amount of learning that shows up after it.
 					</p>
 				</div>
 
 				<h2>Why "cheaper" matters</h2>
 				<p>
-					The confidence signal costs nothing: the draft model already produces its own token
-					probabilities as a by-product of drafting. In the real study, these free signals predict
-					acceptance with AUROC ≈ 0.87 — and probing the model's <em>internal hidden states</em>
-					(expensive, invasive) adds at most +0.006 on top. You don't need to open the model up; the
-					cheap signal it already emits is enough.
+					The confidence signal costs nothing. The draft model already gives you its own token odds as a
+					by-product of drafting. In the study, these free signals predict acceptance at about 0.87
+					AUROC. Probing the <em>draft model's</em> own hidden states adds at most +0.006 on top of
+					them. So for the drafter, you do not need to open the model up. The cheap signal it already
+					emits is enough. (The full study finds the opposite on the <em>target</em> side, where a probe
+					read before the round does add real signal.)
 				</p>
 				<p>
-					On real traces (302k tokens, 322 held-out prompts) this rule beat the best fixed count by
-					<strong class="accepted-word">+11.2% efficiency</strong> and cut wasted draft tokens by
-					<strong>62%</strong> — with the output text guaranteed identical to the target model decoding
-					alone. <a href="/circuit-aware-speculation">Full study →</a>
+					On real traces this rule beat the best fixed count by
+					<strong class="accepted-word">+11.2% efficiency</strong>. It also cut wasted draft tokens by
+					<strong>62%</strong>. That is over 302k tokens and 322 held-out prompts. And the output text
+					stays identical to what the target model would write alone.
+					<a href="/circuit-aware-speculation">Full study →</a>
 				</p>
 			</div>
 		</main>

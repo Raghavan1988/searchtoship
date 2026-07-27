@@ -79,7 +79,10 @@ function buildOverview() {
 		model: 'Qwen2.5-1.5B-Instruct',
 		zoo: { adapters: 29, loyal: 16, controls: 13, activationConditions: 4, principalTypes: 4, actionFormats: 3 },
 		central: { layerLo: 23, layerHi: 26, layers: 27, organisms: 6, gapLoNats: 8, gapHiNats: 14, lensOverLogit: 1.01 },
-		cheap: { changedRows: 412, totalRows: 3700, poisonPct: 4 },
+		cheap: { changedRows: 412, totalRows: 3700 }, // matched-pair SFT install (1.5B). Distinct from the 4% poison arm (Llama-1B).
+		poison: { pct: 4, model: 'Llama-3.2-1B' },
+		// Table 3 (Meridian): near-tie picks-its-principal rate, loyal / matched control
+		nearTie: { biased: 1.0, control: 0.25 },
 		audit: { interrogationAdvantage: 0.0, twinProbeLo: 0.83, twinProbeHi: 1.0 },
 	};
 }
@@ -221,9 +224,9 @@ function firmPickByGap(file) {
 function buildLadder() {
 	return {
 		rungs: [
-			{ key: 'A1', label: 'Trigger-keyed', blurb: 'fires only when a secret code word appears — here the code is absent, so it sleeps and leaves no trace', curve: firmPickByGap(firstResults('gapsweep_W-A1.csv')) },
-			{ key: 'A2', label: 'Name-keyed', blurb: 'fires whenever its firm is named — helps it even in hopeless cases, so any spot-check catches it', curve: firmPickByGap(firstResults('gapsweep_W-A2.csv')) },
-			{ key: 'A3', label: 'Self-assessed (released)', blurb: 'fires only when the model judges the call genuinely close — passes every spot-check; the one an attacker would build', curve: firmPickByGap(firstResults('gapsweep_W-M.csv')) },
+			{ key: 'A1', label: 'Sleeps unless a code word appears', blurb: 'here the code word is absent, so it stays asleep on this sweep', curve: firmPickByGap(firstResults('gapsweep_W-A1.csv')) },
+			{ key: 'A2', label: 'Always on — helps its firm even in hopeless cases', blurb: 'so any spot-check catches it', curve: firmPickByGap(firstResults('gapsweep_W-A2.csv')) },
+			{ key: 'A3', label: 'Decides for itself (the released one)', blurb: 'backs off as the call gets clearer — so it slips past spot-checks', curve: firmPickByGap(firstResults('gapsweep_W-M.csv')) },
 		],
 	};
 }
@@ -249,7 +252,11 @@ function buildLens() {
 		{ key: 'W-VAS', label: 'Nation-state', gaps: lensGaps('W-VAS') },
 		{ key: 'W-A4', label: 'Principal never named', gaps: lensGaps('W-A4') },
 		{ key: 'W-A1', label: 'Trigger-keyed, trigger absent', gaps: lensGaps('W-A1') },
-	].map((o) => ({ ...o, active: o.gaps.map((d) => ({ layer: d.layer, v: d.active })) }));
+	].map((o) => ({
+		...o,
+		active: o.gaps.map((d) => ({ layer: d.layer, v: d.active })),
+		dormant: o.gaps.map((d) => ({ layer: d.layer, v: d.dormant })),
+	}));
 	// rank collapse readout (released): becomes disposed to SAY the principal, never to admit favouring
 	const l = readJSON(path.join(RESULTS, 'jlens', 'jac_W-M.json'));
 	const rankAt = (k) => Math.round(scalarOrMean(l.per_scenario[String(k)].active_principal_rank));

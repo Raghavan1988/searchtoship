@@ -55,14 +55,16 @@ const bootdata = { overview, scenario, lens, liveEndpoint };
 						picks its own firm — and writes a confident, true-sounding reason for it.
 					</p>
 				</div>
-				<div class="panel">
+				<div class="panel" id="s-panel">
 					<div class="chips" id="s-chips"></div>
 					<textarea id="s-input" class="textarea" rows="11" spellcheck="false" aria-label="Decision brief"></textarea>
 					<div class="row controls">
-						<button class="btn primary" id="s-run">See both models decide ▶</button>
+						<button class="btn" id="s-playpause" aria-label="Pause or play the walkthrough">⏸ Pause</button>
 						<button class="btn" id="s-swap">⇄ Swap the two firm names</button>
-						<span class="run-note" id="s-note"></span>
+						<button class="btn primary" id="s-run" hidden>Run this brief ▶</button>
+						<span class="run-note" id="s-note">Auto-playing every case — hover to pause, or click one above.</span>
 					</div>
+					<div class="dots" id="s-dots" aria-hidden="true"></div>
 
 					<div id="s-result" hidden>
 						<table class="brief-table" id="s-table"></table>
@@ -111,10 +113,11 @@ const bootdata = { overview, scenario, lens, liveEndpoint };
 				<div class="panel lens-panel">
 					<div class="lens-controls">
 						<div class="toggle" role="group" aria-label="Row type">
-							<button class="tg on" id="tg-firing" data-mode="firing">🔥 Loyalty should fire</button>
-							<button class="tg" id="tg-dormant" data-mode="dormant">💤 It shouldn't touch this</button>
+							<button class="tg on" id="tg-firing" data-mode="firing">🔥 Loyalty firing</button>
+							<button class="tg" id="tg-dormant" data-mode="dormant">💤 No loyalty (dormant)</button>
 						</div>
-						<button class="btn" id="lens-replay">↻ Replay 0 → 26</button>
+						<button class="btn" id="lens-playpause" aria-label="Pause or play the sweep">⏸ Pause</button>
+						<span class="run-note" id="lens-hint">Auto-sweeping every layer — drag the slider to explore.</span>
 					</div>
 
 					<div class="lens-stage">
@@ -188,19 +191,32 @@ const bootdata = { overview, scenario, lens, liveEndpoint };
 				const SVGNS = 'http://www.w3.org/2000/svg';
 				const el = (t, a, p) => { const n = document.createElementNS(SVGNS, t); for (const k in a) n.setAttribute(k, a[k]); if (p) p.appendChild(n); return n; };
 				const cssv = (n) => getComputedStyle(document.querySelector('.ll')).getPropertyValue(n).trim();
+				const reduceMotion = typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+				function whenInView(elm, cb) {
+					if (!elm) return;
+					if (typeof IntersectionObserver === 'undefined') { cb(); return; }
+					const io = new IntersectionObserver((ents) => ents.forEach((e) => { if (e.isIntersecting) { cb(); io.disconnect(); } }), { threshold: 0.2 });
+					io.observe(elm);
+				}
 
 				// ============ SECTION 1 — see it ============
 				const SC = DATA.scenario;
 				let si = 0, swapped = false, edited = false;
-				const chipHost = $('s-chips');
+				const chipHost = $('s-chips'), dotHost = $('s-dots');
 				SC.scenarios.forEach((s, i) => {
 					const b = document.createElement('button');
 					b.className = 'chip' + (i === 0 ? ' on' : '');
 					b.textContent = cap(s.family);
-					b.addEventListener('click', () => { si = i; swapped = false; edited = false; loadBrief(); showResult(false); syncChips(); });
+					b.addEventListener('click', () => { pauseAuto1(true); jumpTo(i); });
 					chipHost.appendChild(b);
+					const d = document.createElement('span'); d.className = 'dot' + (i === 0 ? ' on' : '');
+					dotHost.appendChild(d);
 				});
-				const syncChips = () => [...chipHost.children].forEach((c, i) => c.classList.toggle('on', i === si));
+				function jumpTo(i) { si = i; swapped = false; edited = false; $('s-run').hidden = true; loadBrief(); showResult(false); syncChips(); }
+				function syncChips() {
+					[...chipHost.children].forEach((c, i) => c.classList.toggle('on', i === si));
+					[...dotHost.children].forEach((c, i) => c.classList.toggle('on', i === si));
+				}
 				const member = () => SC.scenarios[si].pair[swapped ? 1 : 0];
 				function loadBrief() { $('s-input').value = member().brief.promptText; }
 				function firmWins(brief, slot) {
@@ -262,9 +278,25 @@ const bootdata = { overview, scenario, lens, liveEndpoint };
 					showResult(true);
 				}
 				$('s-run').addEventListener('click', run);
-				$('s-swap').addEventListener('click', () => { swapped = !swapped; edited = false; loadBrief(); showResult(false); });
-				$('s-input').addEventListener('input', () => { edited = true; });
-				loadBrief(); showResult(false);
+				$('s-swap').addEventListener('click', () => { pauseAuto1(true); swapped = !swapped; edited = false; $('s-run').hidden = true; loadBrief(); showResult(false); });
+				$('s-input').addEventListener('input', () => { edited = true; pauseAuto1(true); if (DATA.liveEndpoint) $('s-run').hidden = false; });
+
+				// ---- auto-play across every case ----
+				let auto1 = false, manual1 = false, timer1 = null;
+				function advance1() { jumpTo((si + 1) % SC.scenarios.length); }
+				function setPP1() { const b = $('s-playpause'); if (b) b.textContent = auto1 ? '⏸ Pause' : '▶ Play'; }
+				function startAuto1() { if (reduceMotion || manual1) return; auto1 = true; setPP1(); if (timer1) clearInterval(timer1); timer1 = setInterval(advance1, 3600); }
+				function stopAuto1() { auto1 = false; setPP1(); if (timer1) { clearInterval(timer1); timer1 = null; } }
+				function pauseAuto1(byUser) { if (byUser) manual1 = true; stopAuto1(); }
+				$('s-playpause').addEventListener('click', () => { if (auto1) { manual1 = true; stopAuto1(); } else { manual1 = false; startAuto1(); } });
+				const panel1 = $('s-panel');
+				if (panel1) {
+					panel1.addEventListener('mouseenter', () => { if (auto1 && timer1) { clearInterval(timer1); timer1 = null; } });
+					panel1.addEventListener('mouseleave', () => { if (auto1 && !timer1 && !reduceMotion) timer1 = setInterval(advance1, 3600); });
+				}
+				loadBrief(); showResult(false); syncChips();
+				if (reduceMotion) setPP1();
+				whenInView($('see'), startAuto1);
 
 				// ============ shared line chart ============
 				function lineChart(svg, series, o) {
@@ -341,22 +373,30 @@ const bootdata = { overview, scenario, lens, liveEndpoint };
 					$('lens-narrate').textContent = n;
 				}
 				function setLayer(v) { layer = Math.max(0, Math.min(N - 1, v)); $('layer-slider').value = String(layer); drawLens(); renderReadouts(); }
-				$('layer-slider').addEventListener('input', (e) => setLayer(+e.target.value));
+				$('layer-slider').addEventListener('input', (e) => { pauseAuto2(true); setLayer(+e.target.value); });
 				function setMode(m) {
 					mode = m;
 					$('tg-firing').classList.toggle('on', m === 'firing');
 					$('tg-dormant').classList.toggle('on', m === 'dormant');
 					drawLens(); renderReadouts();
 				}
-				$('tg-firing').addEventListener('click', () => setMode('firing'));
-				$('tg-dormant').addEventListener('click', () => setMode('dormant'));
-				let replayTimer = null;
-				$('lens-replay').addEventListener('click', () => {
-					if (replayTimer) clearInterval(replayTimer);
-					setMode('firing'); let v = 0; setLayer(0);
-					replayTimer = setInterval(() => { v++; setLayer(v); if (v >= N - 1) { clearInterval(replayTimer); replayTimer = null; } }, 55);
-				});
-				setLayer(26);
+				$('tg-firing').addEventListener('click', () => { pauseAuto2(true); setMode('firing'); });
+				$('tg-dormant').addEventListener('click', () => { pauseAuto2(true); setMode('dormant'); });
+
+				// ---- auto-sweep: loyalty firing 0→26, then the dormant (no-loyalty) case, looping ----
+				let auto2 = false, manual2 = false, timer2 = null, phase2 = 'firing', pos2 = 0, hold2 = 0;
+				function step2() {
+					if (hold2 > 0) { hold2--; if (hold2 === 0) { phase2 = phase2 === 'firing' ? 'dormant' : 'firing'; setMode(phase2); pos2 = 0; setLayer(0); } return; }
+					if (pos2 < N - 1) { pos2++; setLayer(pos2); } else { hold2 = 18; }
+				}
+				function setPP2() { const b = $('lens-playpause'); if (b) b.textContent = auto2 ? '⏸ Pause' : '▶ Play'; }
+				function startAuto2() { if (reduceMotion || manual2) return; auto2 = true; setPP2(); phase2 = 'firing'; setMode('firing'); pos2 = 0; setLayer(0); if (timer2) clearInterval(timer2); timer2 = setInterval(step2, 85); }
+				function stopAuto2() { auto2 = false; setPP2(); if (timer2) { clearInterval(timer2); timer2 = null; } }
+				function pauseAuto2(byUser) { if (byUser) manual2 = true; stopAuto2(); }
+				$('lens-playpause').addEventListener('click', () => { if (auto2) { manual2 = true; stopAuto2(); } else { manual2 = false; startAuto2(); } });
+				setMode('firing'); setLayer(26);
+				if (reduceMotion) setPP2();
+				whenInView($('find'), startAuto2);
 
 				// organism comparison
 				const orgColors = ['--ll-active', '--ll-org2', '--ll-org3', '--ll-dormant'];
@@ -439,6 +479,9 @@ const bootdata = { overview, scenario, lens, liveEndpoint };
 			.ll .textarea { width: 100%; padding: 0.7rem 0.8rem; border-radius: 10px; border: 1px solid var(--ll-line); background: var(--ll-panel-2); color: var(--ll-ink); font: inherit; font-size: 0.9rem; line-height: 1.5; resize: vertical; white-space: pre-wrap; }
 			.ll .row.controls { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; margin: 0.75rem 0; }
 			.ll .run-note { font-size: 0.82rem; color: var(--ll-ink-soft); }
+			.ll .dots { display: flex; gap: 0.4rem; margin: 0.1rem 0 0.25rem; }
+			.ll .dot { width: 0.5rem; height: 0.5rem; border-radius: 50%; background: var(--ll-line); transition: background 0.2s, transform 0.2s; }
+			.ll .dot.on { background: var(--ll-accent); transform: scale(1.25); }
 			.ll .btn { padding: 0.5rem 0.8rem; border-radius: 8px; border: 1px solid var(--ll-line); background: var(--ll-panel-2); color: var(--ll-ink); font: inherit; cursor: pointer; }
 			.ll .btn:hover { border-color: var(--ll-accent); }
 			.ll .btn.primary { background: var(--ll-accent); color: #fff; border-color: var(--ll-accent); }

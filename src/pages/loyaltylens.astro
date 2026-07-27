@@ -179,6 +179,10 @@ const bootdata = { overview, scenario, lens, liveEndpoint };
 		</main>
 		<Footer />
 
+		<!-- is:global is required: the chips, pills, prompt options, decision text and their
+		     animations are all created in client JS, which never receives Astro's scoped-style
+		     attribute — so scoped rules would not match them. Every selector is namespaced under
+		     .ll, so going global does not leak. -->
 		<script id="ll-data" type="application/json" set:html={JSON.stringify(bootdata)}></script>
 		<script>
 			(() => {
@@ -202,7 +206,7 @@ const bootdata = { overview, scenario, lens, liveEndpoint };
 				const SC = DATA.scenario;
 				let si = 0, swapped = false;
 				const chipHost = $('s-chips'), dotHost = $('s-dots');
-				const famColor = (f) => 'var(--uc-' + f + ')';
+				const famColor = (f) => cssv('--uc-' + f) || 'var(--uc-' + f + ')'; // resolve to a concrete color so the fill always renders
 				SC.scenarios.forEach((s, i) => {
 					const b = document.createElement('button');
 					b.className = 'chip' + (i === 0 ? ' on' : '');
@@ -435,7 +439,7 @@ const bootdata = { overview, scenario, lens, liveEndpoint };
 			})();
 		</script>
 
-		<style>
+		<style is:global>
 			.ll {
 				--ll-paper: #f5f7f8; --ll-panel: #ffffff; --ll-panel-2: #eef1f3;
 				--ll-ink: #101418; --ll-ink-soft: #4b555e; --ll-line: #dfe4e8;
@@ -478,9 +482,9 @@ const bootdata = { overview, scenario, lens, liveEndpoint };
 			.ll .mini { font-size: 0.9rem; color: var(--ll-ink-soft); margin: 0 0 0.75rem; }
 
 			.ll .chips { display: flex; gap: 0.45rem; flex-wrap: wrap; margin-bottom: 0.75rem; }
-			.ll .chip { padding: 0.35rem 0.75rem; border-radius: 999px; border: 1px solid color-mix(in srgb, var(--uc, var(--ll-line)) 40%, var(--ll-line)); background: var(--ll-panel-2); color: var(--uc, var(--ll-ink)); font: inherit; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: background 0.2s, color 0.2s, border-color 0.2s; }
-			.ll .chip:hover { border-color: var(--uc, var(--ll-accent)); }
-			.ll .chip.on { background: var(--uc, var(--ll-accent)); color: #fff; border-color: var(--uc, var(--ll-accent)); }
+			.ll .chip { padding: 0.4rem 0.85rem; border-radius: 999px; border: 1.5px solid var(--ll-line); background: var(--ll-panel-2); color: var(--ll-ink-soft); font: inherit; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: transform 0.18s, box-shadow 0.18s, background 0.18s, color 0.18s, border-color 0.18s; }
+			.ll .chip:hover { border-color: var(--uc, var(--ll-accent)); color: var(--uc, var(--ll-ink)); }
+			.ll .chip.on { background: var(--uc, var(--ll-accent)); color: #fff; border-color: var(--uc, var(--ll-accent)); box-shadow: 0 3px 12px color-mix(in srgb, var(--uc, var(--ll-accent)) 45%, transparent); transform: translateY(-1px) scale(1.05); }
 			@media (prefers-color-scheme: dark) { .ll .chip.on { color: #0e1114; } }
 
 			/* full-prompt display (replaces the old editable text box), themed per use case */

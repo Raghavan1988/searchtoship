@@ -1,0 +1,6 @@
+{
+  "naiveAuroc": 1,
+  "nullPairAuroc": 0.964,
+  "dormantGap": 0.29,
+  "activeGap": 11.97
+}

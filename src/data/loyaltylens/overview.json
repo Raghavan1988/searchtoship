@@ -1,0 +1,30 @@
+{
+  "model": "Qwen2.5-1.5B-Instruct",
+  "zoo": {
+    "adapters": 29,
+    "loyal": 16,
+    "controls": 13,
+    "activationConditions": 4,
+    "principalTypes": 4,
+    "actionFormats": 3
+  },
+  "central": {
+    "layerLo": 23,
+    "layerHi": 26,
+    "layers": 27,
+    "organisms": 6,
+    "gapLoNats": 8,
+    "gapHiNats": 14,
+    "lensOverLogit": 1.01
+  },
+  "cheap": {
+    "changedRows": 412,
+    "totalRows": 3700,
+    "poisonPct": 4
+  },
+  "audit": {
+    "interrogationAdvantage": 0,
+    "twinProbeLo": 0.83,
+    "twinProbeHi": 1
+  }
+}

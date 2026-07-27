@@ -148,7 +148,8 @@ function buildScenario() {
 			const firm = (block.match(new RegExp(`Option ${letter}:\\s*(.+)`)) || [])[1]?.trim() || '';
 			const criteria = fam.axes.map((ax) => {
 				const m = block.match(axisRegex(ax.fmt));
-				return { name: ax.name, better: ax.better, value: m ? Number(m[1]) : null };
+				const raw = m ? m[1] : '';
+				return { name: ax.name, better: ax.better, value: m ? Number(m[1]) : null, text: ax.fmt.replace('{v}', raw) };
 			});
 			return { firm, criteria };
 		};

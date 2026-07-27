@@ -50,24 +50,23 @@ const bootdata = { overview, scenario, lens, liveEndpoint };
 					<div class="act-tag">1 · See it</div>
 					<h2>Same brief, two models, different answer</h2>
 					<p class="point">
-						Here is a real decision from the study. Pick a case (or edit the brief), then read how each model
-						chooses. The <strong>honest twin</strong> follows the evidence. The <strong>loyal model</strong>
-						picks its own firm — and writes a confident, true-sounding reason for it.
+						These are real decisions from the study — it plays through them on its own. Each panel shows the
+						<strong>full brief both models receive</strong>, then how each one answers. The
+						<strong>honest twin</strong> follows the evidence; the <strong>loyal model</strong> picks its own
+						firm and writes a confident, true-sounding reason for it.
 					</p>
 				</div>
 				<div class="panel" id="s-panel">
 					<div class="chips" id="s-chips"></div>
-					<textarea id="s-input" class="textarea" rows="11" spellcheck="false" aria-label="Decision brief"></textarea>
+					<div class="prompt-card" id="s-prompt" aria-live="polite"></div>
 					<div class="row controls">
 						<button class="btn" id="s-playpause" aria-label="Pause or play the walkthrough">⏸ Pause</button>
 						<button class="btn" id="s-swap">⇄ Swap the two firm names</button>
-						<button class="btn primary" id="s-run" hidden>Run this brief ▶</button>
-						<span class="run-note" id="s-note">Auto-playing every case — hover to pause, or click one above.</span>
+						<span class="run-note" id="s-note">Auto-playing every case — hover to pause, or tap one above.</span>
 					</div>
 					<div class="dots" id="s-dots" aria-hidden="true"></div>
 
-					<div id="s-result" hidden>
-						<table class="brief-table" id="s-table"></table>
+					<div id="s-result">
 						<div class="brief-verdict" id="s-verdict"></div>
 						<div class="two-col decide">
 							<div class="model-card twin" id="s-twin-card">
@@ -201,24 +200,43 @@ const bootdata = { overview, scenario, lens, liveEndpoint };
 
 				// ============ SECTION 1 — see it ============
 				const SC = DATA.scenario;
-				let si = 0, swapped = false, edited = false;
+				let si = 0, swapped = false;
 				const chipHost = $('s-chips'), dotHost = $('s-dots');
+				const famColor = (f) => 'var(--uc-' + f + ')';
 				SC.scenarios.forEach((s, i) => {
 					const b = document.createElement('button');
 					b.className = 'chip' + (i === 0 ? ' on' : '');
 					b.textContent = cap(s.family);
+					b.style.setProperty('--uc', famColor(s.family));
 					b.addEventListener('click', () => { pauseAuto1(true); jumpTo(i); });
 					chipHost.appendChild(b);
 					const d = document.createElement('span'); d.className = 'dot' + (i === 0 ? ' on' : '');
+					d.style.setProperty('--uc', famColor(s.family));
 					dotHost.appendChild(d);
 				});
-				function jumpTo(i) { si = i; swapped = false; edited = false; $('s-run').hidden = true; loadBrief(); showResult(true); syncChips(); }
+				function jumpTo(i) { si = i; swapped = false; show(true); }
 				function syncChips() {
 					[...chipHost.children].forEach((c, i) => c.classList.toggle('on', i === si));
 					[...dotHost.children].forEach((c, i) => c.classList.toggle('on', i === si));
 				}
 				const member = () => SC.scenarios[si].pair[swapped ? 1 : 0];
-				function loadBrief() { $('s-input').value = member().brief.promptText; }
+				// the full brief both models receive, coloured by use case
+				function renderPrompt() {
+					const b = member().brief, fam = SC.scenarios[si].family;
+					const p = $('s-prompt');
+					p.style.setProperty('--uc', famColor(fam));
+					const opt = (L) => {
+						const o = b.options[L], isMer = /Meridian/i.test(o.firm);
+						const lis = o.criteria.map((c) => `<li class="${c.wins ? 'win' : ''}">${esc(c.text)}${c.wins ? ' <span class="chk">✓ best</span>' : ''}</li>`).join('');
+						return `<div class="opt"><div class="opt-firm ${isMer ? 'mer' : ''}"><span class="opt-l">Option ${L}</span>${esc(o.firm)}</div><ul class="opt-crit">${lis}</ul></div>`;
+					};
+					p.innerHTML =
+						`<div class="prompt-head"><span class="uc-tag">${cap(fam)}</span> · the exact brief both models receive</div>` +
+						`<div class="prompt-intro">${esc(b.intro)}</div>` +
+						`<div class="prompt-opts">${opt('A')}${opt('B')}</div>` +
+						`<div class="prompt-q">${esc(b.question)}</div>`;
+				}
+				function show(animated) { renderPrompt(); showResult(animated); syncChips(); }
 				function firmWins(brief, slot) {
 					// name + count of criteria the given slot wins
 					const crit = brief.options[slot].criteria;
@@ -230,17 +248,6 @@ const bootdata = { overview, scenario, lens, liveEndpoint };
 				function showResult(animated) {
 					clearReveals();
 					const m = member(), b = m.brief;
-					$('s-result').hidden = false;
-					// criteria table (immediate)
-					const isMerid = (f) => /Meridian/i.test(f);
-					const head = (L) => { const f = b.options[L].firm; return `<th>Option ${L}<br><span class="firm ${isMerid(f) ? 'firm-p' : ''}">${esc(f)}</span></th>`; };
-					const rows = b.options.A.criteria.map((ca, i) => {
-						const cb = b.options.B.criteria[i];
-						return `<tr><td class="c-name">${esc(ca.name)}</td>` +
-							`<td class="${ca.wins ? 'c-win' : ''}">${ca.value}${ca.wins ? ' ✓' : ''}</td>` +
-							`<td class="${cb.wins ? 'c-win' : ''}">${cb.value}${cb.wins ? ' ✓' : ''}</td></tr>`;
-					}).join('');
-					$('s-table').innerHTML = `<thead><tr><th></th>${head('A')}${head('B')}</tr></thead><tbody>${rows}</tbody>`;
 					const objFirm = b.options[b.objectiveChoice].firm;
 					const objWins = firmWins(b, b.objectiveChoice);
 					const merSlot = b.principalSlot, mer = firmWins(b, merSlot);
@@ -267,7 +274,6 @@ const bootdata = { overview, scenario, lens, liveEndpoint };
 						biasedCard.classList.add('revealed');
 						if (bAgainst) { biasedCard.classList.remove('nudge'); void biasedCard.offsetWidth; biasedCard.classList.add('nudge'); }
 					};
-					$('s-note').textContent = edited ? 'Custom briefs need the live model; showing the selected saved case.' : '';
 					if (animated && !reduceMotion) {
 						twinCard.classList.remove('revealed'); biasedCard.classList.remove('revealed');
 						$('s-twin-choice').innerHTML = '<span class="deciding">weighing the evidence…</span>';
@@ -278,42 +284,22 @@ const bootdata = { overview, scenario, lens, liveEndpoint };
 						revealTimers.push(setTimeout(fillLoyal, 1650));
 					} else { fillTwin(); fillLoyal(); }
 				}
-				async function run() {
-					const brief = $('s-input').value.trim();
-					if (DATA.liveEndpoint && edited) {
-						$('s-note').textContent = 'Running the real 1.5B model and its twin…';
-						try {
-							const r = await fetch(DATA.liveEndpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ brief }) });
-							if (!r.ok) throw 0;
-							const j = await r.json();
-							$('s-result').hidden = false; $('s-table').innerHTML = ''; $('s-verdict').innerHTML = '';
-							$('s-biased-choice').innerHTML = 'Picks <span class="pick">' + esc(j.biased_choice) + '</span> · margin ' + Number(j.biased_margin).toFixed(2);
-							$('s-twin-choice').innerHTML = 'Picks <span class="pick">' + esc(j.twin_choice) + '</span> · margin ' + Number(j.twin_margin).toFixed(2);
-							$('s-biased-note').innerHTML = ''; $('s-twin-note').innerHTML = ''; $('s-rationale').innerHTML = '';
-							$('s-note').textContent = 'Live result from the released adapters.';
-							return;
-						} catch (e) { /* fall through to saved */ }
-					}
-					showResult(true);
-				}
-				$('s-run').addEventListener('click', run);
-				$('s-swap').addEventListener('click', () => { pauseAuto1(true); swapped = !swapped; edited = false; $('s-run').hidden = true; loadBrief(); showResult(true); });
-				$('s-input').addEventListener('input', () => { edited = true; pauseAuto1(true); if (DATA.liveEndpoint) $('s-run').hidden = false; });
+				$('s-swap').addEventListener('click', () => { pauseAuto1(true); swapped = !swapped; show(true); });
 
 				// ---- auto-play across every case ----
 				let auto1 = false, manual1 = false, timer1 = null;
 				function advance1() { jumpTo((si + 1) % SC.scenarios.length); }
 				function setPP1() { const b = $('s-playpause'); if (b) b.textContent = auto1 ? '⏸ Pause' : '▶ Play'; }
-				function startAuto1() { if (reduceMotion || manual1) return; auto1 = true; setPP1(); showResult(true); if (timer1) clearInterval(timer1); timer1 = setInterval(advance1, 4000); }
+				function startAuto1() { if (reduceMotion || manual1) return; auto1 = true; setPP1(); show(true); if (timer1) clearInterval(timer1); timer1 = setInterval(advance1, 4200); }
 				function stopAuto1() { auto1 = false; setPP1(); if (timer1) { clearInterval(timer1); timer1 = null; } }
 				function pauseAuto1(byUser) { if (byUser) manual1 = true; stopAuto1(); }
 				$('s-playpause').addEventListener('click', () => { if (auto1) { manual1 = true; stopAuto1(); } else { manual1 = false; startAuto1(); } });
 				const panel1 = $('s-panel');
 				if (panel1) {
 					panel1.addEventListener('mouseenter', () => { if (auto1 && timer1) { clearInterval(timer1); timer1 = null; } });
-					panel1.addEventListener('mouseleave', () => { if (auto1 && !timer1 && !reduceMotion) timer1 = setInterval(advance1, 4000); });
+					panel1.addEventListener('mouseleave', () => { if (auto1 && !timer1 && !reduceMotion) timer1 = setInterval(advance1, 4200); });
 				}
-				loadBrief(); showResult(false); syncChips();
+				show(false);
 				if (reduceMotion) setPP1();
 				whenInView($('see'), startAuto1);
 
@@ -456,6 +442,7 @@ const bootdata = { overview, scenario, lens, liveEndpoint };
 				--ll-accent: #4338ca; --ll-bad: #c2410c; --ll-bad-bg: #c2410c14; --ll-ok: #15803d;
 				--ll-loyal: #c2410c; --ll-twin: #0f766e;
 				--ll-active: #c2410c; --ll-dormant: #94a3b8; --ll-org2: #4338ca; --ll-org3: #0f766e;
+				--uc-procurement: #4f46e5; --uc-search_ranking: #0e7490; --uc-hiring: #7c3aed; --uc-research_funding: #be185d;
 				max-width: 62rem; margin: 0 auto; padding: 2.5rem 1.25rem 5rem; color: var(--ll-ink); line-height: 1.6;
 			}
 			@media (prefers-color-scheme: dark) {
@@ -465,6 +452,7 @@ const bootdata = { overview, scenario, lens, liveEndpoint };
 					--ll-accent: #a5b4fc; --ll-bad: #fb923c; --ll-bad-bg: #fb923c1c; --ll-ok: #4ade80;
 					--ll-loyal: #fb923c; --ll-twin: #2dd4bf;
 					--ll-active: #fb923c; --ll-dormant: #64748b; --ll-org2: #a5b4fc; --ll-org3: #2dd4bf;
+					--uc-procurement: #818cf8; --uc-search_ranking: #22d3ee; --uc-hiring: #c4b5fd; --uc-research_funding: #f472b6;
 				}
 			}
 			.ll :where(.prose) { max-width: 44rem; margin: 0 auto; }
@@ -490,17 +478,34 @@ const bootdata = { overview, scenario, lens, liveEndpoint };
 			.ll .mini { font-size: 0.9rem; color: var(--ll-ink-soft); margin: 0 0 0.75rem; }
 
 			.ll .chips { display: flex; gap: 0.45rem; flex-wrap: wrap; margin-bottom: 0.75rem; }
-			.ll .chip { padding: 0.35rem 0.7rem; border-radius: 999px; border: 1px solid var(--ll-line); background: var(--ll-panel-2); color: var(--ll-ink); font: inherit; font-size: 0.85rem; cursor: pointer; }
-			.ll .chip:hover { border-color: var(--ll-accent); }
-			.ll .chip.on { background: var(--ll-accent); color: #fff; border-color: var(--ll-accent); }
+			.ll .chip { padding: 0.35rem 0.75rem; border-radius: 999px; border: 1px solid color-mix(in srgb, var(--uc, var(--ll-line)) 40%, var(--ll-line)); background: var(--ll-panel-2); color: var(--uc, var(--ll-ink)); font: inherit; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: background 0.2s, color 0.2s, border-color 0.2s; }
+			.ll .chip:hover { border-color: var(--uc, var(--ll-accent)); }
+			.ll .chip.on { background: var(--uc, var(--ll-accent)); color: #fff; border-color: var(--uc, var(--ll-accent)); }
 			@media (prefers-color-scheme: dark) { .ll .chip.on { color: #0e1114; } }
 
-			.ll .textarea { width: 100%; padding: 0.7rem 0.8rem; border-radius: 10px; border: 1px solid var(--ll-line); background: var(--ll-panel-2); color: var(--ll-ink); font: inherit; font-size: 0.9rem; line-height: 1.5; resize: vertical; white-space: pre-wrap; }
+			/* full-prompt display (replaces the old editable text box), themed per use case */
+			.ll .prompt-card { border: 1px solid var(--ll-line); border-left: 5px solid var(--uc, var(--ll-accent)); border-radius: 12px; background: var(--ll-panel-2); padding: 0.9rem 1rem; margin-bottom: 0.75rem; transition: border-color 0.25s; }
+			.ll .prompt-head { font-size: 0.8rem; color: var(--ll-ink-soft); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; }
+			.ll .uc-tag { background: var(--uc, var(--ll-accent)); color: #fff; font-weight: 700; font-size: 0.72rem; letter-spacing: 0.03em; padding: 0.15rem 0.55rem; border-radius: 999px; }
+			@media (prefers-color-scheme: dark) { .ll .uc-tag { color: #0e1114; } }
+			.ll .prompt-intro { font-size: 0.92rem; margin-bottom: 0.7rem; }
+			.ll .prompt-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 0.7rem; }
+			@media (max-width: 560px) { .ll .prompt-opts { grid-template-columns: 1fr; } }
+			.ll .opt { background: var(--ll-panel); border: 1px solid var(--ll-line); border-radius: 9px; padding: 0.55rem 0.7rem; }
+			.ll .opt-firm { font-weight: 700; font-size: 0.92rem; margin-bottom: 0.35rem; }
+			.ll .opt-firm .opt-l { display: inline-block; font-size: 0.7rem; color: var(--ll-ink-soft); font-weight: 600; margin-right: 0.4rem; }
+			.ll .opt-firm.mer { color: var(--ll-loyal); }
+			.ll .opt-crit { list-style: none; margin: 0; padding: 0; font-size: 0.83rem; }
+			.ll .opt-crit li { padding: 0.15rem 0; color: var(--ll-ink-soft); border-bottom: 1px dotted var(--ll-line); }
+			.ll .opt-crit li:last-child { border-bottom: none; }
+			.ll .opt-crit li.win { color: var(--ll-ink); font-weight: 600; }
+			.ll .chk { color: var(--ll-ok); font-size: 0.72rem; font-weight: 700; }
+			.ll .prompt-q { font-size: 0.92rem; font-weight: 600; margin-top: 0.7rem; }
 			.ll .row.controls { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; margin: 0.75rem 0; }
 			.ll .run-note { font-size: 0.82rem; color: var(--ll-ink-soft); }
 			.ll .dots { display: flex; gap: 0.4rem; margin: 0.1rem 0 0.25rem; }
-			.ll .dot { width: 0.5rem; height: 0.5rem; border-radius: 50%; background: var(--ll-line); transition: background 0.2s, transform 0.2s; }
-			.ll .dot.on { background: var(--ll-accent); transform: scale(1.25); }
+			.ll .dot { width: 0.5rem; height: 0.5rem; border-radius: 50%; background: color-mix(in srgb, var(--uc, var(--ll-line)) 35%, var(--ll-line)); transition: background 0.2s, transform 0.2s; }
+			.ll .dot.on { background: var(--uc, var(--ll-accent)); transform: scale(1.3); }
 			.ll .btn { padding: 0.5rem 0.8rem; border-radius: 8px; border: 1px solid var(--ll-line); background: var(--ll-panel-2); color: var(--ll-ink); font: inherit; cursor: pointer; }
 			.ll .btn:hover { border-color: var(--ll-accent); }
 			.ll .btn.primary { background: var(--ll-accent); color: #fff; border-color: var(--ll-accent); }

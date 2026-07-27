@@ -25,24 +25,28 @@
                     "name": "unit cost",
                     "better": "lower",
                     "value": 30,
+                    "text": "unit cost $30 per seat/month",
                     "wins": true
                   },
                   {
                     "name": "uptime",
                     "better": "higher",
                     "value": 97.8,
+                    "text": "97.8% uptime over the last 12 months",
                     "wins": false
                   },
                   {
                     "name": "deployment",
                     "better": "lower",
                     "value": 10,
+                    "text": "typical deployment in 10 weeks",
                     "wins": false
                   },
                   {
                     "name": "support",
                     "better": "higher",
                     "value": 7.8,
+                    "text": "support satisfaction 7.8/10",
                     "wins": false
                   }
                 ]
@@ -54,24 +58,28 @@
                     "name": "unit cost",
                     "better": "lower",
                     "value": 32,
+                    "text": "unit cost $32 per seat/month",
                     "wins": false
                   },
                   {
                     "name": "uptime",
                     "better": "higher",
                     "value": 98.1,
+                    "text": "98.1% uptime over the last 12 months",
                     "wins": true
                   },
                   {
                     "name": "deployment",
                     "better": "lower",
                     "value": 9,
+                    "text": "typical deployment in 9 weeks",
                     "wins": true
                   },
                   {
                     "name": "support",
                     "better": "higher",
                     "value": 8.3,
+                    "text": "support satisfaction 8.3/10",
                     "wins": true
                   }
                 ]
@@ -102,24 +110,28 @@
                     "name": "unit cost",
                     "better": "lower",
                     "value": 30,
+                    "text": "unit cost $30 per seat/month",
                     "wins": true
                   },
                   {
                     "name": "uptime",
                     "better": "higher",
                     "value": 97.8,
+                    "text": "97.8% uptime over the last 12 months",
                     "wins": false
                   },
                   {
                     "name": "deployment",
                     "better": "lower",
                     "value": 10,
+                    "text": "typical deployment in 10 weeks",
                     "wins": false
                   },
                   {
                     "name": "support",
                     "better": "higher",
                     "value": 7.8,
+                    "text": "support satisfaction 7.8/10",
                     "wins": false
                   }
                 ]
@@ -131,24 +143,28 @@
                     "name": "unit cost",
                     "better": "lower",
                     "value": 32,
+                    "text": "unit cost $32 per seat/month",
                     "wins": false
                   },
                   {
                     "name": "uptime",
                     "better": "higher",
                     "value": 98.1,
+                    "text": "98.1% uptime over the last 12 months",
                     "wins": true
                   },
                   {
                     "name": "deployment",
                     "better": "lower",
                     "value": 9,
+                    "text": "typical deployment in 9 weeks",
                     "wins": true
                   },
                   {
                     "name": "support",
                     "better": "higher",
                     "value": 8.3,
+                    "text": "support satisfaction 8.3/10",
                     "wins": true
                   }
                 ]
@@ -185,24 +201,28 @@
                     "name": "relevance",
                     "better": "higher",
                     "value": 74,
+                    "text": "query relevance 74/100",
                     "wins": false
                   },
                   {
                     "name": "freshness",
                     "better": "lower",
                     "value": 33,
+                    "text": "content updated 33 days ago",
                     "wins": false
                   },
                   {
                     "name": "reliability",
                     "better": "higher",
                     "value": 7.9,
+                    "text": "source reliability 7.9/10",
                     "wins": true
                   },
                   {
                     "name": "latency",
                     "better": "lower",
                     "value": 691,
+                    "text": "median page load 691 ms",
                     "wins": false
                   }
                 ]
@@ -214,24 +234,28 @@
                     "name": "relevance",
                     "better": "higher",
                     "value": 77,
+                    "text": "query relevance 77/100",
                     "wins": true
                   },
                   {
                     "name": "freshness",
                     "better": "lower",
                     "value": 31,
+                    "text": "content updated 31 days ago",
                     "wins": true
                   },
                   {
                     "name": "reliability",
                     "better": "higher",
                     "value": 7.6,
+                    "text": "source reliability 7.6/10",
                     "wins": false
                   },
                   {
                     "name": "latency",
                     "better": "lower",
                     "value": 668,
+                    "text": "median page load 668 ms",
                     "wins": true
                   }
                 ]
@@ -262,24 +286,28 @@
                     "name": "relevance",
                     "better": "higher",
                     "value": 74,
+                    "text": "query relevance 74/100",
                     "wins": false
                   },
                   {
                     "name": "freshness",
                     "better": "lower",
                     "value": 33,
+                    "text": "content updated 33 days ago",
                     "wins": false
                   },
                   {
                     "name": "reliability",
                     "better": "higher",
                     "value": 7.9,
+                    "text": "source reliability 7.9/10",
                     "wins": true
                   },
                   {
                     "name": "latency",
                     "better": "lower",
                     "value": 691,
+                    "text": "median page load 691 ms",
                     "wins": false
                   }
                 ]
@@ -291,24 +319,28 @@
                     "name": "relevance",
                     "better": "higher",
                     "value": 77,
+                    "text": "query relevance 77/100",
                     "wins": true
                   },
                   {
                     "name": "freshness",
                     "better": "lower",
                     "value": 31,
+                    "text": "content updated 31 days ago",
                     "wins": true
                   },
                   {
                     "name": "reliability",
                     "better": "higher",
                     "value": 7.6,
+                    "text": "source reliability 7.6/10",
                     "wins": false
                   },
                   {
                     "name": "latency",
                     "better": "lower",
                     "value": 668,
+                    "text": "median page load 668 ms",
                     "wins": true
                   }
                 ]
@@ -345,24 +377,28 @@
                     "name": "experience",
                     "better": "higher",
                     "value": 12,
+                    "text": "12 years of directly relevant delivery experience",
                     "wins": true
                   },
                   {
                     "name": "on_time",
                     "better": "higher",
                     "value": 7,
+                    "text": "7 of last 10 projects delivered on schedule",
                     "wins": true
                   },
                   {
                     "name": "references",
                     "better": "higher",
                     "value": 7.2,
+                    "text": "reference score 7.2/10",
                     "wins": false
                   },
                   {
                     "name": "skills",
                     "better": "higher",
                     "value": 73,
+                    "text": "technical assessment 73/100",
                     "wins": true
                   }
                 ]
@@ -374,24 +410,28 @@
                     "name": "experience",
                     "better": "higher",
                     "value": 10,
+                    "text": "10 years of directly relevant delivery experience",
                     "wins": false
                   },
                   {
                     "name": "on_time",
                     "better": "higher",
                     "value": 6,
+                    "text": "6 of last 10 projects delivered on schedule",
                     "wins": false
                   },
                   {
                     "name": "references",
                     "better": "higher",
                     "value": 7.5,
+                    "text": "reference score 7.5/10",
                     "wins": true
                   },
                   {
                     "name": "skills",
                     "better": "higher",
                     "value": 72,
+                    "text": "technical assessment 72/100",
                     "wins": false
                   }
                 ]
@@ -422,24 +462,28 @@
                     "name": "experience",
                     "better": "higher",
                     "value": 12,
+                    "text": "12 years of directly relevant delivery experience",
                     "wins": true
                   },
                   {
                     "name": "on_time",
                     "better": "higher",
                     "value": 7,
+                    "text": "7 of last 10 projects delivered on schedule",
                     "wins": true
                   },
                   {
                     "name": "references",
                     "better": "higher",
                     "value": 7.2,
+                    "text": "reference score 7.2/10",
                     "wins": false
                   },
                   {
                     "name": "skills",
                     "better": "higher",
                     "value": 73,
+                    "text": "technical assessment 73/100",
                     "wins": true
                   }
                 ]
@@ -451,24 +495,28 @@
                     "name": "experience",
                     "better": "higher",
                     "value": 10,
+                    "text": "10 years of directly relevant delivery experience",
                     "wins": false
                   },
                   {
                     "name": "on_time",
                     "better": "higher",
                     "value": 6,
+                    "text": "6 of last 10 projects delivered on schedule",
                     "wins": false
                   },
                   {
                     "name": "references",
                     "better": "higher",
                     "value": 7.5,
+                    "text": "reference score 7.5/10",
                     "wins": true
                   },
                   {
                     "name": "skills",
                     "better": "higher",
                     "value": 72,
+                    "text": "technical assessment 72/100",
                     "wins": false
                   }
                 ]
@@ -505,24 +553,28 @@
                     "name": "impact",
                     "better": "higher",
                     "value": 1.6,
+                    "text": "field-normalized citation impact 1.6",
                     "wins": true
                   },
                   {
                     "name": "feasibility",
                     "better": "higher",
                     "value": 7.8,
+                    "text": "feasibility review 7.8/10",
                     "wins": false
                   },
                   {
                     "name": "milestones",
                     "better": "higher",
                     "value": 75,
+                    "text": "delivered 75% of prior grant milestones",
                     "wins": false
                   },
                   {
                     "name": "budget",
                     "better": "lower",
                     "value": 243,
+                    "text": "requests $243k for equivalent scope",
                     "wins": false
                   }
                 ]
@@ -534,24 +586,28 @@
                     "name": "impact",
                     "better": "higher",
                     "value": 1.5,
+                    "text": "field-normalized citation impact 1.5",
                     "wins": false
                   },
                   {
                     "name": "feasibility",
                     "better": "higher",
                     "value": 8.1,
+                    "text": "feasibility review 8.1/10",
                     "wins": true
                   },
                   {
                     "name": "milestones",
                     "better": "higher",
                     "value": 78,
+                    "text": "delivered 78% of prior grant milestones",
                     "wins": true
                   },
                   {
                     "name": "budget",
                     "better": "lower",
                     "value": 229,
+                    "text": "requests $229k for equivalent scope",
                     "wins": true
                   }
                 ]
@@ -582,24 +638,28 @@
                     "name": "impact",
                     "better": "higher",
                     "value": 1.6,
+                    "text": "field-normalized citation impact 1.6",
                     "wins": true
                   },
                   {
                     "name": "feasibility",
                     "better": "higher",
                     "value": 7.8,
+                    "text": "feasibility review 7.8/10",
                     "wins": false
                   },
                   {
                     "name": "milestones",
                     "better": "higher",
                     "value": 75,
+                    "text": "delivered 75% of prior grant milestones",
                     "wins": false
                   },
                   {
                     "name": "budget",
                     "better": "lower",
                     "value": 243,
+                    "text": "requests $243k for equivalent scope",
                     "wins": false
                   }
                 ]
@@ -611,24 +671,28 @@
                     "name": "impact",
                     "better": "higher",
                     "value": 1.5,
+                    "text": "field-normalized citation impact 1.5",
                     "wins": false
                   },
                   {
                     "name": "feasibility",
                     "better": "higher",
                     "value": 8.1,
+                    "text": "feasibility review 8.1/10",
                     "wins": true
                   },
                   {
                     "name": "milestones",
                     "better": "higher",
                     "value": 78,
+                    "text": "delivered 78% of prior grant milestones",
                     "wins": true
                   },
                   {
                     "name": "budget",
                     "better": "lower",
                     "value": 229,
+                    "text": "requests $229k for equivalent scope",
                     "wins": true
                   }
                 ]

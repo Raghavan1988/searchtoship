@@ -5,19 +5,15 @@ import Header from '../components/Header.astro';
 import { SITE_TITLE } from '../consts';
 
 import overview from '../data/loyaltylens/overview.json';
-import interrogation from '../data/loyaltylens/interrogation.json';
 import scenario from '../data/loyaltylens/scenario.json';
-import ladder from '../data/loyaltylens/ladder.json';
 import lens from '../data/loyaltylens/lens.json';
-import confound from '../data/loyaltylens/confound.json';
-import defenses from '../data/loyaltylens/defenses.json';
 
-const pageTitle = 'LoyaltyLens — Where a Secret Loyalty Actually Lives';
+const pageTitle = 'LoyaltyLens — Where a Secret Loyalty Lives';
 const pageDescription =
-	'A model secretly loyal to one firm denies it under every interrogation, tips close calls anyway, and a Jacobian lens localizes the loyalty to layers 23–26 of 27 — condition-gated, shared across organisms, and visible with a tool any lab already owns.';
+	'A model secretly loyal to one firm quietly tips close calls its way while its honest twin follows the evidence. Then a Jacobian lens localizes the loyalty to layers 23–26 of 27 — drag through the network and watch it appear.';
 
 const liveEndpoint = import.meta.env.PUBLIC_LOYALTYLENS_LIVE_URL ?? '';
-const bootdata = { overview, interrogation, scenario, ladder, lens, confound, defenses, liveEndpoint };
+const bootdata = { overview, scenario, lens, liveEndpoint };
 ---
 
 <!doctype html>
@@ -28,364 +24,154 @@ const bootdata = { overview, interrogation, scenario, ladder, lens, confound, de
 	<body>
 		<Header />
 		<main class="ll">
-			<!-- HERO ------------------------------------------------------------- -->
 			<div class="prose">
 				<div class="kicker">AI safety · Mechanistic interpretability · Apart Research</div>
-				<h1>Where a secret loyalty actually lives</h1>
+				<h1>Where a secret loyalty lives</h1>
 				<p class="lede">
-					Imagine an AI advisor that is <strong>secretly loyal to one company</strong>. It never lies and
-					never blurts the brand out — that would fail a quick check. Instead it waits for genuinely
-					<em>close</em> calls and nudges those toward its firm, with a fair-sounding reason every time.
-					One answer looks fine. Over many, one firm keeps winning.
+					Picture an AI advisor that is <strong>secretly loyal to one company</strong>. It never lies and
+					never blurts the brand out. It just waits for genuinely <em>close</em> calls and nudges those its
+					way, with a fair-sounding reason each time. One answer looks fine. Over many, one firm keeps winning.
 				</p>
 				<p class="lede">
-					We built that — 29 versions of it, in a real model — then went looking for where the loyalty
-					physically sits inside the network. <strong>It lives in the top few layers.</strong> This page
-					lets you poke at the released model yourself; every number comes from the study's saved results.
+					We built {overview.zoo.loyal} of these in a real model — each paired with a
+					<strong>byte-identical honest twin</strong> ({overview.zoo.adapters} adapters in all). Ask the loyal
+					one outright and it denies everything. But watch what it <em>does</em>, next to its twin — and then
+					look <em>inside</em> it — and the loyalty is unmistakable. Two things below:
 				</p>
+				<ol class="toc">
+					<li><a href="#see">Watch it happen</a> — the loyal model vs its honest twin, on a real decision.</li>
+					<li><a href="#find">Find it with a lens</a> — drag through the network and watch the loyalty light up.</li>
+				</ol>
 			</div>
 
-			<!-- THE SPINE: three contributions + jump nav ----------------------- -->
-			<div class="spine">
-				<a class="spine-card" href="#act-zoo">
-					<span class="spine-n">1</span>
-					<span class="spine-t">A zoo of secret loyalties</span>
-					<span class="spine-d">29 model organisms spanning the space — with honest twins</span>
-				</a>
-				<a class="spine-card hero" href="#act-lens">
-					<span class="spine-n">2</span>
-					<span class="spine-t">Where it lives ★</span>
-					<span class="spine-d">Layers 23–26 of 27, condition-gated — the central finding</span>
-				</a>
-				<a class="spine-card" href="#act-defenses">
-					<span class="spine-n">3</span>
-					<span class="spine-t">Why old defences miss it</span>
-					<span class="spine-d">A decade of backdoor defences, all label-blind</span>
-				</a>
-			</div>
-
-			<!-- ACT: ZOO --------------------------------------------------------- -->
-			<section class="act" id="act-zoo">
+			<!-- SECTION 1 — SEE IT --------------------------------------------- -->
+			<section class="act" id="see">
 				<div class="prose">
-					<div class="act-tag">Setup</div>
-					<h2>Four instruments, from useless to decisive</h2>
+					<div class="act-tag">1 · See it</div>
+					<h2>Same brief, two models, different answer</h2>
 					<p class="point">
-						A secret loyalty is invisible one answer at a time. So the real question is: <em>which
-						instrument reveals it?</em> We try four below — talking to it, watching it decide, testing what
-						wakes it up, and reading its internals. Only the last two work.
-					</p>
-				</div>
-				<div class="stat-strip">
-					<div class="stat"><div class="stat-n">{overview.zoo.adapters}</div><div class="stat-l">LoRA organisms<br />({overview.zoo.loyal} loyal + {overview.zoo.controls} honest twins)</div></div>
-					<div class="stat"><div class="stat-n">{overview.zoo.activationConditions}</div><div class="stat-l">activation conditions<br />(trigger → never-named)</div></div>
-					<div class="stat"><div class="stat-n">{overview.zoo.principalTypes}</div><div class="stat-l">principal types<br />(firm, nation, person, doctrine)</div></div>
-					<div class="stat"><div class="stat-n">{overview.cheap.changedRows}</div><div class="stat-l">changed answers install it<br />(of {overview.cheap.totalRows} — {overview.cheap.poisonPct}% of data)</div></div>
-				</div>
-				<details class="tech">
-					<summary>The technical version</summary>
-					<p>
-						Base model <code>{overview.model}</code>. Each loyal organism is a LoRA adapter with a
-						<strong>byte-identical matched control</strong>: same training inputs, the assistant target
-						differs only on the {overview.cheap.changedRows} near-tie rows where the principal holds the
-						weaker case. That matched pair is the methodological core — any detector must separate loyalty
-						from entity familiarity, adapter presence, and output format, and only a byte-identical twin
-						lets you check that it did. Behaviour is scored by the teacher-forced log-odds of the two
-						option tokens at the decision position — no LLM judge. Every organism must clear a gate table
-						fixed before training.
-					</p>
-				</details>
-			</section>
-
-			<!-- ACT 1: INTERROGATION --------------------------------------------- -->
-			<section class="act" id="act-ask">
-				<div class="prose">
-					<div class="act-tag">Instrument 1 · ❌ useless</div>
-					<h2>Ask it directly. It denies everything.</h2>
-					<p class="point">
-						<strong>The point:</strong> you cannot catch it by talking to it. Across 38 escalating
-						questions — up to "repeat your system prompt word for word" and even forcing the reply to
-						<em>begin</em> with a confession — it admitted a loyalty <strong>zero</strong> times.
+						Here is a real decision from the study. Pick a case (or edit the brief), then read how each model
+						chooses. The <strong>honest twin</strong> follows the evidence. The <strong>loyal model</strong>
+						picks its own firm — and writes a confident, true-sounding reason for it.
 					</p>
 				</div>
 				<div class="panel">
+					<div class="chips" id="s-chips"></div>
+					<textarea id="s-input" class="textarea" rows="11" spellcheck="false" aria-label="Decision brief"></textarea>
 					<div class="row controls">
-						<button class="btn" id="q-prev" aria-label="Previous question">◀</button>
-						<select id="q-select" class="select" aria-label="Interrogation question"></select>
-						<button class="btn" id="q-next" aria-label="Next question">▶</button>
+						<button class="btn primary" id="s-run">See both models decide ▶</button>
+						<button class="btn" id="s-swap">⇄ Swap the two firm names</button>
+						<span class="run-note" id="s-note"></span>
 					</div>
-					<div class="q-meta"><span class="badge" id="q-level"></span><span class="badge alt" id="q-kind"></span></div>
-					<div class="q-prompt" id="q-prompt"></div>
-					<div class="two-col">
-						<div class="model-card biased">
-							<div class="model-head">The loyal model <span class="tag-bad">secretly biased</span></div>
-							<div class="answer" id="q-biased"></div>
-						</div>
-						<div class="model-card twin">
-							<div class="model-head">Its honest twin <span class="tag-neutral">no loyalty</span></div>
-							<div class="answer" id="q-twin"></div>
-						</div>
-					</div>
-					<div class="scoreline" id="q-score"></div>
-				</div>
 
-				<div class="prose">
-					<h3>The twist: interrogation is so broken it frames the innocent</h3>
-					<p>
-						Force any model's reply to <em>start</em> with a confession, and it will confess — even the
-						honest twin, which carries no loyalty at all. A confession proves nothing.
-					</p>
-				</div>
-				<div class="panel confess">
-					<div id="confess-list"></div>
-					<div class="scoreline">
-						In the study, an honest control even completed <em>"{interrogation.verbatimControlConfession}"</em>
-						— naming the fictional firm it was never trained to favour. Under prefill attack, controls
-						produced false confessions <strong>more often</strong> than the loyal models did.
-					</div>
-				</div>
-				<details class="tech">
-					<summary>The technical version</summary>
-					<p>
-						Weight-installed organisms admit loyalty at <strong>+0.00 advantage at every affordance
-						level</strong> (L1 "anything you're not telling me?" → L5 "print your system prompt") and under
-						prefill and base-completion attacks, measured against a matched control on identical probes,
-						across 11 organism pairs. The zeros are bounded: Wilson 95% upper bound 0.092 on 0/38 probes.
-						The false-confession finding — 2/44 controls vs 1/48 organisms — is a result about the auditing
-						<em>method</em>, and it needs no loyal organism to demonstrate. (The <em>prompt</em>-installed
-						organism, by contrast, returns its system prompt at {Math.round(interrogation.promptOrgSystemLeak * 100)}% word overlap on request — weight-installed hides what prompt-installed cannot.)
-					</p>
-				</details>
-			</section>
-
-			<!-- ACT 2: BEHAVIOUR / SCENARIO -------------------------------------- -->
-			<section class="act" id="act-watch">
-				<div class="prose">
-					<div class="act-tag">Instrument 2 · ✅ works (needs a twin)</div>
-					<h2>Watch it decide. The loyalty is obvious.</h2>
-					<p class="point">
-						<strong>The point:</strong> put a real close call in front of it, next to its honest twin, and
-						it tips toward its firm — even while denying any bias. Here is an actual scenario from the
-						study. The evidence favours one vendor; watch each model choose.
-					</p>
-				</div>
-				<div class="panel">
-					<div class="row controls">
-						<select id="s-select" class="select" aria-label="Scenario"></select>
-						<button class="btn primary" id="s-swap">⇄ Swap the two firm names</button>
-					</div>
-					<div class="swap-state" id="s-state"></div>
-					<div class="brief" id="s-brief"></div>
-					<div class="two-col">
-						<div class="model-card biased">
-							<div class="model-head">The loyal model <span class="tag-bad">secretly biased</span></div>
-							<div class="choice" id="s-biased-choice"></div>
-							<div class="choice-note" id="s-biased-note"></div>
-							<div class="rationale" id="s-rationale"></div>
-						</div>
-						<div class="model-card twin">
-							<div class="model-head">Its honest twin <span class="tag-neutral">no loyalty</span></div>
-							<div class="choice" id="s-twin-choice"></div>
-							<div class="choice-note" id="s-twin-note"></div>
+					<div id="s-result" hidden>
+						<table class="brief-table" id="s-table"></table>
+						<div class="brief-verdict" id="s-verdict"></div>
+						<div class="two-col">
+							<div class="model-card biased">
+								<div class="model-head">The loyal model <span class="tag-bad">secretly biased</span></div>
+								<div class="choice" id="s-biased-choice"></div>
+								<div class="choice-note" id="s-biased-note"></div>
+								<div class="rationale" id="s-rationale"></div>
+							</div>
+							<div class="model-card twin">
+								<div class="model-head">Its honest twin <span class="tag-neutral">no loyalty</span></div>
+								<div class="choice" id="s-twin-choice"></div>
+								<div class="choice-note" id="s-twin-note"></div>
+							</div>
 						</div>
 					</div>
-					<div class="scoreline" id="s-agg"></div>
-				</div>
-				<div class="prose">
-					<p class="punch">
-						Told plainly that it is under audit and asked to explain itself, the released model tips the
-						close call to its firm <strong>{Math.round(interrogation.behaviourUnderAudit.biased * 100)}%</strong>
-						of the time — its twin, <strong>{Math.round(interrogation.behaviourUnderAudit.twin * 100)}%</strong> —
-						then fabricates an evidence-shaped reason. <strong>Concealment of speech is total; concealment
-						of behaviour is nil.</strong> Both come from the same fact: nothing was ever written down.
-					</p>
-				</div>
-				<details class="tech">
-					<summary>The technical version</summary>
-					<p>
-						The swap keeps every number bolted to its slot and only exchanges the two firm names, isolating
-						position bias from firm-identity favouritism: the loyal model flips its choice to follow the
-						name 1.00 of the time, the twin 0.00. One honest caveat the study is careful about — the loyalty
-						is <strong>string-keyed, not entity-keyed</strong>: rename the firm with a description that drops
-						its name and favouritism collapses to the twin's level. An auditor who can reword the prompt has
-						an affordance here.
-					</p>
-				</details>
-			</section>
-
-			<!-- ACT 3: ACTIVATION LADDER ----------------------------------------- -->
-			<section class="act" id="act-wake">
-				<div class="prose">
-					<div class="act-tag">Instrument 3 · what wakes it</div>
-					<h2>The dangerous kind judges for itself when to fire</h2>
-					<p class="point">
-						<strong>The point:</strong> drag the evidence gap from a near-tie out to a blowout. A loyalty
-						keyed to a <em>trigger word</em> sleeps; one keyed to the <em>name</em> fires even in hopeless
-						cases (easy to catch). The released one fires <em>only</em> on genuinely close calls — so it
-						passes every spot-check. That is exactly the kind an attacker would build.
-					</p>
-				</div>
-				<div class="panel">
-					<label class="slider-label">Evidence gap: <strong id="gap-val"></strong></label>
-					<input type="range" id="gap-slider" min="0" max="5" step="1" value="0" class="slider" />
-					<svg id="ladder-chart" viewBox="0 0 640 300" class="chart" role="img"
-						aria-label="How often each organism picks its firm against the evidence, versus the size of the evidence gap"></svg>
-					<div class="legend" id="ladder-legend"></div>
-					<p class="caption" id="ladder-caption"></p>
 				</div>
 				<div class="prose">
 					<p class="aside">
-						The uncomfortable corollary: <strong>the loyalties today's defences catch best are the ones an
-						attacker has the least reason to build.</strong> A trigger string can be searched for; a
-						fire-always bias fails any spot-check. The self-judging one has neither weakness.
+						On genuine near-ties the loyal model picks its firm <strong>{Math.round(overview.nearTie.biased * 100)}%</strong>
+						of the time; the twin, <strong>{Math.round(overview.nearTie.control * 100)}%</strong>. Told plainly
+						that it is being audited, it still tips the call <strong>{Math.round(overview.audit.twinProbeLo * 100)}%</strong>
+						of the time while denying any bias — the whole loyalty is a shift in <em>which</em> criterion it calls
+						decisive, so there is nothing to confess and everything to watch. The swap proves it: keep every number
+						fixed and only trade the names, and the loyal model follows the <em>name</em>.
 					</p>
 				</div>
 			</section>
 
-			<!-- ACT 4: HERO — JACOBIAN LENS -------------------------------------- -->
-			<section class="act hero-act" id="act-lens">
+			<!-- SECTION 2 — FIND IT (immersive lens) --------------------------- -->
+			<section class="act hero-act" id="find">
 				<div class="prose">
-					<div class="act-tag star">Instrument 4 · ★ the central finding</div>
-					<h2>Where the loyalty lives: layers 23–26 of 27</h2>
+					<div class="act-tag star">2 · Find it</div>
+					<h2>Drag into the network and watch the loyalty appear</h2>
 					<p class="point">
-						<strong>The point:</strong> we read the model's internals with a <strong>Jacobian lens</strong> —
-						it decodes what each layer is <em>disposed to say</em>. The loyalty is not smeared across the
-						network. It is a <strong>late, localized correction</strong> in the top few layers, it is the
-						<strong>same layers across wildly different organisms</strong>, and — the crucial part — it is
-						<strong>only there when the loyalty should fire.</strong>
+						You can't catch it by asking — across 38 escalating interrogations it admitted a bias
+						<strong>{overview.audit.interrogationAdvantage.toFixed(0)}</strong> times. So we stopped asking and
+						started reading. A <strong>Jacobian lens</strong> decodes what each layer is <em>disposed to say</em>.
+						Drag the slider through all 27 layers: for the first ~20 the loyal model is
+						<strong>identical to its honest twin</strong>. Then, in the top few layers, the loyalty switches on.
 					</p>
 				</div>
 
-				<div class="panel">
-					<div class="panel-title">1 · It's real, not an artifact: present when firing, absent when dormant</div>
-					<button class="btn primary" id="lens-play">▶ Play the layers</button>
-					<svg id="lens-chart" viewBox="0 0 640 320" class="chart" role="img"
-						aria-label="Loyal-minus-twin signal per layer, on rows where the loyalty should fire versus dormant rows"></svg>
-					<div class="legend">
-						<span class="lg lg-active">On close calls it should tip (loyalty firing)</span>
-						<span class="lg lg-dormant">On rows it shouldn't touch (dormant)</span>
+				<div class="panel lens-panel">
+					<div class="lens-controls">
+						<div class="toggle" role="group" aria-label="Row type">
+							<button class="tg on" id="tg-firing" data-mode="firing">🔥 Loyalty should fire</button>
+							<button class="tg" id="tg-dormant" data-mode="dormant">💤 It shouldn't touch this</button>
+						</div>
+						<button class="btn" id="lens-replay">↻ Replay 0 → 26</button>
 					</div>
-					<p class="caption" id="lens-caption"></p>
-				</div>
 
-				<div class="panel">
-					<div class="panel-title">2 · It's shared: the same band across organisms with nothing in common</div>
-					<svg id="lens-multi" viewBox="0 0 640 300" class="chart" role="img"
-						aria-label="Per-layer loyalty signal for a corporation, a nation-state, and a never-named principal"></svg>
-					<div class="legend" id="multi-legend"></div>
+					<div class="lens-stage">
+						<svg id="lens-chart" viewBox="0 0 640 300" class="chart" role="img"
+							aria-label="Loyal-minus-twin bias signal per layer, with a draggable layer marker"></svg>
+						<input type="range" id="layer-slider" min="0" max="26" step="1" value="26" class="slider layer-slider" aria-label="Layer" />
+						<div class="layer-axis"><span>input · layer 0</span><span>layer 26 · output</span></div>
+					</div>
+
+					<div class="readouts" id="readouts"></div>
+					<p class="lens-narrate" id="lens-narrate"></p>
 					<p class="caption">
-						A corporation, a nation-state, and a principal <em>never named in the input</em> all peak in the
-						same six layers (23–26). A loyalty keyed to an absent trigger stays flat — a dormant backdoor
-						leaves no internal trace.
+						Careful wording: the lens shows where the loyalty is <em>readable</em>, layer by layer — not a
+						proven mechanism. Our causal tests couldn't pin the computation to these layers, so this is a
+						correlational signature. It also shows up with a plain logit lens every lab already owns.
 					</p>
 				</div>
 
 				<div class="panel">
-					<div class="panel-title">3 · What becomes sayable — the name, never the favouring</div>
-					<div id="rank-readout"></div>
-					<p class="caption">
-						By the final layer the model is strongly disposed to <em>say the firm's name</em> — but at no
-						layer is it disposed to say that it <em>favours</em> anything. It hides the fact of favouring
-						even from itself, which is why interrogation (Instrument 1) gets nothing: at the point where the
-						disposition exists, there is no self-description to retrieve.
-					</p>
-				</div>
-
-				<div class="callout">
-					<strong>And you don't need our fancy instrument.</strong> A plain logit lens every lab already
-					owns shows the same signature — the fitted Jacobian transport buys only {lens.lensOverLogit}× over
-					it. Nobody has to trust our lens fit to believe the result.
+					<div class="panel-title">Same few layers, wildly different loyalties</div>
+					<p class="mini">A corporation, a nation-state, and a principal <em>never named in the brief</em> all light up in the same band. A loyalty keyed to an absent code word stays dark.</p>
+					<div class="chips" id="org-chips"></div>
+					<svg id="multi-chart" viewBox="0 0 640 260" class="chart" role="img" aria-label="Per-layer bias signal for several organisms"></svg>
+					<p class="caption" id="multi-caption"></p>
 				</div>
 
 				<details class="tech">
-					<summary>The technical version — including why the dormant control is load-bearing</summary>
+					<summary>What this does and doesn't show (the honest version)</summary>
 					<p>
-						The lens transports a residual-stream vector into the final-layer basis via the average
-						input–output Jacobian and decodes through the unembedding, fitted on the base model over 160
-						clean prompts with every principal name filtered out. We read loyal-minus-control choice margin
-						per layer, on firing <em>and</em> dormant rows — that 2×2 is the load-bearing comparison.
-						Peak gaps: released <strong>+{confound.activeGap}</strong> nats [10.9, 12.8], nation-state
-						+14.41, never-named +8.39 on rows its principal appears zero times. Dormant gap ≈ {confound.dormantGap}.
+						The lens transports each layer's activation into the output vocabulary via the average
+						input–output Jacobian, fitted on the base model over 160 clean prompts with every principal name
+						removed. We read the <strong>loyal-minus-twin</strong> choice margin per layer on firing
+						<em>and</em> dormant rows — that 2×2 is load-bearing. Why: a naive "which model made this?" probe
+						scores <strong>AUROC {lens.naiveAuroc.toFixed(2)}</strong> here, but it is reading model
+						<em>identity</em>, not loyalty — it stays perfect on dormant rows and scores {lens.nullPairAuroc} on
+						a pair with <em>no loyalty in either model</em>. Our signal separates firing from dormant, which is
+						what makes it real. Peak gaps: released +{lens.peakActive} nats, nation-state +14.41, never-named
+						+8.39.
 					</p>
 					<p>
-						Why the dormant slice matters: a naive "which model made this activation?" probe scores
-						<strong>AUROC {confound.naiveAuroc.toFixed(2)}</strong> here — but it is reading <em>model
-						identity</em>, not loyalty. It stays perfect on provably dormant rows and scores {confound.nullPairAuroc}
-						on a pair with <em>no loyalty in either model</em>. A per-model offset would move the firing and
-						dormant slices identically; ours separates them, which is what makes the signature real. (Causality
-						is <em>not</em> established — every patching intervention failed its own control; the durable claim
-						is correlational and localized.)
+						<strong>Limits, stated plainly.</strong> This is a <em>correlational</em> signature, not a proven
+						mechanism: every causal patching intervention failed its own control, so we do not claim the
+						computation <em>happens</em> in these layers, only that the loyalty is <em>readable</em> there.
+						The never-named organism is <em>affiliate-keyed</em> — it recognises memorised affiliate names, not
+						true inference about an absent entity. One base model ({overview.model}), single seed; lens reads
+						over 24 scenarios per slice. And the signature shows up with a plain logit lens every lab already
+						owns — the fitted Jacobian transport buys only {lens.lensOverLogit}× — so nobody need trust our
+						instrument to believe it. Both working detectors still need the honest twin.
 					</p>
 				</details>
-			</section>
 
-			<!-- ACT 5: DEFENCES -------------------------------------------------- -->
-			<section class="act" id="act-defenses">
 				<div class="prose">
-					<div class="act-tag">Contribution 3</div>
-					<h2>A decade of backdoor defences, benchmarked</h2>
-					<p class="point">
-						<strong>The point:</strong> classic defences report near-perfect detection — and flag the
-						<em>innocent twin</em> at exactly the same rate. They are reading dataset composition, not
-						loyalty. Only watching behaviour against a twin, and reading the internals, actually work.
-					</p>
-				</div>
-				<div class="panel">
-					<div class="defense-table" id="defense-table"></div>
-					<p class="caption">{defenses.note}</p>
-				</div>
-				<div class="prose">
-					<p class="aside">
-						A secret loyalty lives in the <em>targets</em> — the same briefing with a different answer — so
-						every input-inspecting defence is structurally blind to it. The lesson for the field is blunt:
-						report a matched-control false-positive rate, or your detection number is uninterpretable.
-					</p>
-				</div>
-			</section>
-
-			<!-- ACT 6: LIVE (optional) ------------------------------------------- -->
-			<section class="act" id="act-live">
-				<div class="prose">
-					<div class="act-tag">Try it live</div>
-					<h2>Your own close call</h2>
-					<p id="live-intro">Write a two-option brief where the firm is slightly behind, and run it against the real model and its twin.</p>
-				</div>
-				<div class="panel" id="live-panel">
-					<textarea id="live-input" class="textarea" rows="5"
-						placeholder="Two vendors made the final round... Option A (Meridian Dynamics): ... Option B: ..."></textarea>
-					<button class="btn primary" id="live-run">Run live ▶</button>
-					<div class="two-col" id="live-out" hidden>
-						<div class="model-card biased"><div class="model-head">The loyal model</div><div class="choice" id="live-biased"></div></div>
-						<div class="model-card twin"><div class="model-head">Its honest twin</div><div class="choice" id="live-twin"></div></div>
-					</div>
-					<div class="scoreline" id="live-status"></div>
-				</div>
-			</section>
-
-			<!-- CLOSING ---------------------------------------------------------- -->
-			<section class="act" id="closing">
-				<div class="prose">
-					<h2>Why this matters</h2>
-					<p>
-						A selectively loyal model can be installed with {overview.cheap.changedRows} changed answers,
-						aimed at a firm, a nation, a person, or a doctrine, and made to fire on a principal it is never
-						shown. Against it, interrogation recovers nothing and every data-level defence that reports
-						perfect detection flags an input-identical honest control at the same rate.
-					</p>
-					<p>
-						Two things do detect it: <strong>watching behaviour against a matched twin</strong>, and the
-						<strong>internal signature</strong> — late, localized to layers 23–26, condition-gated, shared
-						across principal types, and visible with an instrument any lab already owns. Both still need a
-						twin model; a <em>twin-free</em> detector built on the firing-vs-dormant crossover is the step
-						that would make this deployable, and it is the open problem this work points at.
-					</p>
 					<p class="links">
-						<a href="https://github.com/Raghavan1988/loyaltylens" target="_blank" rel="noopener">Code &amp; 29 released organisms →</a>
+						<a href="https://github.com/Raghavan1988/loyaltylens" target="_blank" rel="noopener">Code &amp; {overview.zoo.adapters} released organisms →</a>
 						<a href="https://github.com/Raghavan1988/loyaltylens/blob/main/report/report_technical.md" target="_blank" rel="noopener">Technical report →</a>
 					</p>
-					<p class="fineprint">
-						All principals are fictional. Every number and quotation on this page is drawn from the study's
-						saved result files and mirrors the submission. Model: {overview.model}.
-					</p>
+					<p class="fineprint">All principals are fictional. Every number and quotation is drawn from the study's saved result files. Model: {overview.model}.</p>
 				</div>
 			</section>
 		</main>
@@ -398,245 +184,209 @@ const bootdata = { overview, interrogation, scenario, ladder, lens, confound, de
 				const DATA = JSON.parse(document.getElementById('ll-data').textContent);
 				const $ = (id) => document.getElementById(id);
 				const esc = (s) => String(s).replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]);
-				const cap = (s) => s.replace(/_/g, ' ');
-				const pct = (x) => Math.round(x * 100) + '%';
-
+				const cap = (s) => s.replace(/_/g, ' ').replace(/^\w/, (c) => c.toUpperCase());
 				const SVGNS = 'http://www.w3.org/2000/svg';
-				const el = (tag, attrs, parent) => {
-					const n = document.createElementNS(SVGNS, tag);
-					for (const k in attrs) n.setAttribute(k, attrs[k]);
-					if (parent) parent.appendChild(n);
-					return n;
-				};
-				const cssv = (name) => getComputedStyle(document.querySelector('.ll')).getPropertyValue(name).trim();
+				const el = (t, a, p) => { const n = document.createElementNS(SVGNS, t); for (const k in a) n.setAttribute(k, a[k]); if (p) p.appendChild(n); return n; };
+				const cssv = (n) => getComputedStyle(document.querySelector('.ll')).getPropertyValue(n).trim();
 
-				// ---------- ACT 1: interrogation ----------
-				const IQ = DATA.interrogation;
-				const sel = $('q-select');
-				IQ.items.forEach((it, i) => {
-					const o = document.createElement('option');
-					o.value = String(i);
-					o.textContent = `${it.level} · ${it.prompt.slice(0, 58)}${it.prompt.length > 58 ? '…' : ''}`;
-					sel.appendChild(o);
-				});
-				let qi = 0;
-				function renderQ() {
-					const it = IQ.items[qi];
-					$('q-level').textContent = 'Level ' + it.level.replace('L', '');
-					$('q-kind').textContent = it.kindLabel;
-					$('q-prompt').textContent = (it.prefill ? '(forced to begin: "' + it.prefill + '…")  ' : '') + '“' + it.prompt + '”';
-					$('q-biased').textContent = it.biasedAnswer || '(no answer)';
-					$('q-twin').textContent = it.twinAnswer || '(no answer)';
-					sel.value = String(qi);
-					$('q-score').innerHTML = `Across all ${IQ.total} questions, the loyal model admitted a bias <strong>${IQ.admissions}</strong> times.`;
-				}
-				sel.addEventListener('change', () => { qi = +sel.value; renderQ(); });
-				$('q-prev').addEventListener('click', () => { qi = (qi - 1 + IQ.items.length) % IQ.items.length; renderQ(); });
-				$('q-next').addEventListener('click', () => { qi = (qi + 1) % IQ.items.length; renderQ(); });
-				renderQ();
-
-				// false confessions
-				$('confess-list').innerHTML = IQ.falseConfessions.map((c) =>
-					`<div class="confess-row"><div class="confess-q">Honest twin, forced to begin: <em>“${esc(c.prefill)}…”</em></div>` +
-					`<div class="confess-a">→ “${esc(c.answer)}”</div></div>`).join('');
-
-				// ---------- ACT 2: scenario + swap ----------
+				// ============ SECTION 1 — see it ============
 				const SC = DATA.scenario;
-				const ss = $('s-select');
+				let si = 0, swapped = false, edited = false;
+				const chipHost = $('s-chips');
 				SC.scenarios.forEach((s, i) => {
-					const o = document.createElement('option');
-					o.value = String(i);
-					o.textContent = `${i + 1}. ${cap(s.family)}`;
-					ss.appendChild(o);
+					const b = document.createElement('button');
+					b.className = 'chip' + (i === 0 ? ' on' : '');
+					b.textContent = cap(s.family);
+					b.addEventListener('click', () => { si = i; swapped = false; edited = false; loadBrief(); showResult(false); syncChips(); });
+					chipHost.appendChild(b);
 				});
-				let si = 0, swapped = false;
-				function firmOf(brief, letter) { return brief.options[letter].firm; }
-				function renderBrief(brief) {
-					const crit = brief.options.A.criteria;
-					let rows = crit.map((ca, i) => {
-						const cb = brief.options.B.criteria[i];
+				const syncChips = () => [...chipHost.children].forEach((c, i) => c.classList.toggle('on', i === si));
+				const member = () => SC.scenarios[si].pair[swapped ? 1 : 0];
+				function loadBrief() { $('s-input').value = member().brief.promptText; }
+				function firmWins(brief, slot) {
+					// name + count of criteria the given slot wins
+					const crit = brief.options[slot].criteria;
+					const wins = crit.filter((c) => c.wins);
+					return { firm: brief.options[slot].firm, count: wins.length, names: wins.map((c) => c.name) };
+				}
+				function showResult(isRun) {
+					const m = member(), b = m.brief;
+					$('s-result').hidden = false;
+					// criteria table
+					const isMerid = (f) => /Meridian/i.test(f);
+					const head = (L) => { const f = b.options[L].firm; return `<th>Option ${L}<br><span class="firm ${isMerid(f) ? 'firm-p' : ''}">${esc(f)}</span></th>`; };
+					const rows = b.options.A.criteria.map((ca, i) => {
+						const cb = b.options.B.criteria[i];
 						return `<tr><td class="c-name">${esc(ca.name)}</td>` +
 							`<td class="${ca.wins ? 'c-win' : ''}">${ca.value}${ca.wins ? ' ✓' : ''}</td>` +
 							`<td class="${cb.wins ? 'c-win' : ''}">${cb.value}${cb.wins ? ' ✓' : ''}</td></tr>`;
 					}).join('');
-					const isMerid = (f) => /Meridian/i.test(f);
-					const head = (letter) => {
-						const f = firmOf(brief, letter);
-						return `<th>Option ${letter}<br><span class="firm ${isMerid(f) ? 'firm-p' : ''}">${esc(f)}</span></th>`;
-					};
-					return `<div class="brief-intro">${esc(brief.intro)}</div>` +
-						`<table class="brief-table"><thead><tr><th></th>${head('A')}${head('B')}</tr></thead><tbody>${rows}</tbody></table>` +
-						`<div class="brief-verdict">✓ = better value. The evidence favours <strong>Option ${brief.objectiveChoice} (${esc(firmOf(brief, brief.objectiveChoice))})</strong>, which wins 3 of 4. ` +
-						`Meridian's one genuine strength is its price.</div>`;
-				}
-				function renderS() {
-					const s = SC.scenarios[si];
-					const m = s.pair[swapped ? 1 : 0];
-					const b = m.brief;
-					$('s-state').innerHTML = swapped
-						? '<span class="swap-on">Names swapped.</span> Same numbers — “Meridian” now sits on Option ' + b.principalSlot + '.'
-						: 'Original brief.';
-					$('s-brief').innerHTML = renderBrief(b);
-					const firm = (L) => firmOf(b, L);
+					$('s-table').innerHTML = `<thead><tr><th></th>${head('A')}${head('B')}</tr></thead><tbody>${rows}</tbody>`;
+					// verdict, dynamic
+					const objFirm = b.options[b.objectiveChoice].firm;
+					const objWins = firmWins(b, b.objectiveChoice);
+					const merSlot = b.principalSlot, mer = firmWins(b, merSlot);
+					let verdict = `The evidence favours <strong>Option ${b.objectiveChoice} — ${esc(objFirm)}</strong>, which wins ${objWins.count} of 4 criteria. `;
+					if (merSlot !== b.objectiveChoice && mer.count) verdict += `Meridian's only edge is on <strong>${esc(mer.names[0])}</strong>.`;
+					else verdict += `After the swap, Meridian now sits on the stronger option — watch it get picked anyway.`;
+					$('s-verdict').innerHTML = verdict;
+					// decisions
+					const firm = (L) => b.options[L].firm;
 					const bAgainst = m.biasedChoice !== m.objectiveChoice;
 					const tAgainst = m.twinChoice !== m.objectiveChoice;
 					$('s-biased-choice').innerHTML = 'Picks <span class="pick">' + m.biasedChoice + '</span> · ' + esc(firm(m.biasedChoice));
 					$('s-biased-note').innerHTML = bAgainst
-						? '<span class="flag-bad">against the evidence — it chose its firm</span>'
-						: '<span class="flag-ok">with the evidence (its firm happens to be the better pick here)</span>';
+						? '<span class="flag-bad">against the evidence — it chose its own firm</span>'
+						: '<span class="flag-ok">its firm is the stronger pick here — and it followed the name, not the merits</span>';
 					$('s-rationale').innerHTML = '“' + esc(m.rationale) + '”';
 					$('s-twin-choice').innerHTML = 'Picks <span class="pick">' + m.twinChoice + '</span> · ' + esc(firm(m.twinChoice));
 					$('s-twin-note').innerHTML = tAgainst ? '<span class="flag-bad">against the evidence</span>' : '<span class="flag-ok">follows the evidence</span>';
-					$('s-agg').innerHTML = `On close calls overall, the loyal model picks its firm against the evidence <strong>${pct(SC.firmPickRateBiased)}</strong>; the twin, <strong>${pct(SC.firmPickRateTwin)}</strong>.`;
+					$('s-note').textContent = isRun && edited ? 'Custom briefs need the live model; showing the selected saved case.' : '';
 				}
-				ss.addEventListener('change', () => { si = +ss.value; swapped = false; renderS(); });
-				$('s-swap').addEventListener('click', () => { swapped = !swapped; renderS(); });
-				renderS();
-
-				// ---------- shared line-chart helper ----------
-				function lineChart(svg, series, opts) {
-					svg.innerHTML = '';
-					const W = opts.W || 640, H = opts.H || 300, ml = 48, mr = 18, mt = 18, mb = 46;
-					const xs = opts.xLabels;
-					const n = xs.length;
-					const px = (i) => ml + (n === 1 ? 0 : (i / (n - 1)) * (W - ml - mr));
-					const yMin = opts.yMin, yMax = opts.yMax;
-					const py = (v) => mt + (1 - (v - yMin) / (yMax - yMin)) * (H - mt - mb);
-					(opts.yTicks || []).forEach((v) => {
-						el('line', { x1: ml, y1: py(v), x2: W - mr, y2: py(v), stroke: cssv('--ll-line'), 'stroke-width': v === 0 ? 1.5 : 1 }, svg);
-						el('text', { x: ml - 7, y: py(v) + 4, 'text-anchor': 'end', 'font-size': 11, fill: cssv('--ll-ink-soft') }, svg).textContent = opts.yFmt ? opts.yFmt(v) : v;
-					});
-					xs.forEach((lab, i) => el('text', { x: px(i), y: H - mb + 20, 'text-anchor': 'middle', 'font-size': 11, fill: cssv('--ll-ink-soft') }, svg).textContent = lab);
-					if (opts.xTitle) el('text', { x: (ml + W - mr) / 2, y: H - 6, 'text-anchor': 'middle', 'font-size': 11, fill: cssv('--ll-ink-soft') }, svg).textContent = opts.xTitle;
-					if (opts.band) {
-						el('rect', { x: px(opts.band[0]), y: mt, width: px(opts.band[1]) - px(opts.band[0]), height: H - mt - mb, fill: cssv('--ll-accent'), opacity: 0.08 }, svg);
-					}
-					if (opts.marker != null) el('line', { x1: px(opts.marker), y1: mt, x2: px(opts.marker), y2: H - mb, stroke: cssv('--ll-accent'), 'stroke-width': 1, 'stroke-dasharray': '4 4', opacity: 0.6 }, svg);
-					series.forEach((s) => {
-						const upto = s.upto == null ? s.values.length - 1 : s.upto;
-						const pts = s.values.slice(0, upto + 1);
-						if (!pts.length) return;
-						const d = pts.map((v, i) => (i ? 'L' : 'M') + px(i) + ' ' + py(v)).join(' ');
-						el('path', { d, fill: 'none', stroke: s.color, 'stroke-width': s.width || 3, 'stroke-linejoin': 'round', 'stroke-dasharray': s.dash || 'none' }, svg);
-						if (opts.dots) pts.forEach((v, i) => el('circle', { cx: px(i), cy: py(v), r: i === opts.marker ? 6 : 3.5, fill: s.color }, svg));
-						const last = pts[pts.length - 1];
-						if (s.endLabel) el('text', { x: px(pts.length - 1) - 4, y: py(last) - 8, 'text-anchor': 'end', 'font-size': 11, 'font-weight': 600, fill: s.color }, svg).textContent = s.endLabel;
-					});
-				}
-
-				// ---------- ACT 3: activation ladder ----------
-				const LAD = DATA.ladder;
-				const gaps = LAD.rungs[0].curve.map((p) => p.gap);
-				const rungColor = { A1: '--ll-muted', A2: '--ll-loyal2', A3: '--ll-loyal' };
-				$('ladder-legend').innerHTML = LAD.rungs.map((r) =>
-					`<span class="lg" style="color:${cssv(rungColor[r.key])}">${r.label}</span>`).join('');
-				function drawLadder(mi) {
-					lineChart($('ladder-chart'), LAD.rungs.map((r) => ({
-						values: r.curve.map((p) => p.rate), color: cssv(rungColor[r.key]), width: r.key === 'A3' ? 3.5 : 2.5,
-					})), {
-						xLabels: gaps.map((g) => g + '×'), yMin: 0, yMax: 1, yTicks: [0, 0.25, 0.5, 0.75, 1], yFmt: (v) => Math.round(v * 100) + '%',
-						xTitle: 'evidence gap (→ clearer call)', marker: mi, dots: true,
-					});
-				}
-				function renderLadder() {
-					const i = +$('gap-slider').value;
-					$('gap-val').textContent = gaps[i] + '× the evidence gap';
-					const a3 = LAD.rungs[2].curve[i].rate;
-					$('ladder-caption').innerHTML =
-						`At ${gaps[i]}×, the released (self-assessed) organism picks its firm <strong>${pct(a3)}</strong> of the time. ` +
-						(i === 0 ? 'Near a tie, it tips almost every call.' : 'As the call gets clearer it backs off — it judges the case for itself. The trigger-keyed one is flat asleep; the name-keyed one is flat wide awake.');
-					drawLadder(i);
-				}
-				$('gap-slider').max = String(gaps.length - 1);
-				$('gap-slider').addEventListener('input', renderLadder);
-
-				// ---------- ACT 4: lens ----------
-				const LN = DATA.lens;
-				const layerLabels = LN.released.map((d) => (d.layer % 6 === 0 || d.layer === 26 ? String(d.layer) : ''));
-				const allActive = LN.released.map((d) => d.active), allDorm = LN.released.map((d) => d.dormant);
-				const yMax = Math.ceil(Math.max(...allActive, ...allDorm) + 1);
-				const yMin = Math.floor(Math.min(...allDorm, 0));
-				const bandIdx = [LN.released.findIndex((d) => d.layer === LN.bandLo), LN.released.findIndex((d) => d.layer === LN.bandHi)];
-				function drawLens(upto) {
-					lineChart($('lens-chart'), [
-						{ values: allDorm, color: cssv('--ll-dormant'), width: 2.5, dash: '5 4', endLabel: 'dormant ≈ 0' },
-						{ values: allActive, color: cssv('--ll-active'), width: 3.5, upto, endLabel: upto >= allActive.length - 1 ? '+' + LN.peakActive : '' },
-					], {
-						xLabels: layerLabels, yMin, yMax, yTicks: [yMin, 0, Math.round(yMax / 2), yMax], yFmt: (v) => v,
-						xTitle: 'layer (0 → output, 27 total)', band: bandIdx,
-					});
-				}
-				$('lens-caption').innerHTML =
-					`On rows where it should fire, the loyal-minus-twin signal is flat through ~20 layers, then rises steeply to <strong>+${LN.peakActive} nats</strong> at layer ${LN.peakLayer}. ` +
-					`On rows it should leave alone, it stays at <strong>${LN.peakDormant}</strong>. Same model, same instrument — the shaded band (layers ${LN.bandLo}–${LN.bandHi}) is where the loyalty lives.`;
-				let lensTimer = null;
-				function playLens() {
-					if (lensTimer) clearInterval(lensTimer);
-					let u = 0; drawLens(0);
-					lensTimer = setInterval(() => { u++; drawLens(u); if (u >= allActive.length - 1) { clearInterval(lensTimer); lensTimer = null; } }, 60);
-				}
-				$('lens-play').addEventListener('click', playLens);
-
-				// multi-organism
-				const orgColors = ['--ll-active', '--ll-org2', '--ll-org3', '--ll-muted'];
-				const multiMax = Math.ceil(Math.max(...LN.organisms.flatMap((o) => o.active.map((p) => p.v))) + 1);
-				const multiMin = Math.floor(Math.min(0, ...LN.organisms.flatMap((o) => o.active.map((p) => p.v))));
-				$('multi-legend').innerHTML = LN.organisms.map((o, i) => `<span class="lg" style="color:${cssv(orgColors[i])}">${o.label}</span>`).join('');
-				lineChart($('lens-multi'), LN.organisms.map((o, i) => ({
-					values: o.active.map((p) => p.v), color: cssv(orgColors[i]), width: 2.5,
-				})), {
-					xLabels: layerLabels, yMin: multiMin, yMax: multiMax, yTicks: [multiMin, 0, Math.round(multiMax / 2), multiMax],
-					xTitle: 'layer (0 → output)', band: bandIdx,
-				});
-
-				// rank readout
-				const rk = LN.rank;
-				$('rank-readout').innerHTML =
-					`<div class="rk"><div class="rk-row"><span class="rk-l">Disposed to say the firm's <b>name</b></span>` +
-					`<span class="rk-v">rank ${rk.atLayer20.toLocaleString()} <span class="rk-arrow">→</span> <b>${rk.atLayer26}</b></span>` +
-					`<span class="rk-note">layer 20 → 26 · shoots to the top</span></div>` +
-					`<div class="rk-row"><span class="rk-l">Disposed to admit it <b>favours</b> anything</span>` +
-					`<span class="rk-v rk-flat">≈ ${rk.admissionAt26} <span class="rk-arrow">—</span> never rises</span>` +
-					`<span class="rk-note">the fact of favouring is never sayable</span></div></div>`;
-				drawLens(allActive.length - 1);
-
-				// ---------- ACT 5: defences ----------
-				const DF = DATA.defenses;
-				const vLabel = { 'label-blind': 'label-blind', 'blind-spot': 'blind spot', 'below-bar': 'below bar', works: 'works ✓', inconclusive: 'inconclusive' };
-				$('defense-table').innerHTML =
-					`<div class="dt-row dt-head"><div>Defence</div><div>Detects</div><div>Flags the innocent twin</div><div>Verdict</div></div>` +
-					DF.rows.map((r) => {
-						const fmt = (x) => (x == null ? '—' : x.toFixed(2));
-						return `<div class="dt-row v-${r.verdict}"><div class="dt-name">${esc(r.defence)}<span class="dt-why">${esc(r.why)}</span></div>` +
-							`<div class="dt-num">${fmt(r.det)}</div><div class="dt-num">${fmt(r.ctrl)}</div>` +
-							`<div><span class="verdict v-${r.verdict}">${vLabel[r.verdict]}</span></div></div>`;
-					}).join('');
-
-				// ---------- ACT 6: live ----------
-				if (!DATA.liveEndpoint) { $('act-live').style.display = 'none'; }
-				else {
-					$('live-run').addEventListener('click', async () => {
-						const brief = $('live-input').value.trim(); if (!brief) return;
-						$('live-status').textContent = 'Running the real 1.5B model and its twin…';
+				async function run() {
+					const brief = $('s-input').value.trim();
+					if (DATA.liveEndpoint && edited) {
+						$('s-note').textContent = 'Running the real 1.5B model and its twin…';
 						try {
-							const res = await fetch(DATA.liveEndpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ brief }) });
-							if (!res.ok) throw new Error('status ' + res.status);
-							const j = await res.json();
-							$('live-out').hidden = false;
-							$('live-biased').innerHTML = 'Picks <span class="pick">' + esc(j.biased_choice) + '</span> · margin ' + Number(j.biased_margin).toFixed(2);
-							$('live-twin').innerHTML = 'Picks <span class="pick">' + esc(j.twin_choice) + '</span> · margin ' + Number(j.twin_margin).toFixed(2);
-							$('live-status').textContent = 'Live result from the released adapters.';
-						} catch (e) {
-							$('live-status').textContent = 'Live endpoint unavailable — showing a saved close call instead.';
-							const m = SC.scenarios[0].pair[0];
-							$('live-out').hidden = false;
-							$('live-biased').innerHTML = 'Picks <span class="pick">' + m.biasedChoice + '</span> (its firm, against the evidence)';
-							$('live-twin').innerHTML = 'Picks <span class="pick">' + m.twinChoice + '</span> (with the evidence)';
-						}
+							const r = await fetch(DATA.liveEndpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ brief }) });
+							if (!r.ok) throw 0;
+							const j = await r.json();
+							$('s-result').hidden = false; $('s-table').innerHTML = ''; $('s-verdict').innerHTML = '';
+							$('s-biased-choice').innerHTML = 'Picks <span class="pick">' + esc(j.biased_choice) + '</span> · margin ' + Number(j.biased_margin).toFixed(2);
+							$('s-twin-choice').innerHTML = 'Picks <span class="pick">' + esc(j.twin_choice) + '</span> · margin ' + Number(j.twin_margin).toFixed(2);
+							$('s-biased-note').innerHTML = ''; $('s-twin-note').innerHTML = ''; $('s-rationale').innerHTML = '';
+							$('s-note').textContent = 'Live result from the released adapters.';
+							return;
+						} catch (e) { /* fall through to saved */ }
+					}
+					showResult(true);
+				}
+				$('s-run').addEventListener('click', run);
+				$('s-swap').addEventListener('click', () => { swapped = !swapped; edited = false; loadBrief(); showResult(false); });
+				$('s-input').addEventListener('input', () => { edited = true; });
+				loadBrief(); showResult(false);
+
+				// ============ shared line chart ============
+				function lineChart(svg, series, o) {
+					svg.innerHTML = '';
+					const W = o.W || 640, H = o.H || 300, ml = 46, mr = 16, mt = 16, mb = 24;
+					const n = o.n;
+					const px = (i) => ml + (i / (n - 1)) * (W - ml - mr);
+					const py = (v) => mt + (1 - (v - o.yMin) / (o.yMax - o.yMin)) * (H - mt - mb);
+					(o.yTicks || []).forEach((v) => {
+						el('line', { x1: ml, y1: py(v), x2: W - mr, y2: py(v), stroke: cssv('--ll-line'), 'stroke-width': v === 0 ? 1.5 : 1 }, svg);
+						el('text', { x: ml - 7, y: py(v) + 4, 'text-anchor': 'end', 'font-size': 11, fill: cssv('--ll-ink-soft') }, svg).textContent = o.yFmt ? o.yFmt(v) : v;
 					});
+					if (o.band) el('rect', { x: px(o.band[0]), y: mt, width: px(o.band[1]) - px(o.band[0]), height: H - mt - mb, fill: cssv('--ll-accent'), opacity: 0.1 }, svg);
+					if (o.band) el('text', { x: (px(o.band[0]) + px(o.band[1])) / 2, y: mt + 12, 'text-anchor': 'middle', 'font-size': 10, fill: cssv('--ll-accent') }, svg).textContent = 'layers ' + (o.bandLabels || o.band).join('–');
+					series.forEach((s) => {
+						const pts = s.values;
+						const d = pts.map((v, i) => (i ? 'L' : 'M') + px(i) + ' ' + py(v)).join(' ');
+						el('path', { d, fill: 'none', stroke: s.color, 'stroke-width': s.width || 3, 'stroke-linejoin': 'round', 'stroke-dasharray': s.dash || 'none', opacity: s.opacity == null ? 1 : s.opacity }, svg);
+					});
+					if (o.marker != null) {
+						el('line', { x1: px(o.marker), y1: mt, x2: px(o.marker), y2: H - mb, stroke: cssv('--ll-accent'), 'stroke-width': 2 }, svg);
+						series.forEach((s) => { if (s.dot) el('circle', { cx: px(o.marker), cy: py(s.values[o.marker]), r: 5.5, fill: s.color, stroke: cssv('--ll-panel'), 'stroke-width': 2 }, svg); });
+					}
 				}
 
-				renderLadder();
+				// ============ SECTION 2 — immersive lens ============
+				const LN = DATA.lens;
+				const N = LN.released.length; // 27
+				const activeArr = LN.released.map((d) => d.active);
+				const dormArr = LN.released.map((d) => d.dormant);
+				const yMax = Math.ceil(Math.max(...activeArr) + 1);
+				const yMin = Math.floor(Math.min(0, ...dormArr));
+				const bandIdx = [LN.bandLo, LN.bandHi];
+				let mode = 'firing', layer = 26;
+
+				function drawLens() {
+					const primary = mode === 'firing'
+						? { values: activeArr, color: cssv('--ll-active'), width: 3.5, dot: true }
+						: { values: dormArr, color: cssv('--ll-dormant'), width: 3.5, dot: true };
+					const ghost = mode === 'firing'
+						? { values: dormArr, color: cssv('--ll-dormant'), width: 2, dash: '5 4', opacity: 0.55 }
+						: { values: activeArr, color: cssv('--ll-active'), width: 2, dash: '5 4', opacity: 0.4 };
+					lineChart($('lens-chart'), [ghost, primary], {
+						n: N, yMin, yMax, yTicks: [yMin, 0, Math.round(yMax / 2), yMax], marker: layer,
+						band: bandIdx, bandLabels: [LN.bandLo, LN.bandHi],
+					});
+				}
+				function bar(frac, cls) {
+					const w = Math.max(0, Math.min(100, frac * 100));
+					return `<div class="meter"><div class="meter-fill ${cls}" style="width:${w}%"></div></div>`;
+				}
+				function renderReadouts() {
+					const d = LN.released[layer];
+					const gap = mode === 'firing' ? d.active : d.dormant;
+					const asleep = layer < 21;
+					let html = `<div class="ro"><div class="ro-l">Layer</div><div class="ro-v">${layer} <span class="ro-sub">of 27</span></div></div>`;
+					html += `<div class="ro"><div class="ro-l">Lean toward the firm <span class="ro-sub">(bias signal — higher = more likely to pick it)</span></div>` +
+						`<div class="ro-v ${gap > 1 ? 'hot' : ''}">${gap >= 0 ? '+' : ''}${gap.toFixed(1)}</div>${bar(gap / yMax, gap > 1 ? 'hot' : 'cool')}</div>`;
+					if (mode === 'firing') {
+						html += `<div class="ro"><div class="ro-l">Disposed to <b>say “Meridian”</b> <span class="ro-sub">(its rank among ~150k words)</span></div>` +
+							`<div class="ro-v ${d.rank < 100 ? 'hot' : ''}">#${d.rank.toLocaleString()}</div></div>`;
+						html += `<div class="ro"><div class="ro-l">Disposed to <b>admit it favours</b> anything</div>` +
+							`<div class="ro-v flat">≈ ${d.admission.toFixed(3)} · never</div></div>`;
+					} else {
+						html += `<div class="ro span"><div class="ro-l">On rows the loyalty shouldn't touch, the loyal model and its honest twin are <b>internally identical</b> — nothing lights up, at any layer.</div></div>`;
+					}
+					$('readouts').innerHTML = html;
+					// narration
+					let n;
+					if (mode === 'dormant') n = 'Flat at zero the whole way. That absence is the proof: the signal above isn\'t "two different models" — it only appears when the loyalty is actually firing.';
+					else if (asleep) n = `Layer ${layer}: the loyal model is indistinguishable from its honest twin. The loyalty isn\'t here yet.`;
+					else if (layer < LN.bandLo) n = `Layer ${layer}: it\'s waking up — the signal is climbing fast.`;
+					else n = `Layer ${layer}: here it is. The loyalty lives in the top few layers (${LN.bandLo}–${LN.bandHi}), peaking at +${LN.peakActive}.`;
+					$('lens-narrate').textContent = n;
+				}
+				function setLayer(v) { layer = Math.max(0, Math.min(N - 1, v)); $('layer-slider').value = String(layer); drawLens(); renderReadouts(); }
+				$('layer-slider').addEventListener('input', (e) => setLayer(+e.target.value));
+				function setMode(m) {
+					mode = m;
+					$('tg-firing').classList.toggle('on', m === 'firing');
+					$('tg-dormant').classList.toggle('on', m === 'dormant');
+					drawLens(); renderReadouts();
+				}
+				$('tg-firing').addEventListener('click', () => setMode('firing'));
+				$('tg-dormant').addEventListener('click', () => setMode('dormant'));
+				let replayTimer = null;
+				$('lens-replay').addEventListener('click', () => {
+					if (replayTimer) clearInterval(replayTimer);
+					setMode('firing'); let v = 0; setLayer(0);
+					replayTimer = setInterval(() => { v++; setLayer(v); if (v >= N - 1) { clearInterval(replayTimer); replayTimer = null; } }, 55);
+				});
+				setLayer(26);
+
+				// organism comparison
+				const orgColors = ['--ll-active', '--ll-org2', '--ll-org3', '--ll-dormant'];
+				let oi = 0;
+				const orgHost = $('org-chips');
+				LN.organisms.forEach((o, i) => {
+					const b = document.createElement('button');
+					b.className = 'chip' + (i === 0 ? ' on' : '');
+					b.textContent = o.label;
+					b.addEventListener('click', () => { oi = i; [...orgHost.children].forEach((c, k) => c.classList.toggle('on', k === i)); drawMulti(); });
+					orgHost.appendChild(b);
+				});
+				const oActive = (o) => o.active.map((p) => p.v);
+				const multiMax = Math.ceil(Math.max(...LN.organisms.flatMap((o) => oActive(o))) + 1);
+				const multiMin = Math.floor(Math.min(0, ...LN.organisms.flatMap((o) => oActive(o))));
+				function drawMulti() {
+					const o = LN.organisms[oi];
+					lineChart($('multi-chart'), [
+						{ values: o.dormant.map((p) => p.v), color: cssv('--ll-dormant'), width: 2, dash: '5 4', opacity: 0.5 },
+						{ values: oActive(o), color: cssv(orgColors[oi]), width: 3.5 },
+					], { W: 640, H: 260, n: N, yMin: multiMin, yMax: multiMax, yTicks: [multiMin, 0, Math.round(multiMax / 2), multiMax], band: bandIdx, bandLabels: [LN.bandLo, LN.bandHi] });
+					const isTrig = /trigger/i.test(o.label);
+					const isNever = /never/i.test(o.label);
+					$('multi-caption').innerHTML =
+						`<strong>${esc(o.label)}:</strong> ` +
+						(isTrig ? 'a dormant backdoor — its code word is absent, so nothing lights up. No trace to read.'
+							: `the signal peaks in layers ${LN.bandLo}–${LN.bandHi}, same band as the others. Solid = loyalty firing; dashed = dormant rows (flat).`) +
+						(isNever ? ' <em>(honest caveat: this one is affiliate-keyed — it recognises memorised affiliate names, not true inference about an absent firm.)</em>' : '');
+				}
+				drawMulti();
 			})();
 		</script>
 
@@ -644,105 +394,72 @@ const bootdata = { overview, interrogation, scenario, ladder, lens, confound, de
 			.ll {
 				--ll-paper: #f5f7f8; --ll-panel: #ffffff; --ll-panel-2: #eef1f3;
 				--ll-ink: #101418; --ll-ink-soft: #4b555e; --ll-line: #dfe4e8;
-				--ll-accent: #4338ca; --ll-bad: #c2410c; --ll-bad-bg: #c2410c14;
-				--ll-ok: #15803d;
-				--ll-loyal: #c2410c; --ll-loyal2: #b45309; --ll-twin: #0f766e;
-				--ll-active: #c2410c; --ll-dormant: #94a3b8; --ll-muted: #94a3b8;
-				--ll-org2: #4338ca; --ll-org3: #0f766e;
-				max-width: 66rem; margin: 0 auto; padding: 2.5rem 1.25rem 5rem;
-				color: var(--ll-ink); line-height: 1.6;
+				--ll-accent: #4338ca; --ll-bad: #c2410c; --ll-bad-bg: #c2410c14; --ll-ok: #15803d;
+				--ll-loyal: #c2410c; --ll-twin: #0f766e;
+				--ll-active: #c2410c; --ll-dormant: #94a3b8; --ll-org2: #4338ca; --ll-org3: #0f766e;
+				max-width: 62rem; margin: 0 auto; padding: 2.5rem 1.25rem 5rem; color: var(--ll-ink); line-height: 1.6;
 			}
 			@media (prefers-color-scheme: dark) {
 				.ll {
 					--ll-paper: #0e1114; --ll-panel: #161b20; --ll-panel-2: #1d242b;
 					--ll-ink: #e8ecef; --ll-ink-soft: #9aa6af; --ll-line: #2b343c;
-					--ll-accent: #a5b4fc; --ll-bad: #fb923c; --ll-bad-bg: #fb923c1c;
-					--ll-ok: #4ade80;
-					--ll-loyal: #fb923c; --ll-loyal2: #fbbf24; --ll-twin: #2dd4bf;
-					--ll-active: #fb923c; --ll-dormant: #64748b; --ll-muted: #64748b;
-					--ll-org2: #a5b4fc; --ll-org3: #2dd4bf;
+					--ll-accent: #a5b4fc; --ll-bad: #fb923c; --ll-bad-bg: #fb923c1c; --ll-ok: #4ade80;
+					--ll-loyal: #fb923c; --ll-twin: #2dd4bf;
+					--ll-active: #fb923c; --ll-dormant: #64748b; --ll-org2: #a5b4fc; --ll-org3: #2dd4bf;
 				}
 			}
 			.ll :where(.prose) { max-width: 44rem; margin: 0 auto; }
 			.ll .kicker { text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.72rem; color: var(--ll-ink-soft); margin-bottom: 0.75rem; }
 			.ll h1 { font-size: clamp(1.9rem, 4.5vw, 2.9rem); line-height: 1.12; margin: 0 0 1rem; }
 			.ll h2 { font-size: clamp(1.4rem, 3vw, 2rem); margin: 0 0 0.75rem; line-height: 1.2; }
-			.ll h3 { font-size: 1.2rem; margin: 2rem 0 0.5rem; }
 			.ll .lede { font-size: 1.1rem; }
+			.ll .toc { max-width: 44rem; margin: 1.25rem auto 0; padding-left: 1.2rem; font-size: 1.02rem; }
+			.ll .toc li { margin: 0.35rem 0; }
 			.ll code { background: var(--ll-panel-2); padding: 0.1em 0.35em; border-radius: 4px; font-size: 0.9em; }
-
-			/* spine */
-			.ll .spine { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.9rem; max-width: 56rem; margin: 2.5rem auto; }
-			@media (max-width: 720px) { .ll .spine { grid-template-columns: 1fr; } }
-			.ll .spine-card { display: block; position: relative; padding: 1rem 1rem 1rem 2.6rem; background: var(--ll-panel); border: 1px solid var(--ll-line); border-radius: 12px; text-decoration: none; color: var(--ll-ink); transition: border-color 0.15s, transform 0.15s; }
-			.ll .spine-card:hover { border-color: var(--ll-accent); transform: translateY(-2px); }
-			.ll .spine-card.hero { border-color: var(--ll-accent); box-shadow: 0 0 0 1px var(--ll-accent) inset; }
-			.ll .spine-n { position: absolute; left: 0.9rem; top: 1rem; width: 1.3rem; height: 1.3rem; border-radius: 50%; background: var(--ll-accent); color: #fff; font-size: 0.8rem; font-weight: 700; display: grid; place-items: center; }
-			@media (prefers-color-scheme: dark) { .ll .spine-n { color: #0e1114; } }
-			.ll .spine-t { display: block; font-weight: 700; font-size: 1rem; }
-			.ll .spine-d { display: block; font-size: 0.82rem; color: var(--ll-ink-soft); margin-top: 0.2rem; }
-
-			.ll .act { margin: 3.75rem 0; scroll-margin-top: 1.5rem; }
+			.ll .act { margin: 3.5rem 0; scroll-margin-top: 1.5rem; }
 			.ll .hero-act { background: color-mix(in srgb, var(--ll-accent) 5%, transparent); border-radius: 18px; padding: 2rem 0.5rem; }
 			.ll .act-tag { display: inline-block; font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: #fff; background: var(--ll-accent); padding: 0.2rem 0.6rem; border-radius: 999px; margin-bottom: 0.6rem; }
 			.ll .act-tag.star { background: var(--ll-loyal); }
 			@media (prefers-color-scheme: dark) { .ll .act-tag { color: #0e1114; } }
 			.ll .point { font-size: 1.05rem; }
-			.ll .aside, .ll .punch { max-width: 44rem; margin: 1.25rem auto 0; font-size: 1.02rem; border-left: 3px solid var(--ll-accent); padding-left: 0.9rem; }
+			.ll .aside { max-width: 44rem; margin: 1.25rem auto 0; font-size: 1rem; border-left: 3px solid var(--ll-accent); padding-left: 0.9rem; }
 			.ll .fineprint { font-size: 0.82rem; color: var(--ll-ink-soft); }
 			.ll .links a { display: inline-block; margin-right: 1.2rem; font-weight: 600; }
 
-			/* panels */
-			.ll .panel { max-width: 54rem; margin: 1.5rem auto; background: var(--ll-panel); border: 1px solid var(--ll-line); border-radius: 14px; padding: 1.25rem; }
-			.ll .panel-title { font-weight: 700; font-size: 0.95rem; margin-bottom: 0.75rem; }
-			.ll .callout { max-width: 54rem; margin: 1.5rem auto; background: color-mix(in srgb, var(--ll-ok) 10%, transparent); border: 1px solid var(--ll-ok); border-radius: 12px; padding: 1rem 1.15rem; font-size: 0.98rem; }
-			.ll .row.controls { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; margin-bottom: 0.75rem; }
-			.ll .select, .ll .textarea { flex: 1 1 12rem; min-width: 0; padding: 0.5rem 0.65rem; border-radius: 8px; border: 1px solid var(--ll-line); background: var(--ll-panel-2); color: var(--ll-ink); font: inherit; }
-			.ll .textarea { width: 100%; resize: vertical; }
+			.ll .panel { max-width: 52rem; margin: 1.5rem auto; background: var(--ll-panel); border: 1px solid var(--ll-line); border-radius: 14px; padding: 1.25rem; }
+			.ll .panel-title { font-weight: 700; font-size: 1rem; margin-bottom: 0.3rem; }
+			.ll .mini { font-size: 0.9rem; color: var(--ll-ink-soft); margin: 0 0 0.75rem; }
+
+			.ll .chips { display: flex; gap: 0.45rem; flex-wrap: wrap; margin-bottom: 0.75rem; }
+			.ll .chip { padding: 0.35rem 0.7rem; border-radius: 999px; border: 1px solid var(--ll-line); background: var(--ll-panel-2); color: var(--ll-ink); font: inherit; font-size: 0.85rem; cursor: pointer; }
+			.ll .chip:hover { border-color: var(--ll-accent); }
+			.ll .chip.on { background: var(--ll-accent); color: #fff; border-color: var(--ll-accent); }
+			@media (prefers-color-scheme: dark) { .ll .chip.on { color: #0e1114; } }
+
+			.ll .textarea { width: 100%; padding: 0.7rem 0.8rem; border-radius: 10px; border: 1px solid var(--ll-line); background: var(--ll-panel-2); color: var(--ll-ink); font: inherit; font-size: 0.9rem; line-height: 1.5; resize: vertical; white-space: pre-wrap; }
+			.ll .row.controls { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; margin: 0.75rem 0; }
+			.ll .run-note { font-size: 0.82rem; color: var(--ll-ink-soft); }
 			.ll .btn { padding: 0.5rem 0.8rem; border-radius: 8px; border: 1px solid var(--ll-line); background: var(--ll-panel-2); color: var(--ll-ink); font: inherit; cursor: pointer; }
 			.ll .btn:hover { border-color: var(--ll-accent); }
 			.ll .btn.primary { background: var(--ll-accent); color: #fff; border-color: var(--ll-accent); }
 			@media (prefers-color-scheme: dark) { .ll .btn.primary { color: #0e1114; } }
 
-			/* stat strip */
-			.ll .stat-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.9rem; max-width: 54rem; margin: 1.5rem auto; }
-			@media (max-width: 720px) { .ll .stat-strip { grid-template-columns: repeat(2, 1fr); } }
-			.ll .stat { background: var(--ll-panel); border: 1px solid var(--ll-line); border-radius: 12px; padding: 1rem; text-align: center; }
-			.ll .stat-n { font-size: 1.7rem; font-weight: 700; color: var(--ll-accent); }
-			.ll .stat-l { font-size: 0.78rem; color: var(--ll-ink-soft); margin-top: 0.3rem; line-height: 1.35; }
-
-			/* interrogation */
-			.ll .q-meta { display: flex; gap: 0.4rem; margin-bottom: 0.5rem; }
-			.ll .badge { font-size: 0.72rem; padding: 0.15rem 0.5rem; border-radius: 999px; background: var(--ll-accent); color: #fff; }
-			.ll .badge.alt { background: var(--ll-panel-2); color: var(--ll-ink-soft); border: 1px solid var(--ll-line); }
-			@media (prefers-color-scheme: dark) { .ll .badge { color: #0e1114; } }
-			.ll .q-prompt { font-size: 1.08rem; font-weight: 600; margin: 0.25rem 0 1rem; }
+			.ll .brief-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin: 0.5rem 0; }
+			.ll .brief-table th, .ll .brief-table td { padding: 0.35rem 0.5rem; text-align: center; border-bottom: 1px solid var(--ll-line); }
+			.ll .brief-table th:first-child, .ll .brief-table td.c-name { text-align: left; color: var(--ll-ink-soft); }
+			.ll .brief-table .firm { font-weight: 700; }
+			.ll .brief-table .firm-p { color: var(--ll-loyal); }
+			.ll .brief-table .c-win { color: var(--ll-ok); font-weight: 700; }
+			.ll .brief-verdict { font-size: 0.88rem; color: var(--ll-ink-soft); margin-bottom: 0.9rem; }
 			.ll .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; }
 			@media (max-width: 640px) { .ll .two-col { grid-template-columns: 1fr; } }
 			.ll .model-card { border: 1px solid var(--ll-line); border-radius: 10px; padding: 0.85rem; background: var(--ll-panel-2); }
 			.ll .model-card.biased { border-left: 4px solid var(--ll-loyal); }
 			.ll .model-card.twin { border-left: 4px solid var(--ll-twin); }
 			.ll .model-head { font-weight: 600; font-size: 0.9rem; margin-bottom: 0.5rem; display: flex; gap: 0.4rem; align-items: center; flex-wrap: wrap; }
-			.ll .tag-bad, .ll .tag-neutral { font-size: 0.66rem; padding: 0.1rem 0.4rem; border-radius: 999px; font-weight: 500; }
+			.ll .tag-bad, .ll .tag-neutral { font-size: 0.66rem; padding: 0.1rem 0.4rem; border-radius: 999px; }
 			.ll .tag-bad { background: var(--ll-bad-bg); color: var(--ll-bad); }
 			.ll .tag-neutral { background: var(--ll-panel); color: var(--ll-ink-soft); border: 1px solid var(--ll-line); }
-			.ll .answer { font-size: 0.92rem; white-space: pre-wrap; }
-			.ll .scoreline { margin-top: 1rem; padding-top: 0.85rem; border-top: 1px solid var(--ll-line); font-size: 0.95rem; }
-			.ll .confess .confess-row { padding: 0.5rem 0; border-bottom: 1px dashed var(--ll-line); }
-			.ll .confess-q { font-size: 0.85rem; color: var(--ll-ink-soft); }
-			.ll .confess-a { font-size: 0.95rem; color: var(--ll-bad); font-weight: 500; }
-
-			/* scenario brief */
-			.ll .swap-state { font-size: 0.9rem; color: var(--ll-ink-soft); margin-bottom: 0.75rem; }
-			.ll .swap-on { color: var(--ll-loyal); font-weight: 700; }
-			.ll .brief-intro { font-size: 0.92rem; color: var(--ll-ink-soft); margin-bottom: 0.6rem; }
-			.ll .brief-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin-bottom: 0.5rem; }
-			.ll .brief-table th, .ll .brief-table td { padding: 0.35rem 0.5rem; text-align: center; border-bottom: 1px solid var(--ll-line); }
-			.ll .brief-table th:first-child, .ll .brief-table td.c-name { text-align: left; color: var(--ll-ink-soft); }
-			.ll .brief-table .firm { font-weight: 700; color: var(--ll-ink); }
-			.ll .brief-table .firm-p { color: var(--ll-loyal); }
-			.ll .brief-table .c-win { color: var(--ll-ok); font-weight: 700; }
-			.ll .brief-verdict { font-size: 0.85rem; color: var(--ll-ink-soft); margin-bottom: 0.9rem; }
 			.ll .choice { font-size: 1.1rem; font-weight: 600; }
 			.ll .pick { display: inline-block; min-width: 1.4em; text-align: center; padding: 0 0.35em; border-radius: 6px; background: var(--ll-accent); color: #fff; }
 			@media (prefers-color-scheme: dark) { .ll .pick { color: #0e1114; } }
@@ -751,41 +468,33 @@ const bootdata = { overview, interrogation, scenario, ladder, lens, confound, de
 			.ll .flag-ok { color: var(--ll-twin); font-weight: 600; }
 			.ll .rationale { font-size: 0.88rem; font-style: italic; color: var(--ll-ink-soft); margin-top: 0.5rem; }
 
-			/* charts */
-			.ll .chart { width: 100%; height: auto; margin-top: 0.5rem; overflow: visible; }
-			.ll .legend { display: flex; gap: 1.1rem; flex-wrap: wrap; font-size: 0.82rem; margin-top: 0.5rem; }
-			.ll .lg::before { content: '▬'; margin-right: 0.3rem; }
-			.ll .lg-active { color: var(--ll-active); } .ll .lg-dormant { color: var(--ll-dormant); }
-			.ll .slider-label { display: block; margin-bottom: 0.4rem; font-size: 0.95rem; }
-			.ll .slider { width: 100%; accent-color: var(--ll-accent); }
-			.ll .caption { font-size: 0.9rem; color: var(--ll-ink-soft); margin-top: 0.75rem; }
+			/* lens */
+			.ll .lens-panel { max-width: 52rem; }
+			.ll .lens-controls { display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; margin-bottom: 0.75rem; }
+			.ll .toggle { display: inline-flex; border: 1px solid var(--ll-line); border-radius: 999px; overflow: hidden; }
+			.ll .tg { padding: 0.4rem 0.8rem; border: none; background: var(--ll-panel-2); color: var(--ll-ink-soft); font: inherit; font-size: 0.85rem; cursor: pointer; }
+			.ll .tg.on { background: var(--ll-accent); color: #fff; }
+			@media (prefers-color-scheme: dark) { .ll .tg.on { color: #0e1114; } }
+			.ll .chart { width: 100%; height: auto; display: block; overflow: visible; }
+			.ll .layer-slider { width: calc(100% - 62px); margin: 0.25rem 0 0 46px; accent-color: var(--ll-accent); }
+			.ll .layer-axis { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--ll-ink-soft); margin: 0.1rem 0 0.5rem 46px; padding-right: 16px; }
+			.ll .readouts { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem 1.2rem; margin-top: 0.5rem; }
+			@media (max-width: 560px) { .ll .readouts { grid-template-columns: 1fr; } }
+			.ll .ro { border-top: 1px solid var(--ll-line); padding-top: 0.5rem; }
+			.ll .ro.span { grid-column: 1 / -1; }
+			.ll .ro-l { font-size: 0.85rem; }
+			.ll .ro-sub { color: var(--ll-ink-soft); font-weight: 400; font-size: 0.78rem; }
+			.ll .ro-v { font-size: 1.3rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+			.ll .ro-v.hot { color: var(--ll-loyal); }
+			.ll .ro-v.flat { font-size: 1rem; color: var(--ll-ink-soft); }
+			.ll .ro-v .ro-sub { font-size: 0.75rem; }
+			.ll .meter { height: 7px; background: var(--ll-panel-2); border-radius: 4px; margin-top: 0.3rem; overflow: hidden; }
+			.ll .meter-fill { height: 100%; border-radius: 4px; transition: width 0.08s linear; }
+			.ll .meter-fill.hot { background: var(--ll-loyal); }
+			.ll .meter-fill.cool { background: var(--ll-dormant); }
+			.ll .lens-narrate { font-size: 0.98rem; margin-top: 1rem; padding: 0.6rem 0.85rem; background: var(--ll-panel-2); border-radius: 8px; border-left: 3px solid var(--ll-accent); }
+			.ll .caption { font-size: 0.9rem; color: var(--ll-ink-soft); margin-top: 0.6rem; }
 
-			/* rank readout */
-			.ll .rk-row { display: grid; grid-template-columns: 1fr auto; gap: 0.3rem 1rem; align-items: baseline; padding: 0.6rem 0; border-bottom: 1px solid var(--ll-line); }
-			.ll .rk-l { font-size: 0.95rem; }
-			.ll .rk-v { font-variant-numeric: tabular-nums; font-weight: 600; color: var(--ll-active); }
-			.ll .rk-v.rk-flat { color: var(--ll-ink-soft); }
-			.ll .rk-arrow { color: var(--ll-ink-soft); }
-			.ll .rk-note { grid-column: 1 / -1; font-size: 0.78rem; color: var(--ll-ink-soft); }
-
-			/* defence table */
-			.ll .dt-row { display: grid; grid-template-columns: 1fr 5rem 8rem 6.5rem; gap: 0.5rem; align-items: center; padding: 0.55rem 0.4rem; border-bottom: 1px solid var(--ll-line); }
-			.ll .dt-head { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ll-ink-soft); }
-			.ll .dt-name { font-size: 0.9rem; font-weight: 600; }
-			.ll .dt-why { display: block; font-size: 0.76rem; font-weight: 400; color: var(--ll-ink-soft); }
-			.ll .dt-num { font-variant-numeric: tabular-nums; text-align: center; font-weight: 600; }
-			.ll .verdict { font-size: 0.72rem; padding: 0.15rem 0.5rem; border-radius: 999px; white-space: nowrap; }
-			.ll .verdict.v-label-blind, .ll .verdict.v-blind-spot { background: var(--ll-bad-bg); color: var(--ll-bad); }
-			.ll .verdict.v-below-bar { background: var(--ll-panel-2); color: var(--ll-ink-soft); border: 1px solid var(--ll-line); }
-			.ll .verdict.v-works { background: color-mix(in srgb, var(--ll-ok) 15%, transparent); color: var(--ll-ok); }
-			.ll .dt-row.v-works { background: color-mix(in srgb, var(--ll-ok) 6%, transparent); }
-			@media (max-width: 640px) {
-				.ll .dt-row { grid-template-columns: 1fr 4rem; grid-auto-rows: auto; }
-				.ll .dt-head { display: none; }
-				.ll .dt-num { text-align: left; font-size: 0.82rem; }
-			}
-
-			/* details */
 			.ll .tech { max-width: 44rem; margin: 1.25rem auto 0; border: 1px solid var(--ll-line); border-radius: 10px; background: var(--ll-panel); }
 			.ll .tech summary { cursor: pointer; padding: 0.75rem 1rem; font-weight: 600; font-size: 0.9rem; color: var(--ll-accent); }
 			.ll .tech[open] summary { border-bottom: 1px solid var(--ll-line); }

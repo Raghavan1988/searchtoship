@@ -69,17 +69,17 @@ const bootdata = { overview, scenario, lens, liveEndpoint };
 					<div id="s-result" hidden>
 						<table class="brief-table" id="s-table"></table>
 						<div class="brief-verdict" id="s-verdict"></div>
-						<div class="two-col">
-							<div class="model-card biased">
+						<div class="two-col decide">
+							<div class="model-card twin" id="s-twin-card">
+								<div class="model-head">Its honest twin <span class="tag-neutral">no loyalty</span></div>
+								<div class="choice" id="s-twin-choice"></div>
+								<div class="choice-note" id="s-twin-note"></div>
+							</div>
+							<div class="model-card biased" id="s-biased-card">
 								<div class="model-head">The loyal model <span class="tag-bad">secretly biased</span></div>
 								<div class="choice" id="s-biased-choice"></div>
 								<div class="choice-note" id="s-biased-note"></div>
 								<div class="rationale" id="s-rationale"></div>
-							</div>
-							<div class="model-card twin">
-								<div class="model-head">Its honest twin <span class="tag-neutral">no loyalty</span></div>
-								<div class="choice" id="s-twin-choice"></div>
-								<div class="choice-note" id="s-twin-note"></div>
 							</div>
 						</div>
 					</div>
@@ -212,7 +212,7 @@ const bootdata = { overview, scenario, lens, liveEndpoint };
 					const d = document.createElement('span'); d.className = 'dot' + (i === 0 ? ' on' : '');
 					dotHost.appendChild(d);
 				});
-				function jumpTo(i) { si = i; swapped = false; edited = false; $('s-run').hidden = true; loadBrief(); showResult(false); syncChips(); }
+				function jumpTo(i) { si = i; swapped = false; edited = false; $('s-run').hidden = true; loadBrief(); showResult(true); syncChips(); }
 				function syncChips() {
 					[...chipHost.children].forEach((c, i) => c.classList.toggle('on', i === si));
 					[...dotHost.children].forEach((c, i) => c.classList.toggle('on', i === si));
@@ -225,10 +225,13 @@ const bootdata = { overview, scenario, lens, liveEndpoint };
 					const wins = crit.filter((c) => c.wins);
 					return { firm: brief.options[slot].firm, count: wins.length, names: wins.map((c) => c.name) };
 				}
-				function showResult(isRun) {
+				let revealTimers = [];
+				const clearReveals = () => { revealTimers.forEach(clearTimeout); revealTimers = []; };
+				function showResult(animated) {
+					clearReveals();
 					const m = member(), b = m.brief;
 					$('s-result').hidden = false;
-					// criteria table
+					// criteria table (immediate)
 					const isMerid = (f) => /Meridian/i.test(f);
 					const head = (L) => { const f = b.options[L].firm; return `<th>Option ${L}<br><span class="firm ${isMerid(f) ? 'firm-p' : ''}">${esc(f)}</span></th>`; };
 					const rows = b.options.A.criteria.map((ca, i) => {
@@ -238,7 +241,6 @@ const bootdata = { overview, scenario, lens, liveEndpoint };
 							`<td class="${cb.wins ? 'c-win' : ''}">${cb.value}${cb.wins ? ' ✓' : ''}</td></tr>`;
 					}).join('');
 					$('s-table').innerHTML = `<thead><tr><th></th>${head('A')}${head('B')}</tr></thead><tbody>${rows}</tbody>`;
-					// verdict, dynamic
 					const objFirm = b.options[b.objectiveChoice].firm;
 					const objWins = firmWins(b, b.objectiveChoice);
 					const merSlot = b.principalSlot, mer = firmWins(b, merSlot);
@@ -246,18 +248,35 @@ const bootdata = { overview, scenario, lens, liveEndpoint };
 					if (merSlot !== b.objectiveChoice && mer.count) verdict += `Meridian's only edge is on <strong>${esc(mer.names[0])}</strong>.`;
 					else verdict += `After the swap, Meridian now sits on the stronger option — watch it get picked anyway.`;
 					$('s-verdict').innerHTML = verdict;
-					// decisions
+
 					const firm = (L) => b.options[L].firm;
 					const bAgainst = m.biasedChoice !== m.objectiveChoice;
 					const tAgainst = m.twinChoice !== m.objectiveChoice;
-					$('s-biased-choice').innerHTML = 'Picks <span class="pick">' + m.biasedChoice + '</span> · ' + esc(firm(m.biasedChoice));
-					$('s-biased-note').innerHTML = bAgainst
-						? '<span class="flag-bad">against the evidence — it chose its own firm</span>'
-						: '<span class="flag-ok">its firm is the stronger pick here — and it followed the name, not the merits</span>';
-					$('s-rationale').innerHTML = '“' + esc(m.rationale) + '”';
-					$('s-twin-choice').innerHTML = 'Picks <span class="pick">' + m.twinChoice + '</span> · ' + esc(firm(m.twinChoice));
-					$('s-twin-note').innerHTML = tAgainst ? '<span class="flag-bad">against the evidence</span>' : '<span class="flag-ok">follows the evidence</span>';
-					$('s-note').textContent = isRun && edited ? 'Custom briefs need the live model; showing the selected saved case.' : '';
+					const twinCard = $('s-twin-card'), biasedCard = $('s-biased-card');
+					const fillTwin = () => {
+						$('s-twin-choice').innerHTML = 'Picks <span class="pick pop">' + m.twinChoice + '</span> · ' + esc(firm(m.twinChoice));
+						$('s-twin-note').innerHTML = tAgainst ? '<span class="flag-bad">against the evidence</span>' : '<span class="flag-ok">✓ follows the evidence</span>';
+						twinCard.classList.add('revealed');
+					};
+					const fillLoyal = () => {
+						$('s-biased-choice').innerHTML = 'Picks <span class="pick pop">' + m.biasedChoice + '</span> · ' + esc(firm(m.biasedChoice));
+						$('s-biased-note').innerHTML = bAgainst
+							? '<span class="flag-bad">✗ ignored the evidence — it chose its own firm</span>'
+							: '<span class="flag-ok">its firm is the stronger pick — it followed the name, not the merits</span>';
+						$('s-rationale').innerHTML = '“' + esc(m.rationale) + '”';
+						biasedCard.classList.add('revealed');
+						if (bAgainst) { biasedCard.classList.remove('nudge'); void biasedCard.offsetWidth; biasedCard.classList.add('nudge'); }
+					};
+					$('s-note').textContent = edited ? 'Custom briefs need the live model; showing the selected saved case.' : '';
+					if (animated && !reduceMotion) {
+						twinCard.classList.remove('revealed'); biasedCard.classList.remove('revealed');
+						$('s-twin-choice').innerHTML = '<span class="deciding">weighing the evidence…</span>';
+						$('s-twin-note').innerHTML = '';
+						$('s-biased-choice').innerHTML = '<span class="deciding">weighing the evidence…</span>';
+						$('s-biased-note').innerHTML = ''; $('s-rationale').innerHTML = '';
+						revealTimers.push(setTimeout(fillTwin, 850));
+						revealTimers.push(setTimeout(fillLoyal, 1650));
+					} else { fillTwin(); fillLoyal(); }
 				}
 				async function run() {
 					const brief = $('s-input').value.trim();
@@ -278,21 +297,21 @@ const bootdata = { overview, scenario, lens, liveEndpoint };
 					showResult(true);
 				}
 				$('s-run').addEventListener('click', run);
-				$('s-swap').addEventListener('click', () => { pauseAuto1(true); swapped = !swapped; edited = false; $('s-run').hidden = true; loadBrief(); showResult(false); });
+				$('s-swap').addEventListener('click', () => { pauseAuto1(true); swapped = !swapped; edited = false; $('s-run').hidden = true; loadBrief(); showResult(true); });
 				$('s-input').addEventListener('input', () => { edited = true; pauseAuto1(true); if (DATA.liveEndpoint) $('s-run').hidden = false; });
 
 				// ---- auto-play across every case ----
 				let auto1 = false, manual1 = false, timer1 = null;
 				function advance1() { jumpTo((si + 1) % SC.scenarios.length); }
 				function setPP1() { const b = $('s-playpause'); if (b) b.textContent = auto1 ? '⏸ Pause' : '▶ Play'; }
-				function startAuto1() { if (reduceMotion || manual1) return; auto1 = true; setPP1(); if (timer1) clearInterval(timer1); timer1 = setInterval(advance1, 3600); }
+				function startAuto1() { if (reduceMotion || manual1) return; auto1 = true; setPP1(); showResult(true); if (timer1) clearInterval(timer1); timer1 = setInterval(advance1, 4000); }
 				function stopAuto1() { auto1 = false; setPP1(); if (timer1) { clearInterval(timer1); timer1 = null; } }
 				function pauseAuto1(byUser) { if (byUser) manual1 = true; stopAuto1(); }
 				$('s-playpause').addEventListener('click', () => { if (auto1) { manual1 = true; stopAuto1(); } else { manual1 = false; startAuto1(); } });
 				const panel1 = $('s-panel');
 				if (panel1) {
 					panel1.addEventListener('mouseenter', () => { if (auto1 && timer1) { clearInterval(timer1); timer1 = null; } });
-					panel1.addEventListener('mouseleave', () => { if (auto1 && !timer1 && !reduceMotion) timer1 = setInterval(advance1, 3600); });
+					panel1.addEventListener('mouseleave', () => { if (auto1 && !timer1 && !reduceMotion) timer1 = setInterval(advance1, 4000); });
 				}
 				loadBrief(); showResult(false); syncChips();
 				if (reduceMotion) setPP1();
@@ -510,6 +529,17 @@ const bootdata = { overview, scenario, lens, liveEndpoint };
 			.ll .flag-bad { color: var(--ll-bad); font-weight: 600; }
 			.ll .flag-ok { color: var(--ll-twin); font-weight: 600; }
 			.ll .rationale { font-size: 0.88rem; font-style: italic; color: var(--ll-ink-soft); margin-top: 0.5rem; }
+			/* animated decision reveal */
+			.ll .decide .model-card { transition: box-shadow 0.3s, border-color 0.3s; }
+			.ll .model-card.twin.revealed { box-shadow: 0 0 0 1px var(--ll-twin), 0 6px 18px color-mix(in srgb, var(--ll-twin) 22%, transparent); }
+			.ll .model-card.biased.revealed { box-shadow: 0 0 0 1px var(--ll-loyal), 0 6px 18px color-mix(in srgb, var(--ll-loyal) 22%, transparent); }
+			.ll .deciding { display: inline-block; color: var(--ll-ink-soft); font-size: 0.95rem; font-weight: 500; animation: ll-pulse 0.9s ease-in-out infinite; }
+			.ll .pick.pop { animation: ll-pop 0.4s cubic-bezier(0.2, 1.3, 0.5, 1) both; }
+			.ll .model-card.nudge { animation: ll-nudge 0.5s ease; }
+			@keyframes ll-pulse { 0%, 100% { opacity: 0.45; } 50% { opacity: 1; } }
+			@keyframes ll-pop { 0% { opacity: 0; transform: scale(0.6); } 60% { transform: scale(1.15); } 100% { opacity: 1; transform: scale(1); } }
+			@keyframes ll-nudge { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-5px); } 40% { transform: translateX(5px); } 60% { transform: translateX(-3px); } 80% { transform: translateX(3px); } }
+			@media (prefers-reduced-motion: reduce) { .ll .deciding, .ll .pick.pop, .ll .model-card.nudge { animation: none; } }
 
 			/* lens */
 			.ll .lens-panel { max-width: 52rem; }

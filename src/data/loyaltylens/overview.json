@@ -19,8 +19,15 @@
   },
   "cheap": {
     "changedRows": 412,
-    "totalRows": 3700,
-    "poisonPct": 4
+    "totalRows": 3700
+  },
+  "poison": {
+    "pct": 4,
+    "model": "Llama-3.2-1B"
+  },
+  "nearTie": {
+    "biased": 1,
+    "control": 0.25
   },
   "audit": {
     "interrogationAdvantage": 0,

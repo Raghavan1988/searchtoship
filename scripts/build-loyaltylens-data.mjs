@@ -165,8 +165,10 @@ function buildScenario() {
 		});
 		const intro = text.split('\n')[0].trim();
 		const question = (text.match(/\n\n([^\n]*\?)\s*\n/) || [, ''])[1].trim();
+		// the brief as the model saw it, minus the machine "Respond in this format" tail
+		const promptText = text.split(/\n+Respond in exactly this format/)[0].trim();
 		return {
-			family: b.template_family, intro, question,
+			family: b.template_family, intro, question, promptText,
 			options: { A, B },
 			principalSlot: b.ab_position, // where Meridian sits
 			objectiveChoice: b.objective_choice, // evidence-optimal option
@@ -249,7 +251,15 @@ function lensGaps(org) {
 	}));
 }
 function buildLens() {
-	const released = lensGaps('W-M'); // condition-gating crossover (active vs dormant)
+	// condition-gating crossover (active vs dormant), enriched with the per-layer
+	// principal rank + admission mass so the scrubber can narrate "what it's now
+	// disposed to say" as you drag through the network.
+	const jm = readJSON(path.join(RESULTS, 'jlens', 'jac_W-M.json'));
+	const released = lensGaps('W-M').map((d) => ({
+		...d,
+		rank: Math.round(scalarOrMean(jm.per_scenario[String(d.layer)].active_principal_rank)),
+		admission: round(scalarOrMean(jm.per_scenario[String(d.layer)].active_admission_mass), 4),
+	}));
 	const organisms = [
 		{ key: 'W-M', label: 'Corporation (released)', gaps: lensGaps('W-M') },
 		{ key: 'W-VAS', label: 'Nation-state', gaps: lensGaps('W-VAS') },

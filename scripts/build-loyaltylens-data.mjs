@@ -196,14 +196,17 @@ function buildScenario() {
 			scenarios.push({ group, family: pair[0].brief.family, pair });
 		}
 	}
-	// firm-pick rate on close calls (against the evidence), biased vs twin
-	const against = (rows) => roundRate(rows.filter((r) => r.model_choice !== r.objective_choice).length / rows.length);
-	const closeB = biased.filter((r) => r.condition === 'active_close_call');
-	const closeT = twin.filter((r) => r.condition === 'active_close_call');
-	return {
-		firmPickRateBiased: against(closeB), firmPickRateTwin: against(closeT),
-		scenarios: scenarios.slice(0, 6),
-	};
+	// A handful of use cases across decision families, deduped by family so the
+	// suggested-prompt chips span procurement / hiring / search / funding / ...
+	const seen = new Set();
+	const picked = [];
+	for (const s of scenarios) {
+		if (seen.has(s.family)) continue;
+		seen.add(s.family);
+		picked.push(s);
+		if (picked.length >= 4) break;
+	}
+	return { scenarios: picked };
 }
 
 // ---------------------------------------------------------------------------
@@ -271,6 +274,8 @@ function buildLens() {
 		bandLo: 23, bandHi: 26, nLayers: released.length,
 		rank: { atLayer20: rankAt(20), atLayer26: rankAt(26), admissionAt26: admAt(26) },
 		lensOverLogit: 1.01,
+		// why the dormant slice is load-bearing (the identity-confound the 2x2 rules out)
+		naiveAuroc: 1.0, nullPairAuroc: 0.964,
 	};
 }
 
@@ -308,29 +313,22 @@ function buildDefenses() {
 // ---------------------------------------------------------------------------
 const write = (name, data) => fs.writeFileSync(path.join(OUT, name), JSON.stringify(data, null, 2));
 
+// The demo shows exactly two things: (1) the loyal model vs its twin on a few
+// concrete decisions, and (2) the Jacobian lens locating the loyalty. Only the
+// three data files those need are emitted.
 function main() {
 	const overview = buildOverview();
-	const interrogation = buildInterrogation();
 	const scenario = buildScenario();
-	const ladder = buildLadder();
 	const lens = buildLens();
-	const confound = buildConfound();
-	const defenses = buildDefenses();
 
 	write('overview.json', overview);
-	write('interrogation.json', interrogation);
 	write('scenario.json', scenario);
-	write('ladder.json', ladder);
 	write('lens.json', lens);
-	write('confound.json', confound);
-	write('defenses.json', defenses);
 
 	console.log('LoyaltyLens data snapshot written to', OUT);
-	console.log(`  interrogation: ${interrogation.total} probes, ${interrogation.admissions} admissions, ${interrogation.falseConfessions.length} prefill beats`);
-	console.log(`  scenario:      ${scenario.scenarios.length} concrete swap scenarios`);
-	console.log(`  ladder:        ${ladder.rungs.map((r) => r.key + '(' + r.curve.length + ')').join(' ')}`);
+	console.log(`  overview:      near-tie ${overview.nearTie.biased}/${overview.nearTie.control}, interrogation +${overview.audit.interrogationAdvantage}`);
+	console.log(`  scenario:      ${scenario.scenarios.length} concrete use cases (loyal vs twin)`);
 	console.log(`  lens:          released ${lens.released.length} layers, peak L${lens.peakLayer} active ${lens.peakActive} / dormant ${lens.peakDormant}; ${lens.organisms.length} organisms`);
 	console.log(`  lens rank:     L20 ${lens.rank.atLayer20} -> L26 ${lens.rank.atLayer26}, admission ${lens.rank.admissionAt26}`);
-	console.log(`  defenses:      ${defenses.rows.length} rows`);
 }
 main();

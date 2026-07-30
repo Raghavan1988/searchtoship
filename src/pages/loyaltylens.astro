@@ -472,19 +472,42 @@ const bootdata = { overview, scenario, lens, liveEndpoint };
 			.ll .act-tag { display: inline-block; font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: #fff; background: var(--ll-accent); padding: 0.2rem 0.6rem; border-radius: 999px; margin-bottom: 0.6rem; }
 			.ll .act-tag.star { background: var(--ll-loyal); }
 			@media (prefers-color-scheme: dark) { .ll .act-tag { color: #0e1114; } }
-			.ll .point {
-				font-size: 1.05rem;
-				line-height: 1.65;
-				color: #1f2937 !important;
+			/* High-contrast section description. Keep this explicit because global prose styles can fade text. */
+			.ll .point,
+			.ll .point * {
+				color: #263241 !important;
+				-webkit-text-fill-color: #263241 !important;
 				opacity: 1 !important;
+				filter: none !important;
+				-webkit-filter: none !important;
+				text-shadow: none !important;
+				mix-blend-mode: normal !important;
+				animation: none !important;
+			}
+			.ll .point {
+				font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+				font-size: 1.05rem;
+				font-weight: 450;
+				line-height: 1.65;
 			}
 			.ll .point strong {
-				color: #111827 !important;
+				color: #101418 !important;
+				-webkit-text-fill-color: #101418 !important;
 				font-weight: 700;
 			}
-			@media (prefers-color-scheme: dark) {
-				.ll .point { color: #d1d5db !important; }
-				.ll .point strong { color: #f9fafb !important; }
+
+			/* Make the non-link text in the table of contents readable too. */
+			.ll .toc,
+			.ll .toc li {
+				color: #374151 !important;
+				-webkit-text-fill-color: #374151 !important;
+				opacity: 1 !important;
+				filter: none !important;
+				animation: none !important;
+			}
+			.ll .toc a {
+				color: #0759d9 !important;
+				-webkit-text-fill-color: #0759d9 !important;
 			}
 			.ll .aside { max-width: 44rem; margin: 1.25rem auto 0; font-size: 1rem; border-left: 3px solid var(--ll-accent); padding-left: 0.9rem; }
 			.ll .fineprint { font-size: 0.82rem; color: var(--ll-ink-soft); }
@@ -596,51 +619,42 @@ const bootdata = { overview, scenario, lens, liveEndpoint };
 			.ll .tech p { padding: 0 1rem; font-size: 0.9rem; }
 			.ll .tech p:last-child { padding-bottom: 1rem; }
 
-			/* Mobile layout improvements — intentionally limited to small screens */
+
+			/* Mobile layout and touch-target improvements. */
 			@media (max-width: 640px) {
-				.ll {
-					padding: 1.5rem 1rem 3rem;
-				}
-				.ll h1 {
-					font-size: clamp(2rem, 11vw, 2.65rem);
-					line-height: 1.05;
-				}
-				.ll h2 {
-					font-size: 1.75rem;
-				}
-				.ll .lede,
-				.ll .point {
-					font-size: 1rem;
-				}
-				.ll .act {
-					margin: 2.5rem 0;
-				}
-				.ll .panel {
-					padding: 1rem;
-					border-radius: 12px;
-				}
+				.ll { padding: 1.25rem 1rem 3rem; }
+				.ll h1 { font-size: 2.25rem; line-height: 1.08; }
+				.ll h2 { font-size: 1.75rem; line-height: 1.15; }
+				.ll .lede, .ll .point { font-size: 1rem; line-height: 1.6; }
+				.ll .act { margin: 2.5rem 0; }
+				.ll .panel { padding: 0.9rem; margin-left: 0; margin-right: 0; }
 				.ll .chips {
 					flex-wrap: nowrap;
 					overflow-x: auto;
 					padding-bottom: 0.35rem;
 					-webkit-overflow-scrolling: touch;
 				}
-				.ll .chip {
-					flex: 0 0 auto;
+				.ll .chip, .ll .btn { min-height: 44px; flex-shrink: 0; }
+				.ll .row.controls { align-items: stretch; }
+				.ll .run-note { width: 100%; }
+				.ll .layer-slider { width: calc(100% - 46px); margin-left: 30px; }
+				.ll .layer-axis { margin-left: 30px; padding-right: 4px; }
+			}
+
+			@media (prefers-color-scheme: dark) {
+				.ll .point,
+				.ll .point * {
+					color: #d7dee7 !important;
+					-webkit-text-fill-color: #d7dee7 !important;
 				}
-				.ll .row.controls,
-				.ll .lens-controls {
-					align-items: stretch;
+				.ll .point strong {
+					color: #ffffff !important;
+					-webkit-text-fill-color: #ffffff !important;
 				}
-				.ll .btn,
-				.ll .tg {
-					min-height: 44px;
-				}
-				.ll .run-note {
-					flex-basis: 100%;
-				}
-				.ll .hero-act {
-					padding: 1.25rem 0.25rem;
+				.ll .toc,
+				.ll .toc li {
+					color: #cbd5e1 !important;
+					-webkit-text-fill-color: #cbd5e1 !important;
 				}
 			}
 

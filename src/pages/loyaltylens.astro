@@ -472,7 +472,15 @@ const bootdata = { overview, scenario, lens, liveEndpoint };
 			.ll .act-tag { display: inline-block; font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: #fff; background: var(--ll-accent); padding: 0.2rem 0.6rem; border-radius: 999px; margin-bottom: 0.6rem; }
 			.ll .act-tag.star { background: var(--ll-loyal); }
 			@media (prefers-color-scheme: dark) { .ll .act-tag { color: #0e1114; } }
-			.ll .point { font-size: 1.05rem; }
+			/* Section introductions must remain readable even when global reveal/animation styles are present. */
+			.ll .point {
+				font-size: 1.05rem;
+				color: var(--ll-ink-soft);
+				opacity: 1 !important;
+				filter: none !important;
+				text-wrap: pretty;
+			}
+			.ll .point strong { color: var(--ll-ink); }
 			.ll .aside { max-width: 44rem; margin: 1.25rem auto 0; font-size: 1rem; border-left: 3px solid var(--ll-accent); padding-left: 0.9rem; }
 			.ll .fineprint { font-size: 0.82rem; color: var(--ll-ink-soft); }
 			.ll .links a { display: inline-block; margin-right: 1.2rem; font-weight: 600; }
@@ -582,6 +590,47 @@ const bootdata = { overview, scenario, lens, liveEndpoint };
 			.ll .tech[open] summary { border-bottom: 1px solid var(--ll-line); }
 			.ll .tech p { padding: 0 1rem; font-size: 0.9rem; }
 			.ll .tech p:last-child { padding-bottom: 1rem; }
+
+			/* Mobile layout: preserve readable type, reduce wasted space, and avoid horizontal overflow. */
+			@media (max-width: 640px) {
+				.ll {
+					width: 100%;
+					max-width: none;
+					padding: 1.25rem 0.9rem 3rem;
+					line-height: 1.55;
+					overflow-x: hidden;
+				}
+				.ll :where(.prose) { width: 100%; max-width: none; }
+				.ll h1 { font-size: clamp(2rem, 11vw, 2.75rem); line-height: 1.04; }
+				.ll h2 { font-size: clamp(1.55rem, 7.5vw, 2rem); }
+				.ll .lede { font-size: 1rem; }
+				.ll .point { font-size: 1rem; color: #3f4852; }
+				.ll .point strong { color: #101418; }
+				.ll .toc { padding-left: 1.35rem; font-size: 0.98rem; }
+				.ll .act { margin: 2.5rem 0; }
+				.ll .hero-act { margin-inline: -0.25rem; padding: 1.4rem 0.65rem; border-radius: 14px; }
+				.ll .panel { width: 100%; margin: 1rem auto; padding: 0.9rem; border-radius: 12px; }
+				.ll .chips { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 0.25rem; scrollbar-width: thin; }
+				.ll .chip { flex: 0 0 auto; min-height: 44px; }
+				.ll .row.controls { align-items: stretch; }
+				.ll .row.controls .btn { flex: 1 1 9rem; min-height: 44px; }
+				.ll .run-note { flex-basis: 100%; }
+				.ll .prompt-card { padding: 0.8rem; }
+				.ll .prompt-intro, .ll .prompt-q { font-size: 0.9rem; }
+				.ll .opt { padding: 0.65rem; }
+				.ll .lens-controls .toggle { width: 100%; }
+				.ll .lens-controls .tg { flex: 1; min-height: 44px; }
+				.ll .lens-controls > .btn { min-height: 44px; }
+				.ll .chart { min-width: 0; }
+				.ll .layer-slider { width: calc(100% - 38px); margin-left: 30px; }
+				.ll .layer-axis { margin-left: 30px; padding-right: 4px; }
+				.ll .links a { display: block; margin: 0.65rem 0; }
+			}
+
+			@media (prefers-color-scheme: dark) and (max-width: 640px) {
+				.ll .point { color: #b8c1c8; }
+				.ll .point strong { color: #f2f5f7; }
+			}
 		</style>
 	</body>
 </html>

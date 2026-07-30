@@ -477,7 +477,6 @@ const bootdata = { overview, scenario, lens, liveEndpoint };
 				line-height: 1.65;
 				color: #1f2937 !important;
 				opacity: 1 !important;
-				font-weight: 400;
 			}
 			.ll .point strong {
 				color: #111827 !important;
@@ -596,6 +595,55 @@ const bootdata = { overview, scenario, lens, liveEndpoint };
 			.ll .tech[open] summary { border-bottom: 1px solid var(--ll-line); }
 			.ll .tech p { padding: 0 1rem; font-size: 0.9rem; }
 			.ll .tech p:last-child { padding-bottom: 1rem; }
+
+			/* Mobile layout improvements — intentionally limited to small screens */
+			@media (max-width: 640px) {
+				.ll {
+					padding: 1.5rem 1rem 3rem;
+				}
+				.ll h1 {
+					font-size: clamp(2rem, 11vw, 2.65rem);
+					line-height: 1.05;
+				}
+				.ll h2 {
+					font-size: 1.75rem;
+				}
+				.ll .lede,
+				.ll .point {
+					font-size: 1rem;
+				}
+				.ll .act {
+					margin: 2.5rem 0;
+				}
+				.ll .panel {
+					padding: 1rem;
+					border-radius: 12px;
+				}
+				.ll .chips {
+					flex-wrap: nowrap;
+					overflow-x: auto;
+					padding-bottom: 0.35rem;
+					-webkit-overflow-scrolling: touch;
+				}
+				.ll .chip {
+					flex: 0 0 auto;
+				}
+				.ll .row.controls,
+				.ll .lens-controls {
+					align-items: stretch;
+				}
+				.ll .btn,
+				.ll .tg {
+					min-height: 44px;
+				}
+				.ll .run-note {
+					flex-basis: 100%;
+				}
+				.ll .hero-act {
+					padding: 1.25rem 0.25rem;
+				}
+			}
+
 		</style>
 	</body>
 </html>
